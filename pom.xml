@@ -9,7 +9,7 @@
 	<artifactId>eri-commons-lang</artifactId>
 	<name>ERI Commons - Language Extensions</name>
 	<description>Shared Java language extensions</description>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 
 	<properties>
 		<scm>code.elderresearch.com</scm>
@@ -19,7 +19,8 @@
 		<developerConnection>scm:git:https://${scm}/eri-commons/eri-lang.git</developerConnection>
 		<connection>scm:git:http://${scm}/eri-commons/eri-lang.git</connection>
 		<url>http://${scm}/summary/eri-commons%2Feri-lang.git</url>
-	</scm>
+	  <tag>eri-commons-lang-0.0.1</tag>
+  </scm>
 	
 	<dependencies>
 		<dependency>
