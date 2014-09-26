@@ -43,6 +43,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.bind.DatatypeConverter;
+
 import com.datamininglab.commons.logging.LogContext;
 
 /**
@@ -612,7 +614,9 @@ public final class Utilities {
 			(byte) '8', (byte) '9', (byte) 'a', (byte) 'b',
 			(byte) 'c',	(byte) 'd', (byte) 'e', (byte) 'f' };
 	/**
-	 * Converts a byte array to its corresponding hex representation.
+	 * Converts a byte array to its corresponding hex representation. This implementation
+	 * is faster than {@link DatatypeConverter#printHexBinary(byte[])}, but may be
+	 * deprecated in the future.
 	 * @param raw the byte array
 	 * @return its hex representation (lower case)
 	 */

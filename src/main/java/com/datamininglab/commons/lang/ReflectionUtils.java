@@ -1,9 +1,8 @@
-package com.datamininglab.commons.lang;
 /*
  * Copyright (c) 2013 Elder Research, Inc.
  * All rights reserved.
  */
-
+package com.datamininglab.commons.lang;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

@@ -6,7 +6,6 @@ package com.datamininglab.commons.lang;
 
 import java.util.concurrent.TimeUnit;
 
-import com.datamininglab.commons.lang.Utilities;
 import com.datamininglab.commons.logging.LogContext;
 
 /**
