@@ -946,7 +946,7 @@ public final class Utilities {
 	 */
 	public static <T> boolean offer(BlockingQueue<T> queue, T obj, StatusMonitor rm) {
 		while (rm == null || rm.isRunning()) {
-			if (offer(queue, obj, 1L, TimeUnit.SECONDS)) { return true; }
+			if (offer(queue, obj, 50L, TimeUnit.MILLISECONDS)) { return true; }
 		}
 		return false;
 	}

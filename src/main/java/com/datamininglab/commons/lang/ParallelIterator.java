@@ -22,8 +22,8 @@ import com.datamininglab.commons.logging.LogContext;
  * @param <T> the type of object to iterate
  */
 public abstract class ParallelIterator<T> {
-	private static final long WAIT_TIME_MS = 64L;
-	private static final int  DEFAULT_QUEUE_SIZE = 1024;
+	private static final long WAIT_TIME_MS = 50L;
+	private static final int  DEFAULT_QUEUE_SIZE = 102400;
 	private static final int  DEFAULT_THREADS = 1;
 
 	private StatusMonitor sm;
