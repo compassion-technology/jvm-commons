@@ -31,8 +31,8 @@ public abstract class ParallelIterator<T> {
 	
 	// If the iterator has more elements available (don't want workers to stop when queue is empty)
 	private volatile boolean iterHasNext;
-	// If all the iterator worker threads are still running
-	private volatile boolean iterWorking;
+	// If objects are still being enqueued/read by the iterator
+	private volatile boolean iterEnqueuing;
 	// The number of live worker threads
 	private CountDownLatch liveThreads;
 	
@@ -83,14 +83,14 @@ public abstract class ParallelIterator<T> {
 	 * @param iter the iterator to consume
 	 */
 	public void iterate(Iterator<T> iter) {
-		iterHasNext = true;
-		iterWorking = true;
-		liveThreads = new CountDownLatch(threads);
+		iterHasNext   = true;
+		iterEnqueuing = true;
+		liveThreads   = new CountDownLatch(threads);
 		for (int i = 0; i < threads; i++) {
 			new ThreadedIterWorker("IterThread" + i).start();
 		}
 		
-		while (iterWorking && iter.hasNext()) {
+		while (iterEnqueuing && iter.hasNext()) {
 			T obj = preprocess(iter.next());
 			if (obj != null) { Utilities.offer(queue, obj, null); }
 		}
@@ -131,9 +131,11 @@ public abstract class ParallelIterator<T> {
 		
 		@Override
 		public void run() {
-			while (iterWorking && (iterHasNext || !queue.isEmpty())) {
+			// Must process the queue (even when iter has stopped) so the enqueuer
+			// thread doesn't hang indefinitely waiting for space in the queue.
+			while (iterHasNext || !queue.isEmpty()) {
 				T obj = Utilities.poll(queue, WAIT_TIME_MS, TimeUnit.MILLISECONDS);
-				if (obj != null) { iterWorking &= process(obj); }
+				if (obj != null) { iterEnqueuing &= process(obj); }
 			}
 			liveThreads.countDown();
 		}
