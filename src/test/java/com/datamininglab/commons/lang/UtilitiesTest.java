@@ -56,7 +56,7 @@ public class UtilitiesTest extends TestCase {
 	
 	public void testStripQuotes() {
 		assertEquals("Hello", Utilities.stripQuotes(" 'Hello'"));
-		assertEquals("Hello ", Utilities.stripQuotes("\"Hello \""));
+		assertEquals("Hello", Utilities.stripQuotes("\"Hello \""));
 		assertEquals("Hello", Utilities.stripQuotes("'Hello\""));
 		assertEquals("'Hello", Utilities.stripQuotes("'Hello"));
 		assertEquals("hello world", Utilities.stripQuotes("  'hello world '"));
