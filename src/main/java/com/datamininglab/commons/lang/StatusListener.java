@@ -28,7 +28,7 @@ public interface StatusListener {
 	long getNotifyIntervalNS();
 	
 	public static class DefaultStatusListener implements StatusListener {
-		private static final long NOTIFY_S = 5L;
+		private static final long NOTIFY_S = 10L;
 		private static final double PCT_COEFF = 100.0;
 		
 		@Override

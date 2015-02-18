@@ -38,10 +38,6 @@ public class UtilitiesTest extends TestCase {
 		assertEquals("the | cat |  | chased | the | mouse", StringUtils.join(l, " | "));
 	}
 	
-	public void testClean() {
-		assertEquals("hello world", Utilities.clean("  'hello world '"));
-	}
-	
 	public void testEditDistance() {
 		assertEquals(4.0f, Utilities.getEditDistance("cow", "house"));
 		assertEquals(1.0f, Utilities.getEditDistance("now", "cow"));
@@ -63,5 +59,8 @@ public class UtilitiesTest extends TestCase {
 		assertEquals("Hello ", Utilities.stripQuotes("\"Hello \""));
 		assertEquals("Hello", Utilities.stripQuotes("'Hello\""));
 		assertEquals("'Hello", Utilities.stripQuotes("'Hello"));
+		assertEquals("hello world", Utilities.stripQuotes("  'hello world '"));
+		assertEquals("hello world", Utilities.stripQuotes("\" hello world\" "));
+		assertEquals("' hello world", Utilities.stripQuotes("' hello world  "));
 	}
 }

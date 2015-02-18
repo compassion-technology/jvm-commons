@@ -1,9 +1,8 @@
-package com.datamininglab.commons.lang;
 /*
  * Copyright (c) 2012 Elder Research, Inc.
  * All rights reserved.
  */
-
+package com.datamininglab.commons.lang;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -72,19 +71,17 @@ public final class Utilities {
 	}
 	
 	/**
-	 * Removes leading and trailing whitespace, single, and
+	 * Removes leading and trailing whitespace and matching single and
 	 * double quotes.  For example, <br>
-	 * <tt>clean("  'hello world '") = "hello world"</tt>
+	 * <tt>stripQuotes("  'hello world '") = "hello world"</tt>
 	 * @param s the string to clean
 	 * @return the cleaned string
 	 */
-	public static String clean(String s) {
+	public static String stripQuotes(String s) {
 		if (s == null) { return null; }
 		
-		s = s.trim();
-		s = s.replaceAll("^[\"|']+", "");
-		s = s.replaceAll("[\"|']+$", "");
-		return s.trim();
+		Matcher m = PAIRED_QUOTES.matcher(s);
+		return m.matches()? m.group(1).trim() : s.trim();
 	}
 	
 	/**
@@ -326,19 +323,6 @@ public final class Utilities {
 	 */
 	public static boolean isVowel(char c) {
 		return Arrays.binarySearch(vowels, c) >= 0;
-	}
-	
-	/**
-	 * Strips paired single or double quotes.  
-	 * @param s the string to strip
-	 * @return the content between the quotes, if it matches
-	 */
-	public static String stripQuotes(String s) {
-		if (s == null) { return null; }
-		
-		Matcher m = PAIRED_QUOTES.matcher(s);
-		if (m.matches()) { return m.group(1); }
-		return s;
 	}
 	
 	/**
@@ -722,35 +706,16 @@ public final class Utilities {
 	 * @throws IOException if there was a problem reading the file
 	 */
 	public static byte[] readBytes(File file) throws IOException {
-		FileInputStream stream;
-	    stream = null;
+	    try (FileInputStream stream = new FileInputStream(file);
+	         FileChannel channel = stream.getChannel()) {
 
-	    try {
-	        FileChannel      channel;
-	        MappedByteBuffer buffer;
-	        int              fileSize;
-		    
-	        stream   = new FileInputStream(file);
-	        channel  = stream.getChannel();
-	        buffer   = channel.map(MapMode.READ_ONLY, 0, file.length());
-	        fileSize = (int) file.length();
-		    byte[] data = new byte[fileSize];
-
+	        long fileSize = file.length();
+	        MappedByteBuffer buffer = channel.map(MapMode.READ_ONLY, 0L, fileSize);
+		    byte[] data = new byte[(int) fileSize];
 	        for (int i = 0; i < fileSize; i++) {
 	            data[i] = buffer.get();
 	        }
-
 	        return data;
-	    } catch (IOException ex) {
-	        throw ex;
-	    } finally {
-	        if (stream != null) {
-	            try {
-	                stream.close();
-	            } catch (IOException ex) {
-	                ex.printStackTrace();
-	            }
-	        }
 	    }
 	}
 
@@ -1091,6 +1056,7 @@ public final class Utilities {
 	 * @param name the path and name of the resource
 	 * @return the resource, or <tt>null</tt> if it was not found
 	 */
+	@SuppressWarnings("resource")
 	public static InputStream getResourceAsStream(Class<?> c, String name) {
 	    InputStream is = c.getResourceAsStream(name);
 	    if (is == null) {
