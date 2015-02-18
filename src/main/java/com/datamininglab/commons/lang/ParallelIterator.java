@@ -26,7 +26,6 @@ public abstract class ParallelIterator<T> {
 	private static final int  DEFAULT_QUEUE_SIZE = 102400;
 	private static final int  DEFAULT_THREADS = 1;
 
-	private StatusMonitor sm;
 	private int threads, threadPriority;
 	private ArrayBlockingQueue<T> queue;
 	
@@ -78,20 +77,6 @@ public abstract class ParallelIterator<T> {
 	}
 	
 	/**
-	 * Sets the status monitor to use to monitor iteration. If the monitor stops
-	 * running, iteration will stop. As each element is enqueued, the relative
-	 * progress will be incremented by <tt>1</tt>, so the size of the monitor
-	 * should be set to the total number of elements (if known) for determinate
-	 * progress.
-	 * @param sm the status monitor (optional)
-	 * @return this for method chaining
-	 */
-	public ParallelIterator<T> setMonitor(StatusMonitor sm) {
-		this.sm = sm;
-		return this;
-	}
-	
-	/**
 	 * Perform the iteration. This consumes the provided iterator and does not
 	 * return until the callback routine has been invoked for every element
 	 * returned by the iterator (unless iteration is aborted prematurely).
@@ -102,16 +87,12 @@ public abstract class ParallelIterator<T> {
 		iterWorking = true;
 		liveThreads = new CountDownLatch(threads);
 		for (int i = 0; i < threads; i++) {
-			String name = "IterThread" + i;
-			if (sm != null) { name = sm.getName() + name; }
-			
-			new ThreadedIterWorker(name).start();
+			new ThreadedIterWorker("IterThread" + i).start();
 		}
 		
-		if (sm != null) { sm.setProgress(0L, false); }
 		while (iterWorking && iter.hasNext()) {
-			Utilities.offer(queue, iter.next(), sm);
-			if (sm != null) { sm.setProgress(1L, true); }
+			T obj = preprocess(iter.next());
+			if (obj != null) { Utilities.offer(queue, obj, null); }
 		}
 		iterHasNext = false;
 		
@@ -121,6 +102,15 @@ public abstract class ParallelIterator<T> {
 			LogContext.warning("Interrupted while waiting for iterator worker threads");
 		}
 	}
+	
+
+	/**
+	 * Called before each object is enqueued.
+	 * @param object the next object from the iterator
+	 * @return the object after preprocessing, a different object of the same
+	 * type, or <tt>null</tt> to skip this object
+	 */
+	protected T preprocess(T object) { return object; }
 	
 	/**
 	 * The callback to be invoked for each element. This <tt>must</tt> be
