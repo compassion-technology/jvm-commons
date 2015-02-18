@@ -8,10 +8,10 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -71,9 +71,11 @@ public class DateExtractor {
 				locales = Arrays.asList(DateFormat.getAvailableLocales());
 				break;
 			case LANGUAGE:
-				locales = new ArrayList<>();
+				locales = new LinkedList<>();
+				// Ensure the default locale is first (and is tried first)
+				locales.add(defLocale);
 				for (Locale l : DateFormat.getAvailableLocales()) {
-					if (StringUtils.equals(l.getLanguage(), defLang)) { locales.add(l); }
+					if (!l.equals(defLocale) && StringUtils.equals(l.getLanguage(), defLang)) { locales.add(l); }
 				}
 				break;
 			case LOCAL: default:
