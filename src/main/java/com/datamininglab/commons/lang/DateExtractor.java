@@ -8,8 +8,11 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -37,7 +40,20 @@ public class DateExtractor {
 	private Date min = MIN_DATE, max = MAX_DATE;
 	private DateFormat[] formats;
 	
-	public DateExtractor() {
+	public enum DateLocality {
+		/** Use formats from the default locale only (fastest). */
+		LOCAL,
+		/** Use formats from any locale that starts with the same language code as the default locale. */
+		LANGUAGE,
+		/** Use formats from all available locales (slowest). */
+		ALL
+	}
+	
+	/**
+	 * Creates a new date extractor.
+	 * @param locality specifies which locales to use when parsing dates.
+	 */
+	public DateExtractor(DateLocality locality) {
 		// Compile custom formats
 		Set<DateFormat> set = new HashSet<>();
 		for (int i = 0; i < CUSTOM_FORMATS.length; i++) {
@@ -46,11 +62,28 @@ public class DateExtractor {
 			set.add(df);
 		}
 		
-		// Get all available localized date formats
-		Locale[] locales = DateFormat.getAvailableLocales();
-		for (int i = 0; i < locales.length; i++) {
+		// Get the locales specified by the locality parameter
+		Locale defLocale = Locale.getDefault();
+		String defLang = defLocale.getLanguage();
+		List<Locale> locales;
+		switch (locality) {
+			case ALL:
+				locales = Arrays.asList(DateFormat.getAvailableLocales());
+				break;
+			case LANGUAGE:
+				locales = new ArrayList<>();
+				for (Locale l : DateFormat.getAvailableLocales()) {
+					if (StringUtils.equals(l.getLanguage(), defLang)) { locales.add(l); }
+				}
+				break;
+			case LOCAL: default:
+				locales = Arrays.asList(defLocale);
+				break;
+		}
+		
+		for (Locale l : locales) {
 			for (int j = DateFormat.FULL; j <= DateFormat.SHORT; j++) {
-				DateFormat df = DateFormat.getDateInstance(j, locales[i]);
+				DateFormat df = DateFormat.getDateInstance(j, l);
 				df.setLenient(false);
 				set.add(df);
 			}
