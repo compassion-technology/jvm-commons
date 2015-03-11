@@ -11,7 +11,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
@@ -31,10 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -243,15 +239,6 @@ public final class Utilities {
 	}
 	
 	/**
-	 * Gets the absolute path of the directory in which the program is installed.
-	 * @return a string with the program's absolute path (ends with a <tt>'\'</tt>)
-	 */
-	public static String getInstallPath() {
-		String s = new File("install.path").getAbsolutePath();
-		return s.substring(0, s.lastIndexOf('\\')) + '\\';
-	}
-	
-	/**
 	 * Finds the Edit Distance between strings s1 and s2. The Edit Distance
 	 * is defined as the minimum number of single-character edit operations 
 	 * (deletions, insertions, and/or replacements) that would convert
@@ -405,7 +392,7 @@ public final class Utilities {
 		if (precision < 0 || precision == Integer.MAX_VALUE) {
 			return String.valueOf(d);
 		}
-		return String.format("%1." + precision + "f", d);
+		return String.format("%,." + precision + "f", d);
 	}
 	
 	/**
@@ -526,52 +513,6 @@ public final class Utilities {
         
         while (sb.length() < 4) { sb.append('0'); }
         return sb.toString();
-	}
-	
-	private static final String[] COMMON_DELIMS = {
-		",", "\t", ";", Pattern.quote("|"), Pattern.quote("~"), Pattern.quote("^"), "[ \t]+"
-	};
-	
-	/**
-	 * Attempts to automatically detect the delimiter based on the lines that
-	 * are passed as the "preview" of the data.  If nothing splits all the lines
-	 * into the same number of columns, <tt>null</tt> is returned.
-	 * @param preview a few lines of the data file
-	 * @return the data file's delimiter
-	 */
-	public static String getDelimiter(String... preview) {
-		return getDelimiter(Arrays.asList(preview));
-	}
-	
-	/**
-	 * Attempts to automatically detect the delimiter based on the lines that
-	 * are passed as the "preview" of the data.  If nothing splits all the lines
-	 * into the same number of columns, <tt>null</tt> is returned.
-	 * @param preview a few lines of the data file
-	 * @return the data file's delimiter
-	 */
-	public static String getDelimiter(Collection<String> preview) {
-		String delim = null;
-		Map<String, Integer> map = new HashMap<>();
-		for (String d : COMMON_DELIMS) {
-			for (String line : preview) {
-				if (line == null) { break; }
-				Integer len = map.get(d);
-				if (len == null) {
-					len = line.split(d, -1).length;
-					if (len  > 1) { map.put(d, len); }
-				} else if (line.split(d, -1).length != len) {
-					map.put(d, -1);
-				}
-			}
-		}
-		for (Entry<String, Integer> entry : map.entrySet()) {
-			if (entry.getValue() != null && entry.getValue() > 0) {
-				delim = entry.getKey();
-				break;
-			}
-		}
-		return delim;
 	}
 	
 	/**
@@ -761,25 +702,6 @@ public final class Utilities {
 	 */
 	public static PrintStream write(String file) throws FileNotFoundException {
 		return write(file, DEFAULT_BUFFER);
-	}
-	
-	/** Wraps a string builder with an output stream. */
-	public static class StringOutputStream extends OutputStream {
-		private StringBuilder sb;
-		
-		public StringOutputStream() { this(null); }
-		public StringOutputStream(StringBuilder sb) {
-			this.sb = sb;
-			if (sb == null) { sb = new StringBuilder(); }
-		}
-		
-		@Override
-		public void write(int b) throws IOException {
-			sb.append((char) b);
-		}
-		
-		@Override
-		public String toString() { return sb.toString(); }
 	}
 	
 	/**
