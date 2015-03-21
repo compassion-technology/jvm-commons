@@ -63,4 +63,18 @@ public class UtilitiesTest extends TestCase {
 		assertEquals("hello world", Utilities.stripQuotes("\" hello world\" "));
 		assertEquals("' hello world", Utilities.stripQuotes("' hello world  "));
 	}
+	
+	public void testPluralize() {
+		assertEquals("plants", Utilities.pluralize("plant"));
+		assertEquals("indexes", Utilities.pluralize("index"));
+		assertEquals("oboes", Utilities.pluralize("oboe"));
+		assertEquals("cities", Utilities.pluralize("city"));
+		assertEquals("toys", Utilities.pluralize("toy"));
+		assertEquals("glasses", Utilities.pluralize("glass"));
+		
+		assertEquals("plants", Utilities.pluralizeIf("plant", 0));
+		assertEquals("potatoes", Utilities.pluralizeIf("potato", 2));
+		assertEquals("bushes", Utilities.pluralizeIf("bush", 0.3));
+		assertEquals("pizza", Utilities.pluralizeIf("pizza", 1));
+	}
 }

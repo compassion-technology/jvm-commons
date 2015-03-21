@@ -40,6 +40,8 @@ import java.util.regex.Pattern;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.datamininglab.commons.logging.LogContext;
 
 /**
@@ -343,17 +345,40 @@ public final class Utilities {
 	 * @return the pluralized form of <tt>s</tt>
 	 */
 	public static String pluralize(String s) {
-		try {
-			char c = Character.toLowerCase(s.charAt(s.length() - 1));
-			if (c == 's') { return s + "es"; }
-			char b = Character.toLowerCase(s.charAt(s.length() - 2));
-			String sub = s.substring(0, s.length() - 1);
-			if (c == 'x') { return b == 'o'? s + "es" : sub + "cies"; }
-			if (c == 'y' && !isVowel(b)) { return sub + "ies"; }
-			return s + "s";
-		} catch (IndexOutOfBoundsException ex) {
-			return s + "s";
+		if (s == null) { return null; }
+		
+		if (StringUtils.endsWith(s, "x")
+		 || StringUtils.endsWith(s, "o")
+		 || StringUtils.endsWith(s, "ss")
+		 || StringUtils.endsWith(s, "sh")
+		 || StringUtils.endsWith(s, "ch")) {
+			return s + "es";
 		}
+			
+		if (StringUtils.endsWith(s, "y")) {
+			return s.length() > 2 && isVowel(s.charAt(s.length() - 2))? s + "s" : StringUtils.chop(s) + "ies";
+		}
+			
+		if (StringUtils.endsWith(s, "f")) {
+			return StringUtils.chop(s) + "ves";
+		}
+		if (StringUtils.endsWith(s, "fe")) {
+			return StringUtils.chop(StringUtils.chop(s)) + "ves";
+		}
+		
+		return s + "s";
+	}
+	
+	/**
+	 * Return the pluralized form of the string if the number is not equal to
+	 * <tt>1</tt>.
+	 * @param s a singular string
+	 * @param n the amount
+	 * @return the pluralized form if applicable
+	 * @see #pluralize(String)
+	 */
+	public static String pluralizeIf(String s, Number n) {
+		return (n != null && n.longValue() == 1L)? s : pluralize(s);
 	}
 	
 	/**
