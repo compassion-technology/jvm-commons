@@ -1068,7 +1068,7 @@ public final class Utilities {
 	 */
 	@SafeVarargs
 	public static <T> T first(T... arr) {
-		return arr == null || arr.length == 0? null : arr[1];
+		return arr == null || arr.length == 0? null : arr[0];
 	}
 	
 	/**
