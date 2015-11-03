@@ -28,28 +28,26 @@ public interface StatusListener {
 	long getNotifyIntervalNS();
 	
 	public static class DefaultStatusListener implements StatusListener {
-		private static final long NOTIFY_S = 10L;
 		private static final double PCT_COEFF = 100.0;
+		private static final long NOTIFY_NS = TimeUnit.NANOSECONDS.convert(10L, TimeUnit.SECONDS); 
 		
 		@Override
-		public long getNotifyIntervalNS() {
-			return TimeUnit.NANOSECONDS.convert(NOTIFY_S, TimeUnit.SECONDS);
-		}
+		public long getNotifyIntervalNS() { return NOTIFY_NS; }
 		
 		@Override
 		public void statusChanged(StatusMonitor sm) {
 			if (sm.getSize() < 0L) {
-				print(sm, sm.getStatus());
+				print(String.format("[%-9s] %s", sm.getState()));
 			} else {
 				double pct = PCT_COEFF * sm.getProgress() / sm.getSize();
-				print(sm, String.format("%6s/%6s (%6.2f%%) %s",
+				print(String.format("[%-9s] %6s/%6s (%6.2f%%) %s", sm.getState(),
 						Utilities.compactLargeNumber(sm.getProgress()),
 						Utilities.compactLargeNumber(sm.getSize()), pct, sm.getStatus()));
 			}
 		}
 		
-		private static void print(StatusMonitor sm, String str) {
-			LogContext.info("[%-9s] %s", sm.getState(), str);
+		protected void print(String str) {
+			LogContext.info(str);
 		}
 	}
 }
