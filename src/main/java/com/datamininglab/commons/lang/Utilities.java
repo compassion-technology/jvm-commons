@@ -621,10 +621,10 @@ public final class Utilities {
 	 * @param instance an instance of the parent class
 	 * @param clazz the "parent" class
 	 * @param subClass the "child" class which extends <tt>T</tt>
-	 * @return a new instance of the child class with all inherited
-	 * fields set to the values of the parent's fields
 	 * @param <T> the "parent" type
 	 * @param <S> the "child" type which extends <tt>T</tt>
+	 * @return a new instance of the child class with all inherited
+	 * fields set to the values of the parent's fields
 	 */
 	public static <T, S extends T> S asSubclass(T instance, Class<T> clazz, Class<S> subClass) {
 		S sub = ReflectionUtils.newInstance(subClass);
@@ -1051,9 +1051,9 @@ public final class Utilities {
 	/**
 	 * Returns the first element of the collection.
 	 * @param col the collection
+	 * @param <T> the type of objects in <tt>col</tt>
 	 * @return the first element, or <tt>null</tt> if <tt>col</tt> is <tt>null</tt>
 	 * or empty
-	 * @param <T> the type of objects in <tt>col</tt>
 	 */
 	public static <T> T first(Collection<T> col) {
 		return col == null || col.isEmpty()? null : col.iterator().next();

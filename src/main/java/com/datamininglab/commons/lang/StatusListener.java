@@ -37,7 +37,7 @@ public interface StatusListener {
 		@Override
 		public void statusChanged(StatusMonitor sm) {
 			if (sm.getSize() < 0L) {
-				print(String.format("[%-9s] %s", sm.getState()));
+				print(String.format("[%-9s] %s", sm.getState(), sm.getStatus()));
 			} else {
 				double pct = PCT_COEFF * sm.getProgress() / sm.getSize();
 				print(String.format("[%-9s] %6s/%6s (%6.2f%%) %s", sm.getState(),

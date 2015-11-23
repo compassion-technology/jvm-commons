@@ -146,8 +146,8 @@ public class StatusMonitor {
 	/**
 	 * Changes the state of the task.
 	 * @param state the current state of the task
-	 * @see #getState() Description of the states
 	 * @return this for method chaining
+	 * @see #getState() Description of the states
 	 */
 	public StatusMonitor setState(TaskState state) {
 		setStateSilent(state);
