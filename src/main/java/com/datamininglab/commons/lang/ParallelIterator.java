@@ -18,8 +18,8 @@ import com.datamininglab.commons.logging.LogContext;
  * and the iterator order is no longer guaranteed.
  * 
  * @author <a href="dimeo@datamininglab.com">John Dimeo</a>
- * @since Jul 4, 2013
  * @param <T> the type of object to iterate
+ * @since Jul 4, 2013
  */
 public abstract class ParallelIterator<T> {
 	private static final long WAIT_TIME_MS = 50L;

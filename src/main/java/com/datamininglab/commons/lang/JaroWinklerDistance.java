@@ -378,7 +378,7 @@ package com.datamininglab.commons.lang;
  * <table cellpadding="3" border="1" style="margin-left: 2em">
  * <tr>
  * <td><code>cs1</code></td>
- * <td><b>A<b></td>
+ * <td><b>A</b></td>
  * <td><b>B</b></td>
  * <td><b>C</b></td>
  * <td><i>A</i></td>
@@ -562,7 +562,7 @@ public class JaroWinklerDistance {
 	 * This method is defined to be:
 	 * 
 	 * <pre>
-	 *   distance(cSeq1,cSeq2) = 1 - proximity(cSeq1,cSeq2)</code>
+	 *   distance(cSeq1,cSeq2) = 1 - proximity(cSeq1,cSeq2)
 	 * </pre>
 	 * 
 	 * @param cSeq1
