@@ -22,7 +22,7 @@ public interface PreferencesKey {
 	default String key() { return toString().toLowerCase(); }
 	
 	default String get(Preferences node) {
-		return StringUtils.defaultString(node.get(key(), null));
+		return StringUtils.defaultString(node.get(key(), null), null);
 	}
 	default char getChar(Preferences node, char defVal) {
 		return CharUtils.toChar(get(node), defVal);
