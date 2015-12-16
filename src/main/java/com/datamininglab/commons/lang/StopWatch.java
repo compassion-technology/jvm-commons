@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * This class is very similar to Apache Common's stopwatch but with three differences
  * that make it easier to use.<ul>
- * <li>Elapsed time is measured with nanosecond precision, not milisecond</li>
+ * <li>Elapsed time is measured with nanosecond precision, not millisecond</li>
  * <li>Start/suspend/resume/stop simplified to start/stop</li>
  * <li>All the methods return the instance for method chaining</li></ul>
  * 

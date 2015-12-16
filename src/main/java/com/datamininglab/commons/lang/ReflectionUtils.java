@@ -7,6 +7,7 @@ package com.datamininglab.commons.lang;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.function.Supplier;
 
 import com.datamininglab.commons.logging.LogContext;
 
@@ -207,30 +208,18 @@ public final class ReflectionUtils {
 		}
 		return types;
 	}
-	
-	/**
-	 * Creates new instances of type <tt>T</tt>.
-	 * Generic version of {@link org.apache.commons.collections.Factory}. 
-	 */
-	public interface Factory<T> {
-		/**
-		 * Create a new instance of type <tt>T</tt>.
-		 * @return a new instance
-		 */
-		T newInstance();
-	}
-	
+
 	/**
 	 * Factory implementation that uses reflection to create new instances of
 	 * type <tt>T</tt>.
 	 */
-	public static class ReflectionFactory<T> implements Factory<T> {
+	public static class ReflectionFactory<T> implements Supplier<T> {
 		private Class<T> c;
 		
 		public ReflectionFactory(Class<T> c) { this.c = c; }
 		
 		@Override
-		public T newInstance() { return ReflectionUtils.newInstance(c); }
+		public T get() { return ReflectionUtils.newInstance(c); }
 	}
 
 	/**
