@@ -41,8 +41,8 @@ public class DateExtractor {
 	
 	private Date min = MIN_DATE, max = MAX_DATE;
 	
-	private List<DateFormat> formatsWithLetters;
-	private List<DateFormat> formatsNumbersOnly;
+	private List<DateFormat> formatsWithLetters = new LinkedList<>();
+	private List<DateFormat> formatsNumbersOnly = new LinkedList<>();
 	
 	public enum DateLocality {
 		/** Use formats from the default locale only (fastest). */
@@ -58,13 +58,7 @@ public class DateExtractor {
 	 * @param locality specifies which locales to use when parsing dates.
 	 */
 	public DateExtractor(DateLocality locality) {
-		// Compile custom formats
 		Set<DateFormat> set = new HashSet<>();
-		for (int i = 0; i < CUSTOM_FORMATS.length; i++) {
-			DateFormat df = new SimpleDateFormat(CUSTOM_FORMATS[i]);
-			df.setLenient(false);
-			set.add(df);
-		}
 		
 		// Get the locales specified by the locality parameter
 		Locale defLocale = Locale.getDefault();
@@ -89,18 +83,23 @@ public class DateExtractor {
 		
 		for (Locale l : locales) {
 			for (int j = DateFormat.FULL; j <= DateFormat.SHORT; j++) {
-				DateFormat df = DateFormat.getDateInstance(j, l);
-				df.setLenient(false);
-				set.add(df);
+				for (int k = DateFormat.FULL; k <= DateFormat.SHORT; k++) {
+					add(DateFormat.getDateTimeInstance(j, k), false, set);
+				}
+				add(DateFormat.getDateInstance(j, l), false, set);
 			}
 		}
 		
-		formatsWithLetters = new LinkedList<>();
-		formatsNumbersOnly = new LinkedList<>();
-		for (DateFormat df : set)  { add(df, false); }
+		// Compile custom formats
+		for (int i = 0; i < CUSTOM_FORMATS.length; i++) {
+			add(new SimpleDateFormat(CUSTOM_FORMATS[i]), false, set);
+		}
 	}
 	
-	private void add(DateFormat df, boolean atStart) {
+	private void add(DateFormat df, boolean atStart, Set<DateFormat> unique) {
+		if (!unique.add(df)) { return; }
+		
+		df.setLenient(false);
 		List<DateFormat> list = Utilities.containsLetters(df.format(DEF_DATE))? formatsWithLetters : formatsNumbersOnly;
 		if (atStart) {
 			list.add(0, df);
@@ -131,7 +130,9 @@ public class DateExtractor {
 	 * @see SimpleDateFormat
 	 */
 	public void setPreferredFormats(DateFormat... arr) {
-		for (DateFormat df : arr) { add(df, true); }
+		Set<DateFormat> set = new HashSet<>(formatsNumbersOnly);
+		set.addAll(formatsWithLetters);
+		for (DateFormat df : arr) { add(df, true, set); }
 	}
 	
 	/**
