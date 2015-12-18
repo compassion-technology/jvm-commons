@@ -426,12 +426,30 @@ public final class Utilities {
 	 * @return if one or more characters are digits or <tt>false</tt> if <tt>s</tt>
 	 * is <tt>null</tt>
 	 * @see Character#isDigit(char)
+	 * @see #containsLetters(String)
 	 */
 	public static boolean containsDigits(String s) {
 		if (s == null) { return false; }
 		
 		for (int i = 0; i < s.length(); i++) {
 			if (Character.isDigit(s.charAt(i))) { return true; }
+		}
+		return false;
+	}
+	
+	/**
+	 * Tests if the provided string has one or more letter characters.
+	 * @param s the string to test
+	 * @return if one or more characters are letters or <tt>false</tt> if
+	 * <tt>s</tt> is <tt>null</tt>
+	 * @see Character#isLetter(char)
+	 * @see #containsDigits(String)
+	 */
+	public static boolean containsLetters(String s) {
+		if (s == null) { return false; }
+		
+		for (int i = 0; i < s.length(); i++) {
+			if (Character.isLetter(s.charAt(i))) { return true; }
 		}
 		return false;
 	}

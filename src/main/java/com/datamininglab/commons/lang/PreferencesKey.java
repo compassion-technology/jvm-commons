@@ -4,6 +4,7 @@
  */
 package com.datamininglab.commons.lang;
 
+import java.util.Properties;
 import java.util.prefs.Preferences;
 
 import org.apache.commons.lang3.CharUtils;
@@ -11,9 +12,10 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * Interface designed to be used with an {@link Enum} that enumerates the
- * available keys for the preferences in a {@link Preferences} node.
- * This interface uses its subclass' {@code toString()} representation as the
- * key into the node.
+ * available keys for the preferences in a {@link Preferences} node or a 
+ * {@link Properties} table.
+ * This interface uses its subclass' {@code toString()} lower-case representation
+ * as the key into the node.
  * 
  * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
  * @since Nov 23, 2015
@@ -51,5 +53,12 @@ public interface PreferencesKey {
 	}
 	default void put(Preferences node, double val) {
 		node.putDouble(key(), val);
+	}
+	
+	default void set(Properties props, String val) {
+		props.setProperty(key(), val);
+	}
+	default String get(Properties props) {
+		return props.getProperty(key());
 	}
 }

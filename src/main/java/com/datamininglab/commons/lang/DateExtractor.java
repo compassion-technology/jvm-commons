@@ -26,6 +26,8 @@ import org.apache.commons.lang3.StringUtils;
  * @since Jun 30, 2012
  */
 public class DateExtractor {
+	// Epoch- to test formatting
+	private static final Date DEF_DATE = new Date(0);
 	// Jan 1, 1500
 	private static final Date MIN_DATE = new Date(-14828295600000L);
 	// Jan 1, 3000
@@ -38,7 +40,9 @@ public class DateExtractor {
 	};
 	
 	private Date min = MIN_DATE, max = MAX_DATE;
-	private DateFormat[] formats;
+	
+	private List<DateFormat> formatsWithLetters = new LinkedList<>();
+	private List<DateFormat> formatsNumbersOnly = new LinkedList<>();
 	
 	public enum DateLocality {
 		/** Use formats from the default locale only (fastest). */
@@ -54,13 +58,7 @@ public class DateExtractor {
 	 * @param locality specifies which locales to use when parsing dates.
 	 */
 	public DateExtractor(DateLocality locality) {
-		// Compile custom formats
 		Set<DateFormat> set = new HashSet<>();
-		for (int i = 0; i < CUSTOM_FORMATS.length; i++) {
-			DateFormat df = new SimpleDateFormat(CUSTOM_FORMATS[i]);
-			df.setLenient(false);
-			set.add(df);
-		}
 		
 		// Get the locales specified by the locality parameter
 		Locale defLocale = Locale.getDefault();
@@ -85,14 +83,29 @@ public class DateExtractor {
 		
 		for (Locale l : locales) {
 			for (int j = DateFormat.FULL; j <= DateFormat.SHORT; j++) {
-				DateFormat df = DateFormat.getDateInstance(j, l);
-				df.setLenient(false);
-				set.add(df);
+				for (int k = DateFormat.FULL; k <= DateFormat.SHORT; k++) {
+					add(DateFormat.getDateTimeInstance(j, k), false, set);
+				}
+				add(DateFormat.getDateInstance(j, l), false, set);
 			}
 		}
 		
-		formats = new DateFormat[set.size()];
-		set.toArray(formats);
+		// Compile custom formats
+		for (int i = 0; i < CUSTOM_FORMATS.length; i++) {
+			add(new SimpleDateFormat(CUSTOM_FORMATS[i]), false, set);
+		}
+	}
+	
+	private void add(DateFormat df, boolean atStart, Set<DateFormat> unique) {
+		if (!unique.add(df)) { return; }
+		
+		df.setLenient(false);
+		List<DateFormat> list = Utilities.containsLetters(df.format(DEF_DATE))? formatsWithLetters : formatsNumbersOnly;
+		if (atStart) {
+			list.add(0, df);
+		} else {
+			list.add(df);
+		}
 	}
 	
 	/**
@@ -117,10 +130,9 @@ public class DateExtractor {
 	 * @see SimpleDateFormat
 	 */
 	public void setPreferredFormats(DateFormat... arr) {
-		DateFormat[] temp = new DateFormat[formats.length + arr.length];
-		System.arraycopy(arr, 0, temp, 0, arr.length);
-		System.arraycopy(formats, 0, temp, arr.length, formats.length);
-		formats = temp;
+		Set<DateFormat> set = new HashSet<>(formatsNumbersOnly);
+		set.addAll(formatsWithLetters);
+		for (DateFormat df : arr) { add(df, true, set); }
 	}
 	
 	/**
@@ -134,8 +146,8 @@ public class DateExtractor {
 	public Date parse(String date) {
 		if (StringUtils.isEmpty(date)) { return null; }
 		
-		for (int i = 0; i < formats.length; i++) {
-			DateFormat df = formats[i];
+		List<DateFormat> formats = Utilities.containsLetters(date)? formatsWithLetters : formatsNumbersOnly;
+		for (DateFormat df : formats) {
 			synchronized (df) {
 				try {
 					Date d = df.parse(date);
@@ -159,28 +171,30 @@ public class DateExtractor {
 	 */
 	public Set<DateMatch> extractAll(String text) {
 		Set<DateMatch> ret = new HashSet<>();
-		for (int i = 0; i < formats.length; i++) {
-			ParsePosition pp = new ParsePosition(0);
-			boolean tryParse = true;
-			for (int c = 0; c < text.length(); c++) {
-				if (tryParse) {
-					pp.setIndex(c); pp.setErrorIndex(-1);
-					DateFormat df = formats[i];
-					Date d;
-					synchronized (df) {
-						d = df.parse(text, pp);
-					}
-					if (d != null && d.after(min) && d.before(max)) {
-						ret.add(new DateMatch(text, d, c, pp.getIndex()));
-						if (pp.getErrorIndex() < 0) { c = pp.getIndex() - 1; }
-					}
-				}
-				
-				// Only try parsing dates after non-alphanumeric characters
-				tryParse = !Character.isLetterOrDigit(text.charAt(c));
-			}
-		}
+		for (DateFormat df : formatsNumbersOnly) { extractAll(text, df, ret); }
+		for (DateFormat df : formatsWithLetters) { extractAll(text, df, ret); }
 		return ret;
+	}
+	
+	private void extractAll(String text, DateFormat df, Set<DateMatch> out) {
+		ParsePosition pp = new ParsePosition(0);
+		boolean tryParse = true;
+		for (int c = 0; c < text.length(); c++) {
+			if (tryParse) {
+				pp.setIndex(c); pp.setErrorIndex(-1);
+				Date d;
+				synchronized (df) {
+					d = df.parse(text, pp);
+				}
+				if (d != null && d.after(min) && d.before(max)) {
+					out.add(new DateMatch(text, d, c, pp.getIndex()));
+					if (pp.getErrorIndex() < 0) { c = pp.getIndex() - 1; }
+				}
+			}
+			
+			// Only try parsing dates after non-alphanumeric characters
+			tryParse = !Character.isLetterOrDigit(text.charAt(c));
+		}
 	}
 	
 	public static final class DateMatch implements Comparable<DateMatch> {
