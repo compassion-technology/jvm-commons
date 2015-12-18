@@ -97,16 +97,15 @@ public class DateExtractor {
 		
 		formatsWithLetters = new LinkedList<>();
 		formatsNumbersOnly = new LinkedList<>();
-		for (DateFormat df : set)  { add(df); }
+		for (DateFormat df : set)  { add(df, false); }
 	}
 	
-	private void add(DateFormat df) {
-		if (Utilities.containsLetters(df.format(DEF_DATE))) {
-			formatsWithLetters.add(0, df);
+	private void add(DateFormat df, boolean atStart) {
+		List<DateFormat> list = Utilities.containsLetters(df.format(DEF_DATE))? formatsWithLetters : formatsNumbersOnly;
+		if (atStart) {
+			list.add(0, df);
 		} else {
-			// Can contain space, hyphen, etc. but the date/time is only
-			// represented with numbers
-			formatsNumbersOnly.add(0, df);
+			list.add(df);
 		}
 	}
 	
@@ -132,7 +131,7 @@ public class DateExtractor {
 	 * @see SimpleDateFormat
 	 */
 	public void setPreferredFormats(DateFormat... arr) {
-		for (DateFormat df : arr) { add(df); }
+		for (DateFormat df : arr) { add(df, true); }
 	}
 	
 	/**
