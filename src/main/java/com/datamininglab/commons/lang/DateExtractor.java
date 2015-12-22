@@ -36,6 +36,7 @@ public class DateExtractor {
 	
 	// Supplements the ~500 localized date formats provided by DateFormat
 	private static final String[] CUSTOM_FORMATS = {
+		"yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd'T'HH:mm:ssZ",
 		"yyyy", "MMM yyyy", "MMMM yyyy", "MMM yy", "MMMM yy", "MMMyyyy"
 	};
 	
