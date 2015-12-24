@@ -8,8 +8,6 @@ import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
-import com.datamininglab.commons.lang.Utilities;
-
 /**
  * Test case for stop watch utility.
  * 
