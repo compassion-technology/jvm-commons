@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>eri-maven-base</artifactId>
 		<groupId>com.datamininglab</groupId>
-		<version>3.0.1</version>
+		<version>3.0.2</version>
 	</parent>
 	<groupId>com.datamininglab.commons</groupId>
 	<artifactId>eri-commons-lang</artifactId>
