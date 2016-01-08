@@ -40,6 +40,7 @@ import java.util.regex.Pattern;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
 
 import com.datamininglab.commons.logging.LogContext;
@@ -884,6 +885,7 @@ public final class Utilities {
 	/**
 	 * Converts an unordered set into an ordered list using the natural ordering.
 	 * @param set the set to convert
+	 * @param <T> the type of items in the set
 	 * @return the ordered list of values
 	 */
 	public static <T extends Comparable<T>> List<T> getOrderedList(Set<T> set) {
@@ -896,6 +898,7 @@ public final class Utilities {
 	 * Converts an unordered set into an ordered list using the specified comparator.
 	 * @param set the set to convert
 	 * @param comp the comparator to use to compare values in the set
+	 * @param <T> the type of items in the set
 	 * @return the ordered list of values
 	 */
 	public static <T> List<T> getOrderedList(Set<T> set, Comparator<T> comp) {
@@ -973,6 +976,30 @@ public final class Utilities {
 	 */
 	public static float normalize(float amount, float min, float max) {
 		return (float) normalize((double) amount, (double) min, (double) max);
+	}
+	
+	/**
+	 * Clamps the integer value to the specified range.
+	 * @param value the value to clamp
+	 * @param min the minimum value
+	 * @param max the maximum value
+	 * @return the clamped value (the min if the value was less than the min,
+	 * the max if the value was greater than the max, or the original value)
+	 */
+	public static int clamp(int value, int min, int max) {
+		return value > max? max : (value < min? min : value);
+	}
+	
+	/**
+	 * Clamps the value to the specified range.
+	 * @param value the value
+	 * @param range the valid range of values
+	 * @param <T> the value type
+	 * @return the clamped value (the min if the value was less than the min,
+	 * the max if the value was greater than the max, or the original value)
+	 */
+	public static <T> T clamp(T value, Range<T> range) {
+		return range.isBefore(value)? range.getMaximum() : (range.isAfter(value)? range.getMinimum() : value);
 	}
 	
 	/**
