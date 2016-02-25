@@ -25,14 +25,12 @@ public interface StatusListener {
 	 * Get the minimum time between notifications for this listener.
 	 * @return the notification interval (in nanoseconds)
 	 */
-	long getNotifyIntervalNS();
+	default long getNotifyIntervalNS() {
+		return TimeUnit.NANOSECONDS.convert(10L, TimeUnit.SECONDS);
+	}
 	
 	public static class DefaultStatusListener implements StatusListener {
 		private static final double PCT_COEFF = 100.0;
-		private static final long NOTIFY_NS = TimeUnit.NANOSECONDS.convert(10L, TimeUnit.SECONDS); 
-		
-		@Override
-		public long getNotifyIntervalNS() { return NOTIFY_NS; }
 		
 		@Override
 		public void statusChanged(StatusMonitor sm) {
