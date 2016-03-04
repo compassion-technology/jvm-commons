@@ -4,9 +4,16 @@
  */
 package com.datamininglab.commons.lang;
 
+import java.lang.reflect.Field;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.datamininglab.commons.logging.LogContext;
 
 /**
  * Contains some time/date utilities using the {@link Calendar} API.
@@ -91,6 +98,34 @@ public final class CalendarUtils {
 			case Calendar.MILLISECOND:          return "Millisecond";
 			default:                            return "Unknown";
 		}
+	}
+	
+	private static Map<String, Integer> fieldMap;
+	
+	/**
+	 * Returns the field in {@link Calendar} with the given name. If no field
+	 * is found with the specified name, <tt>-1</tt> is returned. Some basic
+	 * cleaning is performed on <tt>field</tt> so that values returned by
+	 * {@link #toString(int)} can be found via this method and vice versa.
+	 * @param field the field to lookup 
+	 * @return the corresponding calendar field constant, or <tt>-1</tt> if a
+	 * matching field could not be found
+	 */
+	public static int valueOf(String field) {
+		if (fieldMap == null) {
+			fieldMap = new HashMap<>();
+			for (Field f : ReflectionUtils.getFields(Calendar.class)) {
+				if (int.class.equals(f.getType())) {
+					try {
+						fieldMap.put(f.getName(), f.getInt(null));
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						LogContext.warning(e, "Error accessing calendar field");
+					}
+				}
+			}
+		}
+		String cleaned = StringUtils.upperCase(StringUtils.replaceChars(field, "-/()", "__"));
+		return fieldMap.getOrDefault(cleaned, -1);
 	}
 	
 	/**
