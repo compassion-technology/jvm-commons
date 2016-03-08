@@ -13,8 +13,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import com.datamininglab.commons.lang.Utilities;
-
 /**
  * This class tries every available date format to parse a date from a string.
  * While the class is not thread-safe, since it relies on {@link DateFormat}
@@ -77,7 +75,7 @@ public class DateExtractor extends Extractor<DateFormat, Date> {
 	static {
 		map = new HashMap<>();
 		for (LocalityLevel l : LocalityLevel.values()) {
-			map.put(l, Utilities.threadLocal(() -> new DateExtractor(l)));
+			map.put(l, ThreadLocal.withInitial(() -> new DateExtractor(l)));
 		}
 	}
 	

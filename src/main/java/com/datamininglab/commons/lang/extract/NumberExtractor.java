@@ -12,7 +12,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import com.datamininglab.commons.lang.Utilities;
 import com.datamininglab.commons.logging.LogContext;
 
 /**
@@ -89,7 +88,7 @@ public class NumberExtractor extends Extractor<NumberFormat, Number> {
 	static {
 		map = new HashMap<>();
 		for (LocalityLevel l : LocalityLevel.values()) {
-			map.put(l, Utilities.threadLocal(() -> new NumberExtractor(l)));
+			map.put(l, ThreadLocal.withInitial(() -> new NumberExtractor(l)));
 		}
 	}
 	
