@@ -35,6 +35,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1128,5 +1129,18 @@ public final class Utilities {
 		List<T> ret = new ArrayList<>();
 		for (Collection<T> c : collections) { ret.addAll(c); }
 		return ret;
+	}
+	
+	/**
+	 * Creates a new thread local using lambda syntax for the initial value.
+	 * @param initVal the initial value supplier
+	 * @param <T> the type of objects managed by the thread local
+	 * @return the new thread local
+	 */
+	public static <T> ThreadLocal<T> threadLocal(Supplier<T> initVal) {
+		return new ThreadLocal<T>() {
+			@Override
+			protected T initialValue() { return initVal.get(); }
+		};
 	}
 }
