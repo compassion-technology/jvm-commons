@@ -22,8 +22,8 @@ import com.datamininglab.commons.lang.Utilities;
  * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
  * @since Mar 8, 2016
  */
-public final class NumberExtractor extends Extractor<NumberFormat, Number> {
-	private NumberExtractor(LocalityLevel locality) {
+public class NumberExtractor extends Extractor<NumberFormat, Number> {
+	public NumberExtractor(LocalityLevel locality) {
 		super(locality, Comparator.comparing(Number::doubleValue), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 1.0);
 	}
 	

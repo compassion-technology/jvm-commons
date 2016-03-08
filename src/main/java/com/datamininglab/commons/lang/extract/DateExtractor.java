@@ -24,7 +24,7 @@ import com.datamininglab.commons.lang.Utilities;
  * @author <a href="dimeo@datamininglab.com">John Dimeo</a>
  * @since Jun 30, 2012
  */
-public final class DateExtractor extends Extractor<DateFormat, Date> {
+public class DateExtractor extends Extractor<DateFormat, Date> {
 	// Epoch- to test formatting
 	private static final Date DEF_DATE = new Date(0);
 	// Jan 1, 1500
@@ -42,7 +42,7 @@ public final class DateExtractor extends Extractor<DateFormat, Date> {
 	 * Creates a new date extractor.
 	 * @param locality specifies which locales to use when parsing dates.
 	 */
-	private DateExtractor(LocalityLevel locality) {
+	public DateExtractor(LocalityLevel locality) {
 		super(locality, Comparator.naturalOrder(), MIN_DATE, MAX_DATE, DEF_DATE);
 	}
 	
