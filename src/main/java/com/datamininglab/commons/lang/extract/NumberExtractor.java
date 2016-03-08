@@ -13,8 +13,17 @@ import java.util.function.Consumer;
 
 import com.datamininglab.commons.lang.Utilities;
 
-public class NumberExtractor extends Extractor<NumberFormat, Number> {
-	public NumberExtractor(LocalityLevel locality) {
+/**
+ * This class tries every available number format to parse a date from a string.
+ * While the class is not thread-safe, since it relies on {@link NumberFormat}
+ * instances that are not thread-safe, thread-localized instances can be 
+ * obtained from the static factory methods of this class.
+ * 
+ * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
+ * @since Mar 8, 2016
+ */
+public final class NumberExtractor extends Extractor<NumberFormat, Number> {
+	private NumberExtractor(LocalityLevel locality) {
 		super(locality, Comparator.comparing(Number::doubleValue), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 1.0);
 	}
 	

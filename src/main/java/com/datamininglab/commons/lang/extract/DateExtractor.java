@@ -17,11 +17,14 @@ import com.datamininglab.commons.lang.Utilities;
 
 /**
  * This class tries every available date format to parse a date from a string.
+ * While the class is not thread-safe, since it relies on {@link DateFormat}
+ * instances that are not thread-safe, thread-localized instances can be 
+ * obtained from the static factory methods of this class.
  * 
  * @author <a href="dimeo@datamininglab.com">John Dimeo</a>
  * @since Jun 30, 2012
  */
-public class DateExtractor extends Extractor<DateFormat, Date> {
+public final class DateExtractor extends Extractor<DateFormat, Date> {
 	// Epoch- to test formatting
 	private static final Date DEF_DATE = new Date(0);
 	// Jan 1, 1500
@@ -39,7 +42,7 @@ public class DateExtractor extends Extractor<DateFormat, Date> {
 	 * Creates a new date extractor.
 	 * @param locality specifies which locales to use when parsing dates.
 	 */
-	public DateExtractor(LocalityLevel locality) {
+	private DateExtractor(LocalityLevel locality) {
 		super(locality, Comparator.naturalOrder(), MIN_DATE, MAX_DATE, DEF_DATE);
 	}
 	
