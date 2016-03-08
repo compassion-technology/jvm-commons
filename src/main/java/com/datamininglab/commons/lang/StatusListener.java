@@ -15,6 +15,9 @@ import com.datamininglab.commons.logging.LogContext;
  * @since Jun 29, 2012
  */
 public interface StatusListener {
+	/** Default listener notify interval (see {@link #getNotifyIntervalNS()}).*/
+	long DEFAULT_NOTIFY_NS = TimeUnit.NANOSECONDS.convert(10L, TimeUnit.SECONDS);
+	
 	/**
 	 * Invoked when either the state, status, size or progess of the task has changed.
 	 * @param sm the current status of the task
@@ -25,14 +28,10 @@ public interface StatusListener {
 	 * Get the minimum time between notifications for this listener.
 	 * @return the notification interval (in nanoseconds)
 	 */
-	long getNotifyIntervalNS();
+	default long getNotifyIntervalNS() { return DEFAULT_NOTIFY_NS; }
 	
 	public static class DefaultStatusListener implements StatusListener {
 		private static final double PCT_COEFF = 100.0;
-		private static final long NOTIFY_NS = TimeUnit.NANOSECONDS.convert(10L, TimeUnit.SECONDS); 
-		
-		@Override
-		public long getNotifyIntervalNS() { return NOTIFY_NS; }
 		
 		@Override
 		public void statusChanged(StatusMonitor sm) {
