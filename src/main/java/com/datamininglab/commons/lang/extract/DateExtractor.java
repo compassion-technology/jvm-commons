@@ -38,16 +38,16 @@ public class DateExtractor extends Extractor<DateFormat, Date> {
 		"yyyy", "MMM yyyy", "MMMM yyyy", "MMM yy", "MMMM yy", "MMMyyyy", "yyyyMM"
 	};
 	
-	/**
-	 * Creates a new date extractor.
-	 * @param locality specifies which locales to use when parsing dates.
-	 */
-	public DateExtractor(LocalityLevel locality) {
-		super(locality, Comparator.naturalOrder(), MIN_DATE, MAX_DATE, DEF_DATE);
+	public DateExtractor() {
+		super(Comparator.naturalOrder(), MIN_DATE, MAX_DATE, DEF_DATE);
+	}
+	public DateExtractor(LocalityLevel lvl) {
+		this();
+		setLocalityLevel(lvl);
 	}
 	
 	@Override
-	protected void init(DateFormat format) {
+	protected void initFormat(DateFormat format) {
 		format.setLenient(false);
 	}
 	

@@ -20,42 +20,36 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.datamininglab.commons.lang.Utilities;
 
+/**
+ * Abstract parent class that contains shared functionality between 
+ * {@link DateExtractor} and {@link NumberExtractor}.
+ * 
+ * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
+ * @param <F> the format class
+ * @param <T> the type of value extracted by the extractor
+ * @since Mar 8, 2016
+ */
 abstract class Extractor<F extends Format, T> {
+	private List<Locale> locales;
 	private Comparator<T> comp;
 	private T min, max, defVal;
 	
-	private List<F> formatsWithLetters = new LinkedList<>();
-	private List<F> formatsNumbersOnly = new LinkedList<>();
+	private List<F> formatsWithLetters;
+	private List<F> formatsNumbersOnly;
 	
-	protected Extractor(LocalityLevel lvl, Comparator<T> comp, T min, T max, T defVal) {
+	protected Extractor(Comparator<T> comp, T min, T max, T defVal) {
 		this.comp   = comp;
 		this.min    = min;
 		this.max    = max;
 		this.defVal = defVal;
-		
+		setLocalityLevel(LocalityLevel.LOCAL);
+	}
+	
+	/** Should be called when a setting changes that affects the list of locales. */
+	protected void loadFormats() {
+		formatsNumbersOnly = new LinkedList<>();
+		formatsWithLetters = new LinkedList<>();
 		Set<F> set = new HashSet<>();
-		
-		// Get the locales specified by the locality parameter
-		Locale defLocale = Locale.getDefault();
-		String defLang = defLocale.getLanguage();
-		List<Locale> locales;
-		switch (lvl) {
-			case ALL:
-				locales = Arrays.asList(getAvailableLocales());
-				break;
-			case LANGUAGE:
-				locales = new LinkedList<>();
-				// Ensure the default locale is first (and is tried first)
-				locales.add(defLocale);
-				for (Locale l : getAvailableLocales()) {
-					if (!l.equals(defLocale) && StringUtils.equals(l.getLanguage(), defLang)) { locales.add(l); }
-				}
-				break;
-			case LOCAL: default:
-				locales = Arrays.asList(defLocale);
-				break;
-		}
-		
 		for (Locale l : locales) {
 			addFormatsFor(l, f -> add(f, false, set));
 		}
@@ -66,20 +60,39 @@ abstract class Extractor<F extends Format, T> {
 	protected abstract void addFormatsFor(Locale l, Consumer<F> adder);
 	protected abstract void addCustomFormats(Consumer<F> adder);
 	
-	protected void init(F format) {
+	/** Optional callback to initialize formats for use by the extractor. */
+	protected void initFormat(F format) {
 		// Do nothing by default
 	}
 	
 	private void add(F f, boolean atStart, Set<F> unique) {
 		if (!unique.add(f)) { return; }
 		
-		init(f);
+		initFormat(f);
 		List<F> list = Utilities.containsLetters(f.format(defVal))? formatsWithLetters : formatsNumbersOnly;
 		if (atStart) {
 			list.add(0, f);
 		} else {
 			list.add(f);
 		}
+	}
+	
+	/**
+	 * Sets the list of locales to be based on the convenience locality level.
+	 * @param locality the new locality level
+	 */
+	public void setLocalityLevel(LocalityLevel locality) {
+		this.locales = locality.getLocales(getAvailableLocales());
+		loadFormats();
+	}
+	
+	/**
+	 * Sets the list of locales to a custom list.
+	 * @param locales the new list of locales
+	 */
+	public void setLocales(Locale... locales) {
+		this.locales = Arrays.asList(locales);
+		loadFormats();
 	}
 	
 	/**
@@ -101,13 +114,16 @@ abstract class Extractor<F extends Format, T> {
 	public void setMaximum(T max) { this.max = max; }
 	
 	/**
-	 * Specifies preferred formats to try first before using all the available
-	 * built-in formats.
+	 * Specifies additional formats to try first before using all the available
+	 * built-in formats. Note that these formats will be lost and will need
+	 * to be re-set if the list of locales changes (via {@link #setLocalityLevel(LocalityLevel)}
+	 * or {@link #setLocales(Locale...)}) so you should generally call this setter last.
 	 * @param arr the list of formats
 	 */
 	@SafeVarargs
-	public final void setPreferredFormats(F... arr) {
-		Set<F> set = new HashSet<>(formatsNumbersOnly);
+	public final void setCustomFormats(F... arr) {
+		Set<F> set = new HashSet<>(formatsNumbersOnly.size() + formatsWithLetters.size());
+		set.addAll(formatsNumbersOnly);
 		set.addAll(formatsWithLetters);
 		for (F f : arr) { add(f, true, set); }
 	}
