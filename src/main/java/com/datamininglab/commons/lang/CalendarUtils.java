@@ -5,6 +5,8 @@
 package com.datamininglab.commons.lang;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.text.DateFormatSymbols;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -41,10 +43,9 @@ public final class CalendarUtils {
 		Calendar.SECOND
 	};
 	
-	private static final ThreadLocal<Calendar> CAL = new ThreadLocal<Calendar>() {
-		@Override
-		protected Calendar initialValue() { return Calendar.getInstance(); }
-	};
+	private static final ThreadLocal<Calendar> CAL = ThreadLocal.withInitial(() -> Calendar.getInstance());
+	private static final ThreadLocal<DateFormatSymbols> DFS = ThreadLocal.withInitial(() -> DateFormatSymbols.getInstance());
+	
 	/**
 	 * Gets a calendar instance that is local to this thread.
 	 * @return a calendar instance that is guaranteed to be thread safe
@@ -100,6 +101,42 @@ public final class CalendarUtils {
 		}
 	}
 	
+	/**
+	 * Converts a calendar field's value to a string, substituting date format
+	 * symbols (like month name) if applicable.
+	 * @param calendarField the calendar field 
+	 * @param value the field value
+	 * @param style whether to return full names ({@link Calendar#LONG}) or 
+	 * short ({@link Calendar#SHORT}) for {@link Calendar#MONTH} and
+	 * {@link Calendar#DAY_OF_WEEK} 
+	 * @return the string representation
+	 */
+	public static String toString(int calendarField, int value, int style) {
+		DateFormatSymbols dfs = DFS.get();
+		String[] arr = null;
+		switch (calendarField) {
+			case Calendar.ERA:
+				arr = dfs.getEras();
+				break;
+			case Calendar.MONTH:
+				arr = style == Calendar.SHORT? dfs.getShortMonths() : dfs.getMonths();
+				break;
+			case Calendar.AM_PM:
+				arr = dfs.getAmPmStrings();
+				break;
+			case Calendar.DAY_OF_WEEK:
+				arr = style == Calendar.SHORT? dfs.getShortWeekdays() : dfs.getWeekdays();
+				break;
+			default: break;
+		}
+		if (arr == null) { return String.valueOf(value); }
+		
+		if (value < 0 || value >= arr.length) {
+			throw new IllegalArgumentException("Value " + value + " was outside the bounds of calendar field " + toString(calendarField));
+		}
+		return arr[value];
+	}
+	
 	private static Map<String, Integer> fieldMap;
 	
 	/**
@@ -115,7 +152,7 @@ public final class CalendarUtils {
 		if (fieldMap == null) {
 			fieldMap = new HashMap<>();
 			for (Field f : ReflectionUtils.getFields(Calendar.class)) {
-				if (int.class.equals(f.getType())) {
+				if (int.class.equals(f.getType()) && Modifier.isStatic(f.getModifiers())) {
 					try {
 						fieldMap.put(f.getName(), f.getInt(null));
 					} catch (IllegalArgumentException | IllegalAccessException e) {
