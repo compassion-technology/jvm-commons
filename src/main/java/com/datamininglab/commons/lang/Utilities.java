@@ -350,12 +350,12 @@ public final class Utilities {
 		
 		if (StringUtils.endsWith(s, "x")
 		 || StringUtils.endsWith(s, "o")
-		 || StringUtils.endsWith(s, "ss")
+		 || StringUtils.endsWith(s, "s")
 		 || StringUtils.endsWith(s, "sh")
 		 || StringUtils.endsWith(s, "ch")) {
 			return s + "es";
 		}
-			
+		
 		if (StringUtils.endsWith(s, "y")) {
 			return s.length() > 2 && isVowel(s.charAt(s.length() - 2))? s + "s" : StringUtils.chop(s) + "ies";
 		}
