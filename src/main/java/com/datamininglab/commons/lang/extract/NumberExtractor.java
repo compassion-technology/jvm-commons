@@ -79,11 +79,6 @@ public class NumberExtractor extends Extractor<NumberFormat, Number> {
 		return types == null || types.get(type.ordinal());
 	}
 	
-	@Override
-	protected void addCustomFormats(Consumer<NumberFormat> adder) {
-		// No built-in custom formats
-	}
-	
 	private static Map<LocalityLevel, ThreadLocal<NumberExtractor>> map;
 	static {
 		map = new HashMap<>();

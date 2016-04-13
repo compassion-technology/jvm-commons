@@ -30,10 +30,19 @@ public class DateExtractor extends Extractor<DateFormat, Date> {
 	// Jan 1, 3000
 	private static final Date MAX_DATE = new Date(32506376400000L);
 	
-	// Supplements the ~500 localized date formats provided by DateFormat
-	private static final String[] CUSTOM_FORMATS = {
-		"yyyy-MM-dd'T'HH:mm:ssZ", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd",
-		"yyyy", "MMM yyyy", "MMMM yyyy", "MMM yy", "MMMM yy", "MMMyyyy", "yyyyMM"
+	public static final DateFormat[] ISO_LIKE_FORMATS = {
+		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"),
+		new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"),
+		new SimpleDateFormat("yyyy-MM-dd")
+	};
+	public static final DateFormat[] MONTH_YEAR_FORMATS = {
+		new SimpleDateFormat("yyyy"),
+		new SimpleDateFormat("MMM yyyy"),
+		new SimpleDateFormat("MMMM yyyy"),
+		new SimpleDateFormat("MMM yy"),
+		new SimpleDateFormat("MMMM yy"),
+		new SimpleDateFormat("MMMyyyy"),
+		new SimpleDateFormat("yyyyMM")
 	};
 	
 	public DateExtractor() {
@@ -61,13 +70,6 @@ public class DateExtractor extends Extractor<DateFormat, Date> {
 				adder.accept(DateFormat.getDateTimeInstance(i, j));
 			}
 			adder.accept(DateFormat.getDateInstance(i, l));
-		}
-	}
-	
-	@Override
-	protected void addCustomFormats(Consumer<DateFormat> adder) {
-		for (int i = 0; i < CUSTOM_FORMATS.length; i++) {
-			adder.accept(new SimpleDateFormat(CUSTOM_FORMATS[i]));
 		}
 	}
 	
