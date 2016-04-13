@@ -23,14 +23,16 @@ public class DateExtractorTest extends TestCase {
 	private static final DateExtractor ALL = DateExtractor.getInstance(LocalityLevel.ALL);
 	private static final DateExtractor LANG = DateExtractor.getInstance(LocalityLevel.LANGUAGE);
 	private static final DateExtractor LOCAL = DateExtractor.getInstance(LocalityLevel.LOCAL);
+	private static final DateExtractor MON_YEAR = DateExtractor.getInstance(LocalityLevel.LANGUAGE);
 	
 	private static final Date DATE = Utilities.parseDate(new SimpleDateFormat("yyyy-MM-dd"), "2009-06-15", null);
 	private static final Date DATE_TIME = Utilities.parseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"), "2009-06-15 13:45:30", null);
 	
 	@Test
 	public void testYearOnly() {
-		assertEquals(DateUtils.truncate(DATE, Calendar.YEAR), LOCAL.parse("2009"));
-		assertNull(LOCAL.parse("1234"));
+		MON_YEAR.setCustomFormats(DateExtractor.MONTH_YEAR_FORMATS);
+		assertEquals(DateUtils.truncate(DATE, Calendar.YEAR), MON_YEAR.parse("2009"));
+		assertNull(MON_YEAR.parse("1234"));
 	}
 	
 	@Test
@@ -60,7 +62,7 @@ public class DateExtractorTest extends TestCase {
 	
 	@Test
 	public void testRemoveOverlaps() {
-		Set<Match<Date>> allMatches = LANG.extractAll("Example text 2000 to 2 March 2001.");
+		Set<Match<Date>> allMatches = MON_YEAR.extractAll("Example text 2000 to 2 March 2001.");
 		
 		List<Match<Date>> list = new ArrayList<>(allMatches);
 		Collections.sort(list, Match.orderByPositionThenShortest());
