@@ -53,12 +53,10 @@ abstract class Extractor<F extends Format, T> {
 		for (Locale l : locales) {
 			addFormatsFor(l, f -> add(f, false, set));
 		}
-		addCustomFormats(f -> add(f, false, set));
 	}
 	
 	protected abstract Locale[] getAvailableLocales();
 	protected abstract void addFormatsFor(Locale l, Consumer<F> adder);
-	protected abstract void addCustomFormats(Consumer<F> adder);
 	
 	/** Optional callback to initialize formats for use by the extractor. */
 	protected void initFormat(F format) {
