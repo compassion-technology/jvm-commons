@@ -119,7 +119,7 @@ abstract class Extractor<F extends Format, T> {
 	 * @param arr the list of formats
 	 */
 	@SafeVarargs
-	public final void setCustomFormats(F... arr) {
+	public final void addCustomFormats(F... arr) {
 		Set<F> set = new HashSet<>(formatsNumbersOnly.size() + formatsWithLetters.size());
 		set.addAll(formatsNumbersOnly);
 		set.addAll(formatsWithLetters);
