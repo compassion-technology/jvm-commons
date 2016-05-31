@@ -31,6 +31,8 @@ public class DateExtractor extends Extractor<DateFormat, Date> {
 	private static final Date MAX_DATE = new Date(32506376400000L);
 	
 	public static final DateFormat[] ISO_LIKE_FORMATS = {
+		// Default Java toString() format
+		new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy"),
 		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"),
 		new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"),
 		new SimpleDateFormat("yyyy-MM-dd")
