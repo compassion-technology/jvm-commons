@@ -30,7 +30,7 @@ public class DateExtractorTest extends TestCase {
 	
 	@Test
 	public void testYearOnly() {
-		MON_YEAR.setCustomFormats(DateExtractor.MONTH_YEAR_FORMATS);
+		MON_YEAR.addCustomFormats(DateExtractor.MONTH_YEAR_FORMATS);
 		assertEquals(DateUtils.truncate(DATE, Calendar.YEAR), MON_YEAR.parse("2009"));
 		assertNull(MON_YEAR.parse("1234"));
 	}
