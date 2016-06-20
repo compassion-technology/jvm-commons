@@ -5,7 +5,6 @@
 package com.datamininglab.commons.lang.extract;
 
 import java.text.Format;
-import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -136,14 +135,21 @@ abstract class Extractor<F extends Format, T> {
 	public T parse(String text) {
 		if (StringUtils.isEmpty(text)) { return null; }
 		
+		ParsePosition pp = new ParsePosition(0);
 		List<F> formats = Utilities.containsLetters(text)? formatsWithLetters : formatsNumbersOnly;
 		for (F f : formats) {
-			try {
-				T val = Utilities.cast(f.parseObject(text));
-				if (comp.compare(val, min) >= 0 && comp.compare(val, max) <= 0) { return val; }
-			} catch (ParseException ex) {
-				// Continue to the next date format
-			}
+			pp.setIndex(0);
+			T val = Utilities.cast(f.parseObject(text, pp));
+			// Return the extracted value if...
+			// ... the value is valid
+			if (val != null
+			// ... there were no errors
+			 && pp.getErrorIndex() < 0
+			// ... the entire text was used
+			 && pp.getIndex() == text.length()
+			// ... the value falls within the expected range
+			 && comp.compare(val, min) >= 0
+			 && comp.compare(val, max) <= 0) { return val; }
 		}
 		return null;
 	}
