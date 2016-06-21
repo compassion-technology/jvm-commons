@@ -70,10 +70,10 @@ public class NumberExtractor extends Extractor<NumberFormat, Number> {
 			adder.accept(NumberFormat.getIntegerInstance(l));	
 		}
 		if (isEnabled(NumberFormatType.PERCENT)) {
-			adder.accept(NumberFormat.getCurrencyInstance(l));	
+			adder.accept(NumberFormat.getPercentInstance(l));	
 		}
 		if (isEnabled(NumberFormatType.CURRENCY)) {
-			adder.accept(NumberFormat.getPercentInstance(l));	
+			adder.accept(NumberFormat.getCurrencyInstance(l));
 		}
 	}
 	private boolean isEnabled(NumberFormatType type) {

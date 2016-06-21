@@ -140,14 +140,11 @@ abstract class Extractor<F extends Format, T> {
 		for (F f : formats) {
 			pp.setIndex(0);
 			T val = Utilities.cast(f.parseObject(text, pp));
-			// Return the extracted value if...
-			// ... the value is valid
+			// Return the extracted value if the value is valid
 			if (val != null
-			// ... there were no errors
-			 && pp.getErrorIndex() < 0
 			// ... the entire text was used
 			 && pp.getIndex() == text.length()
-			// ... the value falls within the expected range
+			// ... and the value falls within the expected range
 			 && comp.compare(val, min) >= 0
 			 && comp.compare(val, max) <= 0) { return val; }
 		}
