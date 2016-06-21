@@ -53,6 +53,7 @@ public class NumberExtractor extends Extractor<NumberFormat, Number> {
 		
 		this.types = new BitSet(NumberFormatType.values().length);
 		for (NumberFormatType type : types) { this.types.set(type.ordinal(), true); }
+		loadFormats();
 	}
 	
 	@Override
@@ -69,10 +70,10 @@ public class NumberExtractor extends Extractor<NumberFormat, Number> {
 			adder.accept(NumberFormat.getIntegerInstance(l));	
 		}
 		if (isEnabled(NumberFormatType.PERCENT)) {
-			adder.accept(NumberFormat.getCurrencyInstance(l));	
+			adder.accept(NumberFormat.getPercentInstance(l));	
 		}
 		if (isEnabled(NumberFormatType.CURRENCY)) {
-			adder.accept(NumberFormat.getPercentInstance(l));	
+			adder.accept(NumberFormat.getCurrencyInstance(l));
 		}
 	}
 	private boolean isEnabled(NumberFormatType type) {
