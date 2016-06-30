@@ -1,7 +1,7 @@
-/*
- * Copyright (c) 2012 Elder Research, Inc.
- * All rights reserved. 
- */
+/*******************************************************************************
+ * Copyright (c) 2016 Elder Research, Inc.
+ * All rights reserved.
+ *******************************************************************************/
 package com.datamininglab.commons.lang.extract;
 
 import java.text.DateFormat;
