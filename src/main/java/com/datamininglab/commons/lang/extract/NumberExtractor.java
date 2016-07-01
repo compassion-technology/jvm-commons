@@ -53,7 +53,7 @@ public class NumberExtractor extends Extractor<NumberFormat, Number> {
 		
 		this.types = new BitSet(NumberFormatType.values().length);
 		for (NumberFormatType type : types) { this.types.set(type.ordinal(), true); }
-		loadFormats();
+		unload();
 	}
 	
 	@Override
