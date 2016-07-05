@@ -15,6 +15,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * This class tries every available date format to parse a date from a string.
@@ -49,6 +50,19 @@ public class DateExtractor extends Extractor<DateFormat, Date> {
 		new SimpleDateFormat("MMMyyyy"),
 		new SimpleDateFormat("yyyyMM")
 	);
+	public static final Supplier<Collection<DateFormat>> EXCEL_FORMATS = () -> Arrays.asList(
+		new SimpleDateFormat("dd-MMM-yy"),
+		new SimpleDateFormat("dd-MMM-yy H:mm"),
+		new SimpleDateFormat("dd-MMM-yy h:mm a"),
+		new SimpleDateFormat("M/d/yy"),
+		new SimpleDateFormat("M/d/yy H:mm"),
+		new SimpleDateFormat("M/d/yy h:mm a")
+	);
+	
+	@SafeVarargs
+	public static Supplier<Collection<DateFormat>> concat(Supplier<Collection<DateFormat>>... formats) {
+		return () -> Arrays.stream(formats).flatMap(s -> s.get().stream()).collect(Collectors.toList());
+	}
 	
 	public DateExtractor() {
 		super(Comparator.naturalOrder(), MIN_DATE, MAX_DATE, DEF_DATE);
