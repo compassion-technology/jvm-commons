@@ -1,17 +1,21 @@
-/*
- * Copyright (c) 2012 Elder Research, Inc.
- * All rights reserved. 
- */
+/*******************************************************************************
+ * Copyright (c) 2016 Elder Research, Inc.
+ * All rights reserved.
+ *******************************************************************************/
 package com.datamininglab.commons.lang.extract;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * This class tries every available date format to parse a date from a string.
@@ -30,14 +34,14 @@ public class DateExtractor extends Extractor<DateFormat, Date> {
 	// Jan 1, 3000
 	private static final Date MAX_DATE = new Date(32506376400000L);
 	
-	public static final DateFormat[] ISO_LIKE_FORMATS = {
+	public static final Supplier<Collection<DateFormat>> ISO_LIKE_FORMATS = () -> Arrays.asList(
 		// Default Java toString() format
 		new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy"),
 		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"),
 		new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"),
 		new SimpleDateFormat("yyyy-MM-dd")
-	};
-	public static final DateFormat[] MONTH_YEAR_FORMATS = {
+	);
+	public static final Supplier<Collection<DateFormat>> MONTH_YEAR_FORMATS = () -> Arrays.asList(
 		new SimpleDateFormat("yyyy"),
 		new SimpleDateFormat("MMM yyyy"),
 		new SimpleDateFormat("MMMM yyyy"),
@@ -45,7 +49,20 @@ public class DateExtractor extends Extractor<DateFormat, Date> {
 		new SimpleDateFormat("MMMM yy"),
 		new SimpleDateFormat("MMMyyyy"),
 		new SimpleDateFormat("yyyyMM")
-	};
+	);
+	public static final Supplier<Collection<DateFormat>> EXCEL_FORMATS = () -> Arrays.asList(
+		new SimpleDateFormat("dd-MMM-yy"),
+		new SimpleDateFormat("dd-MMM-yy H:mm"),
+		new SimpleDateFormat("dd-MMM-yy h:mm a"),
+		new SimpleDateFormat("M/d/yy"),
+		new SimpleDateFormat("M/d/yy H:mm"),
+		new SimpleDateFormat("M/d/yy h:mm a")
+	);
+	
+	@SafeVarargs
+	public static Supplier<Collection<DateFormat>> concat(Supplier<Collection<DateFormat>>... formats) {
+		return () -> Arrays.stream(formats).flatMap(s -> s.get().stream()).collect(Collectors.toList());
+	}
 	
 	public DateExtractor() {
 		super(Comparator.naturalOrder(), MIN_DATE, MAX_DATE, DEF_DATE);

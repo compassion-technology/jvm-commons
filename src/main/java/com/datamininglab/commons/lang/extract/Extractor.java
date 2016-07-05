@@ -1,12 +1,14 @@
-/*
+/*******************************************************************************
  * Copyright (c) 2016 Elder Research, Inc.
  * All rights reserved.
- */
+ *******************************************************************************/
 package com.datamininglab.commons.lang.extract;
 
 import java.text.Format;
 import java.text.ParsePosition;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -21,7 +24,9 @@ import com.datamininglab.commons.lang.Utilities;
 
 /**
  * Abstract parent class that contains shared functionality between 
- * {@link DateExtractor} and {@link NumberExtractor}.
+ * {@link DateExtractor} and {@link NumberExtractor}. This class
+ * is thread-safe since it uses {@link ThreadLocal} to protected
+ * format instances.
  * 
  * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
  * @param <F> the format class
@@ -33,25 +38,39 @@ abstract class Extractor<F extends Format, T> {
 	private Comparator<T> comp;
 	private T min, max, defVal;
 	
-	private List<F> formatsWithLetters;
-	private List<F> formatsNumbersOnly;
+	private Supplier<Collection<F>> customFormats;
+	private ThreadLocal<FormatList<F>> formats;
 	
 	protected Extractor(Comparator<T> comp, T min, T max, T defVal) {
 		this.comp   = comp;
 		this.min    = min;
 		this.max    = max;
 		this.defVal = defVal;
+		this.customFormats = () -> Collections.emptyList();
+		this.formats = ThreadLocal.withInitial(() -> {
+			FormatList<F> ret = new FormatList<>();
+			Set<F> set = new HashSet<>();
+			for (F f : customFormats.get()) {
+				add(ret, f, set);
+			}
+			for (Locale l : locales) {
+				addFormatsFor(l, f -> add(ret, f, set));
+			}
+			return ret;
+		});
+		
 		setLocalityLevel(LocalityLevel.LOCAL);
 	}
-	
-	/** Should be called when a setting changes that affects the list of locales. */
-	protected void loadFormats() {
-		formatsNumbersOnly = new LinkedList<>();
-		formatsWithLetters = new LinkedList<>();
-		Set<F> set = new HashSet<>();
-		for (Locale l : locales) {
-			addFormatsFor(l, f -> add(f, false, set));
+	private void add(FormatList<F> fl, F f, Set<F> unique) {
+		if (unique.add(f)) {
+			initFormat(f);
+			fl.getFormats(f.format(defVal)).add(f);	
 		}
+	}
+	
+	/** Releases all the memory used by this extractor's formats for the current thread. */
+	public void unload() {
+		formats.remove();
 	}
 	
 	protected abstract Locale[] getAvailableLocales();
@@ -62,25 +81,13 @@ abstract class Extractor<F extends Format, T> {
 		// Do nothing by default
 	}
 	
-	private void add(F f, boolean atStart, Set<F> unique) {
-		if (!unique.add(f)) { return; }
-		
-		initFormat(f);
-		List<F> list = Utilities.containsLetters(f.format(defVal))? formatsWithLetters : formatsNumbersOnly;
-		if (atStart) {
-			list.add(0, f);
-		} else {
-			list.add(f);
-		}
-	}
-	
 	/**
 	 * Sets the list of locales to be based on the convenience locality level.
 	 * @param locality the new locality level
 	 */
 	public void setLocalityLevel(LocalityLevel locality) {
 		this.locales = locality.getLocales(getAvailableLocales());
-		loadFormats();
+		unload();
 	}
 	
 	/**
@@ -89,7 +96,7 @@ abstract class Extractor<F extends Format, T> {
 	 */
 	public void setLocales(Locale... locales) {
 		this.locales = Arrays.asList(locales);
-		loadFormats();
+		unload();
 	}
 	
 	/**
@@ -112,19 +119,15 @@ abstract class Extractor<F extends Format, T> {
 	
 	/**
 	 * Specifies additional formats to try first before using all the available
-	 * built-in formats. Note that these formats will be lost and will need
-	 * to be re-set if the list of locales changes (via {@link #setLocalityLevel(LocalityLevel)}
-	 * or {@link #setLocales(Locale...)}) so you should generally call this setter last.
-	 * @param arr the list of formats
+	 * built-in formats. This is a supplier since the collection of custom formats
+	 * may need to be initialized multiple times for thread safety.
+	 * @param customFormats the supplier that produces the collection of custom formats
 	 */
-	@SafeVarargs
-	public final void addCustomFormats(F... arr) {
-		Set<F> set = new HashSet<>(formatsNumbersOnly.size() + formatsWithLetters.size());
-		set.addAll(formatsNumbersOnly);
-		set.addAll(formatsWithLetters);
-		for (F f : arr) { add(f, true, set); }
+	public void setCustomFormats(Supplier<Collection<F>> customFormats) {
+		this.customFormats = customFormats;
+		unload();
 	}
-	
+
 	/**
 	 * Attempts to parse the given string, using all available formats. The
 	 * value parsed by the first format that doesn't throw an exception is returned.
@@ -136,8 +139,7 @@ abstract class Extractor<F extends Format, T> {
 		if (StringUtils.isEmpty(text)) { return null; }
 		
 		ParsePosition pp = new ParsePosition(0);
-		List<F> formats = Utilities.containsLetters(text)? formatsWithLetters : formatsNumbersOnly;
-		for (F f : formats) {
+		for (F f : formats.get().getFormats(text)) {
 			pp.setIndex(0);
 			T val = Utilities.cast(f.parseObject(text, pp));
 			// Return the extracted value if the value is valid
@@ -162,8 +164,9 @@ abstract class Extractor<F extends Format, T> {
 	 */
 	public Set<Match<T>> extractAll(String text) {
 		Set<Match<T>> ret = new HashSet<>();
-		for (F f : formatsNumbersOnly) { extractAll(text, f, ret); }
-		for (F f : formatsWithLetters) { extractAll(text, f, ret); }
+		FormatList<F> fl = formats.get();
+		for (F f : fl.numbersOnly) { extractAll(text, f, ret); }
+		for (F f : fl.withLetters) { extractAll(text, f, ret); }
 		return ret;
 	}
 	
@@ -182,6 +185,15 @@ abstract class Extractor<F extends Format, T> {
 			
 			// Only try parsing dates after non-alphanumeric characters
 			tryParse = !Character.isLetterOrDigit(text.charAt(c));
+		}
+	}
+	
+	private static class FormatList<F extends Format> {
+		List<F> numbersOnly = new LinkedList<>();
+		List<F> withLetters = new LinkedList<>();
+		
+		List<F> getFormats(String s) {
+			return Utilities.containsLetters(s)? withLetters : numbersOnly;
 		}
 	}
 }

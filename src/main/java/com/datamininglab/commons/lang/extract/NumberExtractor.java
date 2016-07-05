@@ -1,7 +1,7 @@
-/*
+/*******************************************************************************
  * Copyright (c) 2016 Elder Research, Inc.
  * All rights reserved.
- */
+ *******************************************************************************/
 package com.datamininglab.commons.lang.extract;
 
 import java.text.NumberFormat;
@@ -53,7 +53,7 @@ public class NumberExtractor extends Extractor<NumberFormat, Number> {
 		
 		this.types = new BitSet(NumberFormatType.values().length);
 		for (NumberFormatType type : types) { this.types.set(type.ordinal(), true); }
-		loadFormats();
+		unload();
 	}
 	
 	@Override

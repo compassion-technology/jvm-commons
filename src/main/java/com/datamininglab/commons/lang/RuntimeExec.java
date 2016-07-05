@@ -1,7 +1,7 @@
-/*
- * Copyright (c) 2013 Elder Research, Inc.
+/*******************************************************************************
+ * Copyright (c) 2016 Elder Research, Inc.
  * All rights reserved.
- */
+ *******************************************************************************/
 package com.datamininglab.commons.lang;
 
 import java.io.BufferedReader;
