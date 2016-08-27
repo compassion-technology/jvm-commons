@@ -4,11 +4,19 @@
  *******************************************************************************/
 package com.datamininglab.commons.lang;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 import java.util.prefs.Preferences;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+
+import com.datamininglab.commons.logging.LogContext;
 
 /**
  * Interface designed to be used with an {@link Enum} that enumerates the
@@ -60,5 +68,43 @@ public interface PreferencesKey {
 	}
 	default String get(Properties props) {
 		return props.getProperty(key());
+	}
+	default char getChar(Properties props, char defVal) {
+		return CharUtils.toChar(get(props), defVal);
+	}
+	default boolean isOn(Properties props) {
+		return BooleanUtils.toBoolean(get(props));
+	}
+	default long getLong(Properties props, long defVal) {
+		return NumberUtils.toLong(get(props), defVal);
+	}
+	default double getDouble(Properties props, double defVal) {
+		return NumberUtils.toDouble(get(props), defVal);
+	}
+	
+	/**
+	 * Loads properties from a file, and optionally overwrites the specified keys with the system property
+	 * if set. This will catch and log any error encountered while loading the file.
+	 * @param props the properties to populate
+	 * @param file the file from which to load
+	 * @param keys the keys to check for overrides in the system properties
+	 * @return if the properties were loaded. This returns <tt>true</tt> if no properties file was found or
+	 * if it was loaded without error.
+	 */
+	static boolean load(Properties props, String file, PreferencesKey... keys) {
+		try (InputStream is = new FileInputStream(file)) {
+			props.load(is);
+		} catch (FileNotFoundException e) {
+			// Use defaults
+		} catch (IOException e) {
+			LogContext.warning(e, "Error loading config from %s", file);
+			return false;
+		}
+		
+		for (PreferencesKey key : keys) {
+			String override = System.getProperty(key.key());
+			if (override != null) { props.setProperty(key.key(), override); }
+		}
+		return true;
 	}
 }
