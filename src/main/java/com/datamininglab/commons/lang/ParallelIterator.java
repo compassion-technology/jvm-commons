@@ -6,6 +6,7 @@ package com.datamininglab.commons.lang;
 
 import java.util.Iterator;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -27,7 +28,7 @@ public abstract class ParallelIterator<T> {
 	private static final int  DEFAULT_THREADS = 1;
 
 	private int threads, threadPriority;
-	private ArrayBlockingQueue<T> queue;
+	private BlockingQueue<T> queue;
 	
 	// If the iterator has more elements available (don't want workers to stop when queue is empty)
 	private volatile boolean iterHasNext;

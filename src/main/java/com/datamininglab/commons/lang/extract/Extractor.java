@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
 
 import com.datamininglab.commons.lang.Utilities;
@@ -195,5 +196,9 @@ abstract class Extractor<F extends Format, T> {
 		List<F> getFormats(String s) {
 			return Utilities.containsLetters(s)? withLetters : numbersOnly;
 		}
+	}
+	
+	public Range<T> getValidRange() {
+		return Range.between(min, max, comp);
 	}
 }

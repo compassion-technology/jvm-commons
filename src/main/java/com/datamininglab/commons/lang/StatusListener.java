@@ -30,7 +30,7 @@ public interface StatusListener {
 	 */
 	default long getNotifyIntervalNS() { return DEFAULT_NOTIFY_NS; }
 	
-	public static class DefaultStatusListener implements StatusListener {
+	class DefaultStatusListener implements StatusListener {
 		private static final double PCT_COEFF = 100.0;
 		
 		@Override

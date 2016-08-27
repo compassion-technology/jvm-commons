@@ -769,12 +769,13 @@ public final class Utilities {
 	
 	/**
 	 * Starts a thread marked as a daemon thread that executes the provided runnable.
+	 * @param g the thread group (can be <tt>null</tt>)
 	 * @param r the runnable to execute
 	 * @param name the name of the thread
 	 * @return the created thread
 	 */
-	public static Thread startDaemon(Runnable r, String name) {
-		Thread t = new Thread(r, name);
+	public static Thread startDaemon(ThreadGroup g, Runnable r, String name) {
+		Thread t = new Thread(g, r, name);
 		t.setDaemon(true);
 		t.start();
 		return t;
@@ -822,7 +823,7 @@ public final class Utilities {
 	}
 	
 	/**
-	 * Waits the specified time for the next available object on the queue, handling the
+	 * Waits up to the specified time for the next available object in the queue, handling the
 	 * interrupted exception.
 	 * @param <T> the type of objects in the queue
 	 * @param queue the queue
@@ -840,6 +841,37 @@ public final class Utilities {
         	LogContext.warning("Interrupted while polling queue " + queue);
         }
         return o;
+	}
+	
+	/**
+	 * Waits the up to specified time for the next available objects in the queue. The batch may only have one item,
+	 * but if there are more available in the queue they will also be added (up until the max batch size). An empty
+	 * list will only be returned if there are no available objects and the specified time has elapsed.
+	 * @param <T> the type of objects in the queue
+	 * @param queue the queue
+	 * @param time how long to wait for objects to become available
+	 * @param unit the unit in which <tt>time</tt> is measured
+	 * @param batch the output batch list. This is a parameter so the same list instance can be reused, and is not
+	 * required to be empty when passed in
+	 * @param maxBatchSize the maximum number of objects to include
+	 * @return if any objects were retrieved from the queue
+	 * @see BlockingQueue#poll(long, TimeUnit)
+	 * @see BlockingQueue#drainTo(Collection, int)
+	 */
+	public static <T> boolean pollBatch(BlockingQueue<T> queue, long time, TimeUnit unit, Collection<T> batch, int maxBatchSize) {
+		// If there are any rows in the queue, drain them to the batch
+		if (queue.drainTo(batch, maxBatchSize) < 1) {
+			// If empty, wait up to a the specified time for an entry to appear
+			T first = Utilities.poll(queue, time, unit);
+			// If one is added, add it to the list, and drain any others into the batch that have since been added
+			if (first != null) {
+				batch.add(first);
+				queue.drainTo(batch, maxBatchSize - 1);
+				return true;
+			}
+			return false;
+		}
+		return true;
 	}
 	
 	/**
@@ -865,7 +897,7 @@ public final class Utilities {
 	/**
 	 * Adds the object to the queue, waiting for space to become available if necessary
 	 * and handling the interrupted exception. This method will continue to wait
-	 * for space to become available every second as long as the status monitor is running.
+	 * for space to become available as long as the status monitor is running.
 	 * @param <T> the type of objects in the queue
 	 * @param queue the queue
 	 * @param obj the object to add
@@ -877,7 +909,7 @@ public final class Utilities {
 	 */
 	public static <T> boolean offer(BlockingQueue<T> queue, T obj, StatusMonitor rm) {
 		while (rm == null || rm.isRunning()) {
-			if (offer(queue, obj, 50L, TimeUnit.MILLISECONDS)) { return true; }
+			if (offer(queue, obj, 1L, TimeUnit.SECONDS)) { return true; }
 		}
 		return false;
 	}
