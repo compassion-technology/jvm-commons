@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * @param <T> the type of items to process
  * @since Aug 26, 2016
  */
-public abstract class QueueDaemonWorker<T> {
+public abstract class QueueDaemonWorker<T> implements Runnable {
 	private static final long WAIT_TIME_MS = 100L;	
 	private static final ThreadGroup GROUP = new ThreadGroup(Utilities.pluralize(QueueDaemonWorker.class.getSimpleName())); 
 	
@@ -42,15 +42,18 @@ public abstract class QueueDaemonWorker<T> {
 	 */
 	public void start() {
 		if (thread == null || !thread.isAlive()) {
-			thread = Utilities.startDaemon(GROUP, () -> {
-				List<T> batch = new ArrayList<>(batchSize);
-				while (running || !queue.isEmpty()) {
-					if (Utilities.pollBatch(queue, 1L, TimeUnit.SECONDS, batch, batchSize)) {
-						nextBatch(batch);
-						batch.clear();
-					}
-				}
-			}, getClass().getSimpleName());
+			thread = Utilities.startDaemon(GROUP, this, getClass().getSimpleName());
+		}
+	}
+	
+	@Override
+	public void run() {
+		List<T> batch = new ArrayList<>(batchSize);
+		while (running || !queue.isEmpty()) {
+			if (Utilities.pollBatch(queue, 1L, TimeUnit.SECONDS, batch, batchSize)) {
+				nextBatch(batch);
+				batch.clear();
+			}
 		}
 	}
 
