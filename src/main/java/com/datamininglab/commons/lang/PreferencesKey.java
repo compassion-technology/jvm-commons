@@ -4,107 +4,123 @@
  *******************************************************************************/
 package com.datamininglab.commons.lang;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.prefs.Preferences;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-
-import com.datamininglab.commons.logging.LogContext;
 
 /**
- * Interface designed to be used with an {@link Enum} that enumerates the
- * available keys for the preferences in a {@link Preferences} node or a 
- * {@link Properties} table.
+ * <p>Interface designed to be used with an {@link Enum} that enumerates the
+ * available keys for the preferences in a {@link Preferences} node.
  * This interface uses its subclass' {@code toString()} lower-case representation
- * as the key into the node.
+ * as the key into the node.</p>
+ * <p>If using the singleton-style methods (the ones that do not take a {@link Preferences} parameter),
+ * you must override and implement the {@link #prefs()} method.</p>
  * 
  * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
  * @since Nov 23, 2015
  */
 public interface PreferencesKey {
-	default String key() { return toString().toLowerCase(); }
-	
-	default String get(Preferences node) {
-		return StringUtils.defaultString(node.get(key(), null), null);
-	}
-	default char getChar(Preferences node, char defVal) {
-		return CharUtils.toChar(get(node), defVal);
-	}
-	default boolean isOn(Preferences node) {
-		return node.getBoolean(key(), false);
-	}
-	default long getLong(Preferences node, long defVal) {
-		return node.getLong(key(), defVal);
-	}
-	default double getDouble(Preferences node, double defVal) {
-		return node.getDouble(key(), defVal);
-	}
-	
-	default void put(Preferences node, String val) {
-		node.put(key(), StringUtils.defaultString(val));
-	}
-	default void put(Preferences node, char val) {
-		put(node, String.valueOf(val));
-	}
-	default void put(Preferences node, boolean flag) {
-		node.putBoolean(key(), flag);
-	}
-	default void put(Preferences node, long val) {
-		node.putLong(key(), val);
-	}
-	default void put(Preferences node, double val) {
-		node.putDouble(key(), val);
-	}
-	
-	default void set(Properties props, String val) {
-		props.setProperty(key(), val);
-	}
-	default String get(Properties props) {
-		return props.getProperty(key());
-	}
-	default char getChar(Properties props, char defVal) {
-		return CharUtils.toChar(get(props), defVal);
-	}
-	default boolean isOn(Properties props) {
-		return BooleanUtils.toBoolean(get(props));
-	}
-	default long getLong(Properties props, long defVal) {
-		return NumberUtils.toLong(get(props), defVal);
-	}
-	default double getDouble(Properties props, double defVal) {
-		return NumberUtils.toDouble(get(props), defVal);
-	}
+	/**
+	 * Returns the preferences node to use for the singleton-style methods that do not take a {@link Preferences} parameter.
+	 * @return the preferences node to use, or <tt>null</tt> by default if you always will pass in a node to each method
+	 */
+	default Preferences prefs() { return null; }
 	
 	/**
-	 * Loads properties from a file, and optionally overwrites the specified keys with the system property
-	 * if set. This will catch and log any error encountered while loading the file.
-	 * @param props the properties to populate
-	 * @param file the file from which to load
-	 * @param keys the keys to check for overrides in the system properties
-	 * @return if the properties were loaded. This returns <tt>true</tt> if no properties file was found or
-	 * if it was loaded without error.
+	 * Gets the key that uniquely identifies this preference. The default implementation is <tt>toString().toLowerCase()</tt>.
+	 * @return the preference key
 	 */
-	static boolean load(Properties props, String file, PreferencesKey... keys) {
-		try (InputStream is = new FileInputStream(file)) {
-			props.load(is);
-		} catch (FileNotFoundException e) {
-			// Use defaults
-		} catch (IOException e) {
-			LogContext.warning(e, "Error loading config from %s", file);
-			return false;
-		}
-		
-		for (PreferencesKey key : keys) {
-			String override = System.getProperty(key.key());
-			if (override != null) { props.setProperty(key.key(), override); }
-		}
-		return true;
+	default String key() { return toString().toLowerCase(); }
+	
+	/**
+	 * Gets the default value for this key as a string.
+	 * @return the default value or <tt>null</tt> if no default has been specified
+	 */
+	default Object defVal() { return null; }
+
+	default String get() {
+		return get(prefs());
+	}
+	default char getChar() {
+		return getChar(prefs());
+	}
+	default int getInt() {
+		return getInt(prefs());
+	}
+	default long getLong() {
+		return getLong(prefs());
+	}
+	default float getFloat() {
+		return getFloat(prefs());
+	}
+	default double getDouble() {
+		return getDouble(prefs());
+	}
+	default boolean isOn() {
+		return isOn(prefs());
+	}
+	default Path getPath() {
+		return getPath(prefs());
+	}
+	
+	default String get(Preferences prefs) {
+		return prefs.get(key(), Objects.toString(defVal(), null));
+	}
+	default char getChar(Preferences prefs) {
+		return CharUtils.toChar(get(prefs), (char) 0);
+	}
+	default int getInt(Preferences prefs) {
+		return prefs.getInt(key(), 0);
+	}
+	default long getLong(Preferences prefs) {
+		return prefs.getLong(key(), 0L);
+	}
+	default float getFloat(Preferences prefs) {
+		return prefs.getFloat(key(), 0.0f);
+	}
+	default double getDouble(Preferences prefs) {
+		return prefs.getDouble(key(), 0.0);
+	}
+	default boolean isOn(Preferences prefs) {
+		return prefs.getBoolean(key(), false);
+	}
+	default Path getPath(Preferences prefs) {
+		return Paths.get(get(prefs));
+	}
+	
+	default void put(String val) {
+		put(prefs(), val);
+	}
+	default void put(char val) {
+		put(prefs(), val);
+	}
+	default void put(boolean flag) {
+		put(prefs(), flag);
+	}
+	default void put(long val) {
+		put(prefs(), val);
+	}
+	default void put(double val) {
+		put(prefs(), val);
+	}
+	
+	default void put(Preferences prefs, String val) {
+		prefs.put(key(), StringUtils.defaultString(val));
+	}
+	default void put(Preferences prefs, char val) {
+		put(String.valueOf(val));
+	}
+	default void put(Preferences prefs, boolean flag) {
+		prefs.putBoolean(key(), flag);
+	}
+	default void put(Preferences prefs, long val) {
+		prefs.putLong(key(), val);
+	}
+	default void put(Preferences prefs, double val) {
+		prefs.putDouble(key(), val);
 	}
 }
