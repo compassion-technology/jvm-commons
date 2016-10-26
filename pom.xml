@@ -10,7 +10,7 @@
 	<artifactId>eri-commons-lang</artifactId>
 	<name>ERI Commons - Language Extensions</name>
 	<description>Shared Java language extensions</description>
-	<version>1.4.3-SNAPSHOT</version>
+	<version>1.4.4-SNAPSHOT</version>
 
 	<properties>
 		<scm>code.elderresearch.com</scm>
@@ -27,12 +27,12 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.4</version>
+			<version>3.5</version>
 		</dependency>
 		<dependency>
 			<groupId>com.datamininglab.commons</groupId>
 			<artifactId>eri-commons-logging</artifactId>
-			<version>1.6</version>
+			<version>1.8.0</version>
 		</dependency>
 	</dependencies>
 </project>
