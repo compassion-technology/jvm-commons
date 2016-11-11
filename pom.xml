@@ -10,7 +10,7 @@
 	<artifactId>eri-commons-lang</artifactId>
 	<name>ERI Commons - Language Extensions</name>
 	<description>Shared Java language extensions</description>
-	<version>1.4.4-SNAPSHOT</version>
+	<version>1.4.5-SNAPSHOT</version>
 
 	<properties>
 		<scm>code.elderresearch.com</scm>
