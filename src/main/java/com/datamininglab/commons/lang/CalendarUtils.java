@@ -17,6 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.datamininglab.commons.logging.LogContext;
 
+import lombok.val;
+
 /**
  * Contains some time/date utilities using the {@link Calendar} API.
  * 
@@ -58,7 +60,7 @@ public final class CalendarUtils {
 	 * @return the calendar
 	 */
 	public static Calendar at(Date d) {
-		Calendar c = get();
+		val c = get();
 		c.setTime(d);
 		return c;
 	}
@@ -69,7 +71,7 @@ public final class CalendarUtils {
 	 * @return the calendar
 	 */
 	public static Calendar at(long millis) {
-		Calendar c = get();
+		val c = get();
 		c.setTimeInMillis(millis);
 		return c;
 	}
@@ -112,7 +114,7 @@ public final class CalendarUtils {
 	 * @return the string representation
 	 */
 	public static String toString(int calendarField, int value, int style) {
-		DateFormatSymbols dfs = DFS.get();
+		val dfs = DFS.get();
 		String[] arr = null;
 		switch (calendarField) {
 			case Calendar.ERA:
@@ -161,7 +163,7 @@ public final class CalendarUtils {
 				}
 			}
 		}
-		String cleaned = StringUtils.upperCase(StringUtils.replaceChars(field, "-/()", "__"));
+		val cleaned = StringUtils.upperCase(StringUtils.replaceChars(field, "-/()", "__"));
 		return fieldMap.getOrDefault(cleaned, -1);
 	}
 	
@@ -171,7 +173,7 @@ public final class CalendarUtils {
 	 * @return the values of every calendar field
 	 */
 	public static int[] extract(Calendar c) {
-		int[] ret = new int[Calendar.FIELD_COUNT];
+		val ret = new int[Calendar.FIELD_COUNT];
 		for (int i = 0; i < ret.length; i++) { ret[i] = c.get(i); }
 		return ret;
 	}
