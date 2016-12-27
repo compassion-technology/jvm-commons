@@ -107,11 +107,11 @@ public interface PropertiesKey {
 	}
 	
 	/**
-	 * Loads properties from a file, and optionally overwrites the specified keys with the system property
-	 * if set. This will catch and log any error encountered while loading the file.
+	 * Loads properties from a file, and optionally overwrites the specified keys with the system property or environment
+	 * variable if set. This will catch and log any error encountered while loading the file.
 	 * @param props the properties to populate
 	 * @param file the file from which to load
-	 * @param keys the keys to check for overrides in the system properties
+	 * @param keys the keys to check for overrides in the system properties and environment variables
 	 * @return if the properties were loaded. This returns <tt>true</tt> if no properties file was found or
 	 * if it was loaded without error.
 	 */
@@ -126,8 +126,11 @@ public interface PropertiesKey {
 		}
 		
 		for (PropertiesKey key : keys) {
-			String override = System.getProperty(key.key());
-			if (override != null) { props.setProperty(key.key(), override); }
+			String sysProp = System.getProperty(key.key());
+			if (sysProp != null) { props.setProperty(key.key(), sysProp); }
+			
+			String envVar = System.getenv(key.key());
+			if (envVar != null) { props.setProperty(key.key(), envVar); }
 		}
 		return true;
 	}

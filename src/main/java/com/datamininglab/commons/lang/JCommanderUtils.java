@@ -10,6 +10,8 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import com.datamininglab.commons.logging.LogContext;
 
+import lombok.val;
+
 /**
  * Convenience utilities when using {@link JCommander} to parse command-line arguments.
  * 
@@ -29,7 +31,7 @@ public final class JCommanderUtils {
 	 * @see JCommander#addObject(Object)
 	 */
 	public static boolean parseArgs(String[] args, Object... objs) {
-		JCommander jc = new JCommander();
+		val jc = new JCommander();
 		Arrays.asList(objs).forEach(o -> jc.addObject(o));
  		return parseArgs(args, jc);
 	}
@@ -46,10 +48,10 @@ public final class JCommanderUtils {
 	 */
 	@SafeVarargs
 	public static <T> T parseCommands(String[] args, T... commands) {
-		JCommander jc = new JCommander();
+		val jc = new JCommander();
 		Arrays.asList(commands).forEach(c -> jc.addCommand(c));
 		if (parseArgs(args, jc)) {
-			String pc = jc.getParsedCommand();
+			val pc = jc.getParsedCommand();
 			if (pc == null) {
 				jc.usage();
 				return null;

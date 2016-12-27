@@ -6,6 +6,7 @@ package com.datamininglab.commons.lang;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -38,7 +39,7 @@ public class StatusMonitor {
 		ERROR
 	}
 	
-	private List<SMListener> listeners;
+	private List<SMListenerWrapper> listeners;
 	private volatile boolean inAtomicUpdate;
 	
 	private Object    name;
@@ -73,13 +74,13 @@ public class StatusMonitor {
 	 * @return this for method chaining 
 	 */
 	public StatusMonitor addListener(StatusListener listener) {
-		listeners.add(new SMListener(listener));
+		listeners.add(new SMListenerWrapper(listener));
 		return this;
 	}
 	
 	private StatusMonitor notifyListeners(boolean forceNotify) {
 		if (inAtomicUpdate) { return this; }
-		for (SMListener sml : listeners) {
+		for (SMListenerWrapper sml : listeners) {
 			if (forceNotify || sml.shouldNotify()) { sml.notify(this); }
 		}
 		return this;
@@ -112,7 +113,7 @@ public class StatusMonitor {
 	 * Gets the name of the task that this status monitor is monitoring.
 	 * @return this monitor's task name
 	 */
-	public String getName() { return name == null? "-" : name.toString(); }
+	public String getName() { return Objects.toString(name, "-"); }
 	
 	/**
 	 * Returns the current task state.
@@ -309,12 +310,12 @@ public class StatusMonitor {
 		    || getState() == TaskState.ERROR;
 	}
 	
-	private static class SMListener {
+	private static class SMListenerWrapper {
 		private StatusListener listener;
 		private long notifyInterval;
 		private volatile long lastNotified;
 		
-		SMListener(StatusListener l) {
+		SMListenerWrapper(StatusListener l) {
 			this.listener = l;
 			this.notifyInterval = l.getNotifyIntervalNS();
 		}
