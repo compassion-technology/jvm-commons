@@ -22,6 +22,7 @@ import com.datamininglab.commons.lang.LambdaUtils.IORunnable;
 public class CloseableIterator<T> implements Iterator<T>, AutoCloseable {
 	private Iterator<T> iter;
 	private IORunnable closer;
+	private long size;
 	
 	/**
 	 * Creates a new closeable iterator. 
@@ -32,6 +33,23 @@ public class CloseableIterator<T> implements Iterator<T>, AutoCloseable {
 		this.iter = iter;
 		this.closer = closer;
 	}
+	
+	/**
+	 * Sets a size to give a hint to callers about how many elements may be returned by the iterator (or bytes, rows, etc.).
+	 * @param size the size of objects that will be returned by this iterator
+	 * @return this for method chaining
+	 */
+	public CloseableIterator<T> setSize(long size) {
+		this.size = size;
+		return this;
+	}
+	
+	/**
+	 * A hint to callers about how many elements may be returned by the iterator (or bytes, rows, etc.). This is manaully
+	 * set via {@link #setSize(long)} so it may not set to a meaningful value.
+	 * @return the iterator's size
+	 */
+	public long getSize() { return size; }
 	
 	@Override
 	public boolean hasNext() {
