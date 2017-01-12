@@ -91,6 +91,13 @@ public final class LambdaUtils {
 		}
 	}
 	
+	/**
+	 * Runnable that throws an {@link IOException}.
+	 * @see Runnable
+	 */
+	public interface IORunnable {
+		void run() throws IOException;
+	}
 	
 	/**
 	 * Consumer that throws an {@link IOException}.
