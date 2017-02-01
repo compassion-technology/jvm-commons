@@ -53,6 +53,42 @@ public final class LambdaUtils {
 		if (in != null && consumer != null) { consumer.accept(in); }
 	}
 	
+	/**
+	 * Perform the operation with the resource, invoking the closer regardless of if the operation succeeds. This is
+	 * for classes that do not implement the {@link Closeable} interface but still have a method that releases
+	 * held resources.
+	 * @param resource the resource on which to operate
+	 * @param consumer the operation to perform on the resource
+	 * @param closer the custom close method (for example <tt>dispose()</tt>)
+	 * @param <R> the resource type
+	 */
+	public static <R> void withResource(R resource, Consumer<R> consumer, Consumer<R> closer) {
+		try {
+			consumer.accept(resource);
+		} finally {
+			closer.accept(resource);
+		}
+	}
+	
+	/**
+	 * Perform the operation with the resource, invoking the closer regardless of if the operation succeeds. This is
+	 * for classes that do not implement the {@link Closeable} interface but still have a method that releases
+	 * held resources.
+	 * @param resource the resource on which to operate
+	 * @param function the operation to perform on the resource
+	 * @param closer the custom close method (for example <tt>dispose()</tt>)
+	 * @param <R> the resource type
+	 * @param <T> the result type
+	 * @return the result of the function
+	 */
+	public static <R, T> T withResource(R resource, Function<R, T> function, Consumer<R> closer) {
+		try {
+			return function.apply(resource);
+		} finally {
+			closer.accept(resource);
+		}
+	}
+	
 	// This class is needed because, when calling these methods, the compiler can't tell the difference of the method
 	// signatures based on throws or not for lambdas- would've needed to cast
 	public static class IO {
