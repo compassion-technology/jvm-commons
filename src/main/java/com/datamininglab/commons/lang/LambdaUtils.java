@@ -4,6 +4,7 @@
  *******************************************************************************/
 package com.datamininglab.commons.lang;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -88,6 +89,76 @@ public final class LambdaUtils {
 		 */
 		public static <I> void accept(I in, IOConsumer<I> consumer) throws IOException {
 			if (in != null && consumer != null) { consumer.accept(in); }
+		}
+		
+		/**
+		 * Lambda wrapper for a try-with-resources blocks.
+		 * @param closeable the closeable resource
+		 * @param consumer the operation to perform on the resource
+		 * @param <C> the resource type
+		 * @throws IOException if <tt>consumer</tt> threw an exception
+		 */
+		public static <C extends Closeable> void withResource(C closeable, IOConsumer<C> consumer) throws IOException {
+			try (C c = closeable) {
+				consumer.accept(c);
+			}
+		}
+		
+		/**
+		 * Lambda wrapper for a try-with-resources blocks.
+		 * @param closeable the closeable resource
+		 * @param function the operation to perform on the resource
+		 * @param <C> the resource type
+		 * @param <T> the result type
+		 * @return the result of the function
+		 * @throws IOException if <tt>function</tt> threw an exception
+		 */
+		public static <C extends Closeable, T> T withResource(C closeable, IOFunction<C, T> function) throws IOException {
+			try (C c = closeable) {
+				return function.apply(c);
+			}
+		}
+		
+		/**
+		 * Perform the operation with the resource, invoking the closer regardless of if the operation succeeds. This is
+		 * for classes that do not implement the {@link Closeable} interface but still have a method that releases
+		 * held resources.
+		 * @param resource the resource on which to operate
+		 * @param consumer the operation to perform on the resource, which may throw an {@link IOException}
+		 * @param closer the custom close method (for example <tt>dispose()</tt>)
+		 * @param <R> the resource type
+		 * @throws IOException if <tt>consumer</tt> threw an exception
+		 */
+		public static <R> void withResource(R resource, IOConsumer<R> consumer, IOConsumer<R> closer) throws IOException {
+			try {
+				consumer.accept(resource);
+			} catch (IOException e) {
+				throw e;
+			} finally {
+				closer.accept(resource);
+			}
+		}
+		
+		/**
+		 * Perform the operation with the resource, invoking the closer regardless of if the operation succeeds. This is
+		 * for classes that do not implement the {@link Closeable} interface but still have a method that releases
+		 * held resources.
+		 * @param resource the resource on which to operate
+		 * @param function the operation to perform on the resource, which may throw an {@link IOException}
+		 * @param closer the custom close method (for example <tt>dispose()</tt>)
+		 * @param <R> the resource type
+		 * @param <T> the result type
+		 * @return the result of the function
+		 * @throws IOException if <tt>function</tt> threw an exception
+		 */
+		public static <R, T> T withResource(R resource, IOFunction<R, T> function, IOConsumer<R> closer) throws IOException {
+			try {
+				return function.apply(resource);
+			} catch (IOException e) {
+				throw e;
+			} finally {
+				closer.accept(resource);
+			}
 		}
 	}
 	
