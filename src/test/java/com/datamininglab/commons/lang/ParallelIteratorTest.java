@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.datamininglab.commons.lang.iter.IteratorMultithreaded;
+
 import junit.framework.TestCase;
 
 public class ParallelIteratorTest extends TestCase {
@@ -20,7 +22,7 @@ public class ParallelIteratorTest extends TestCase {
 		final List<Integer> list = new ArrayList<>(RECORDS);
 		for (int i = 0; i < RECORDS; i++) { list.add(RAND.nextInt(10)); }
 		
-		new ParallelIterator<Integer>() {
+		new IteratorMultithreaded<Integer>() {
 			@Override
 			protected boolean process(Integer object) {
 				count.incrementAndGet();

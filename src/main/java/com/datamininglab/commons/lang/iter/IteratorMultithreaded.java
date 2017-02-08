@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Elder Research, Inc.
  * All rights reserved.
  *******************************************************************************/
-package com.datamininglab.commons.lang;
+package com.datamininglab.commons.lang.iter;
 
 import java.util.Iterator;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -10,6 +10,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import com.datamininglab.commons.lang.Utilities;
 import com.datamininglab.commons.logging.LogContext;
 
 /**
@@ -22,7 +23,7 @@ import com.datamininglab.commons.logging.LogContext;
  * @param <T> the type of object to iterate
  * @since Jul 4, 2013
  */
-public abstract class ParallelIterator<T> {
+public abstract class IteratorMultithreaded<T> {
 	private static final long WAIT_TIME_MS = 50L;
 	private static final int  DEFAULT_QUEUE_SIZE = 102400;
 	private static final int  DEFAULT_THREADS = 1;
@@ -37,7 +38,7 @@ public abstract class ParallelIterator<T> {
 	// The number of live worker threads
 	private CountDownLatch liveThreads;
 	
-	public ParallelIterator() {
+	public IteratorMultithreaded() {
 		setQueueSize(DEFAULT_QUEUE_SIZE);
 		setThreads(DEFAULT_THREADS);
 		setThreadPriority(Thread.NORM_PRIORITY - 1);
@@ -48,7 +49,7 @@ public abstract class ParallelIterator<T> {
 	 * @param size the new size
 	 * @return this for method chaining
 	 */
-	public ParallelIterator<T> setQueueSize(int size) {
+	public IteratorMultithreaded<T> setQueueSize(int size) {
 		this.queue = new ArrayBlockingQueue<>(size);
 		return this;
 	}
@@ -60,7 +61,7 @@ public abstract class ParallelIterator<T> {
 	 * @param threads the number of worker threads
 	 * @return this for method chaining
 	 */
-	public ParallelIterator<T> setThreads(int threads) {
+	public IteratorMultithreaded<T> setThreads(int threads) {
 		this.threads = threads;
 		return this;
 	}
@@ -72,7 +73,7 @@ public abstract class ParallelIterator<T> {
 	 * @param threadPriority the thread priority for the worker threads
 	 * @return this for method chaining
 	 */
-	public ParallelIterator<T> setThreadPriority(int threadPriority) {
+	public IteratorMultithreaded<T> setThreadPriority(int threadPriority) {
 		this.threadPriority = threadPriority;
 		return this;
 	}
