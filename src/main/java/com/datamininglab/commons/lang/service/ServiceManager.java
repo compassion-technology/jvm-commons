@@ -6,6 +6,7 @@ package com.datamininglab.commons.lang.service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.function.Function;
@@ -18,7 +19,7 @@ import java.util.function.Function;
  * @param <S> the service type
  * @since Sep 20, 2016
  */
-public class ServiceManager<S> {
+public class ServiceManager<S> implements Iterable<S> {
 	public enum ServiceImplPriority {
 		/** The default or reference implementation of the service if no others exist. */
 		REFERENCE,
@@ -59,10 +60,18 @@ public class ServiceManager<S> {
 	 * <tt>null</tt>
 	 */
 	public <T> T apply(Function<S, T> fn) {
-		for (S impl : impls) {
+		for (S impl : this) {
 			T ret = fn.apply(impl);
 			if (ret != null) { return ret; }
 		}
 		return null;
+	}
+	
+	/**
+	 * Returns an iterator over implementations for the service, ordered by priority.
+	 */
+	@Override
+	public Iterator<S> iterator() {
+		return impls.iterator();
 	}
 }

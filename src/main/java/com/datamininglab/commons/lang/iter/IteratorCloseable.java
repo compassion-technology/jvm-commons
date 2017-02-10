@@ -2,7 +2,7 @@
  * Copyright (c) 2017 Elder Research, Inc.
  * All rights reserved.
  *******************************************************************************/
-package com.datamininglab.commons.lang;
+package com.datamininglab.commons.lang.iter;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -19,7 +19,7 @@ import com.datamininglab.commons.lang.LambdaUtils.IORunnable;
  * @param <T> the type of data being iterated over
  * @since Jan 5, 2017
  */
-public class CloseableIterator<T> implements Iterator<T>, AutoCloseable {
+public class IteratorCloseable<T> implements IteratorWithSize<T>, AutoCloseable {
 	private Iterator<T> iter;
 	private IORunnable closer;
 	private long size;
@@ -29,7 +29,7 @@ public class CloseableIterator<T> implements Iterator<T>, AutoCloseable {
 	 * @param iter the wrapped iterator
 	 * @param closer the close callback. If this is <tt>null</tt>, you must subclass this class and override {@link #close()}.
 	 */
-	public CloseableIterator(Iterator<T> iter, IORunnable closer) {
+	public IteratorCloseable(Iterator<T> iter, IORunnable closer) {
 		this.iter = iter;
 		this.closer = closer;
 	}
@@ -39,17 +39,13 @@ public class CloseableIterator<T> implements Iterator<T>, AutoCloseable {
 	 * @param size the size of objects that will be returned by this iterator
 	 * @return this for method chaining
 	 */
-	public CloseableIterator<T> setSize(long size) {
+	public IteratorCloseable<T> setSize(long size) {
 		this.size = size;
 		return this;
 	}
 	
-	/**
-	 * A hint to callers about how many elements may be returned by the iterator (or bytes, rows, etc.). This is manaully
-	 * set via {@link #setSize(long)} so it may not set to a meaningful value.
-	 * @return the iterator's size
-	 */
-	public long getSize() { return size; }
+	@Override
+	public long size() { return size; }
 	
 	@Override
 	public boolean hasNext() {

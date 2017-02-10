@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Elder Research, Inc.
  * All rights reserved.
  *******************************************************************************/
-package com.datamininglab.commons.lang;
+package com.datamininglab.commons.lang.io;
 
 import java.io.BufferedReader;
 import java.io.IOException;
