@@ -144,44 +144,27 @@ public final class Utilities {
 	}
 	
 	/**
-	 * Applies the same format string to each element of a <tt>float</tt> array,
+	 * Applies the same format string to each element of an array,
 	 * concatenating each formatted string together with a space.
-	 * @param format the format to use for each element (i.e. <tt>"%3.2f"</tt>)
+	 * @param format the format to use for each element (e.g. <tt>"%5d"</tt>)
+	 * @param delim the delimiter between each element (e.g. <tt>" "</tt>)
 	 * @param array the array to format
 	 * @return a formatted string
 	 * @see String#format(String, Object...)
 	 */
-	public static String deepFormat(String format, float[] array) {
+	public static String deepFormat(String format, String delim, Object[] array) {
 		StringBuilder sb = new StringBuilder();
-		Object[] obj = new Object[array.length];
 		for (int i = 0; i < array.length; i++) {
-			sb.append(format + " ");
-			obj[i] = array[i];
+			if (i > 0) { sb.append(delim); }
+			sb.append(format);
 		}
-		return String.format(sb.toString().trim(), obj);
-	}
-
-	/**
-	 * Applies the same format string to each element of an <tt>int</tt> array,
-	 * concatenating each formatted string together with a space.
-	 * @param format the format to use for each element (i.e. <tt>"%5d"</tt>)
-	 * @param array the array to format
-	 * @return a formatted string
-	 * @see String#format(String, Object...)
-	 */
-	public static String deepFormat(String format, int[] array) {
-		StringBuilder sb = new StringBuilder();
-		Object[] obj = new Object[array.length];
-		for (int i = 0; i < array.length; i++) {
-			sb.append(format + " ");
-			obj[i] = array[i];
-		}
-		return String.format(sb.toString().trim(), obj);
+		return String.format(sb.toString(), array);
 	}
 	
 	private static final char[] NUM_PREFIX_SYM = {
 		'k', 'm', 'g', 't', 'p', 'e', 'z', 'y'
 	};
+	private static final int DIGITS_1K = 4;
 	
 	/**
 	 * Converts a long into its string representation of no more than 4 significant digits,
@@ -195,11 +178,12 @@ public final class Utilities {
 		String s = String.valueOf(l);
 		int i = -1;
 		int n;
-		while ((n = s.length()) > 4) {
-			s = s.substring(0, n - 3); i++;
+		while ((n = s.length()) > DIGITS_1K) {
+			s = s.substring(0, n - DIGITS_1K + 1);
+			i++;
 		}
 		
-		if (n == 4) { s = s.charAt(0) + "," + s.substring(1); }
+		if (n == DIGITS_1K) { s = s.charAt(0) + "," + s.substring(1); }
 		if (i >= 0) { s += NUM_PREFIX_SYM[i]; }
 		return s;
 	}
@@ -661,6 +645,8 @@ public final class Utilities {
 	/**
 	 * Generic cast method. Use with caution as it bypasses compiler checks.
 	 * @param toCast the object to cast
+	 * @param <S> the original type
+	 * @param <T> the casted type
 	 * @return the casted objectS
 	 */
 	@SuppressWarnings("unchecked")
