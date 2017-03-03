@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -23,32 +24,50 @@ import lombok.val;
  * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
  * @since Mar 1, 2017
  */
-@Getter @Builder
+@Builder
 public class Documentation {
+	private Supplier<String> nameProvider;
 	/** A human-readable name for the component. */
-	private String displayName;
+	@Getter private String displayName;
 	/** A longer description of the component. */
-	private String description;
+	@Getter private String description;
 	/** The version of the component. */
-	private String version;
+	@Getter private String version;
 	/** Tags (short keywords) that relate to the component. */
-	private Set<String> tags;
+	@Getter private Set<String> tags;
+
+	/** 
+	 * The identifying name for the component. This is a {@link Supplier} since the documentation should not be the
+	 * authority on assigning names to components, yet the name of a component is important piece of metadata for
+	 * documenting it. This should generally be a method reference, like <tt>this::getName</tt>.
+	 * @param nameProvider the name provider for the component.
+	 * @return thew new instance that is a copy of this instance with the new name provider
+	 */
+	public Documentation withNameProvider(Supplier<String> nameProvider) {
+		return new Documentation(nameProvider, displayName, description, version, tags);
+	}
 	
 	public Documentation withDisplayName(String displayName) {
-		return new Documentation(displayName, description, version, tags);
+		return new Documentation(nameProvider, displayName, description, version, tags);
 	}
 	
 	public Documentation withDescription(String description) {
-		return new Documentation(displayName, description, version, tags);
+		return new Documentation(nameProvider, displayName, description, version, tags);
 	}
 	
 	public Documentation withVersion(String version) {
-		return new Documentation(displayName, description, version, tags);
+		return new Documentation(nameProvider, displayName, description, version, tags);
 	}
 	
 	public Documentation withTags(Set<String> tags) {
-		return new Documentation(displayName, description, version, tags);
+		return new Documentation(nameProvider, displayName, description, version, tags);
 	}
+	
+	/**
+	 * The identifying name for this component.
+	 * @return the component's name
+	 */
+	public String getName() { return LambdaUtils.get(nameProvider); }
 	
 	/** A longer description of a component. */
 	@Retention(RetentionPolicy.RUNTIME)
