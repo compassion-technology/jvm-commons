@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import lombok.Builder;
@@ -124,6 +125,14 @@ public class Documentation {
 		 * @param d the new documentation
 		 */
 		void setDocumentation(Documentation d);
+	}
+	
+	/**
+	 * Indicates a component has "child" components that also support documentation. This is so callers can recurse
+	 * trees of components that support documentation.
+	 */
+	public interface HasDocumentedChildren {
+		void forEachDocumentedChild(Consumer<IsDocumented> callback);
 	}
 	
 	public static void setFromAnnotations(Object o) {
