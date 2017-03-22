@@ -10,8 +10,8 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import lombok.Builder;
@@ -127,39 +127,56 @@ public class Documentation {
 		void setDocumentation(Documentation d);
 	}
 	
-	/**
-	 * Indicates a component has "child" components that also support documentation. This is so callers can recurse
-	 * trees of components that support documentation.
-	 */
-	public interface HasDocumentedChildren {
-		void forEachDocumentedChild(Consumer<IsDocumented> callback);
-	}
-	
-	public static void setFromAnnotations(Object o) {
-		if (o == null) { return; }
-		
-		update(o, get(o.getClass()));
-		for (Field f : o.getClass().getFields()) {
-			update(ReflectionUtils.get(f, o), get(f));
-		}
-	}
-	
 	private static Documentation get(AnnotatedElement ae) {
 		if (ae == null) { return null; }
 		
 		val db = Documentation.builder();
-		db.displayName(LambdaUtils.apply(ae.getAnnotation(DisplayName.class), DisplayName::value));
-		db.description(LambdaUtils.apply(ae.getAnnotation(Description.class), Description::value));
-		db.version(LambdaUtils.apply(ae.getAnnotation(Version.class), Version::value));
-		
-		val tags = new HashSet<String>();
-		LambdaUtils.accept(ae.getAnnotation(Tags.class), a -> Collections.addAll(tags, a.value()));
-		db.tags(tags);
-		
+		Optional.ofNullable(ae.getAnnotation(DisplayName.class))
+		        .map(DisplayName::value)
+		        .ifPresent(db::displayName);
+		Optional.ofNullable(ae.getAnnotation(Description.class))
+		        .map(Description::value)
+		        .ifPresent(db::description);
+		Optional.ofNullable(ae.getAnnotation(Version.class))
+		        .map(Version::value)
+		        .ifPresent(db::version);
+		Optional.ofNullable(ae.getAnnotation(Tags.class))
+		        .map(Tags::value)
+		        .ifPresent(tags -> {
+		        	val set = new HashSet<String>();
+		        	Collections.addAll(set, tags);
+		        	db.tags(set);
+		        });
 		return db.build();
 	}
 	
-	private static void update(Object o, Documentation d) {
+	/**
+	 * Sets the documentation from any present documentation annotations on the static fields in the class. The type
+	 * of each annotated field must implement {@link HasDocumentation}.
+	 * @param c the class whose fields to set
+	 */
+	public static void setFromAnnotations(Class<?> c) {
+		setFromAnnotations(c, null);
+	}
+	
+	/**
+	 * Sets the documentation on an object from any present documentation annotations on the object's class and sets
+	 * the documentation on its fields from annotations on those fields. The parameter object and its annotated fields
+	 * must implement {@link HasDocumentation}.
+	 * @param o the object to set
+	 */
+	public static void setFromAnnotations(Object o) {
+		setFromAnnotations(o.getClass(), o);
+	}
+	
+	private static void setFromAnnotations(Class<?> c, Object o) {
+		if (o != null) { set(o, get(c)); }
+		for (Field f : c.getFields()) {
+			set(ReflectionUtils.get(f, o), get(f));
+		}
+	}
+	
+	private static void set(Object o, Documentation d) {
 		if (o instanceof HasDocumentation) {
 			HasDocumentation hd = Utilities.cast(o);
 			hd.setDocumentation(d);
