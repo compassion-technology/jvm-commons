@@ -130,20 +130,6 @@ public final class Utilities {
 	}
 
 	/**
-	 * Compares the length of a token against its length w/o "Junk" Characters.
-	 * @param token - the token to be compared
-	 * @return a score (0 - 1) showing how much of the token is NOT junk
-	 */
-	public static float getTokenNonJunkCharacterRate(String token) {
-		if (token.length() < 1) {
-			return 0.0f;
-		}
-		String cleanedToken = token.replaceAll("[^ -~]", "");
-		
-		return Float.valueOf(cleanedToken.length()) / Float.valueOf(token.length());
-	}
-	
-	/**
 	 * Applies the same format string to each element of an array,
 	 * concatenating each formatted string together with a space.
 	 * @param format the format to use for each element (e.g. <tt>"%5d"</tt>)

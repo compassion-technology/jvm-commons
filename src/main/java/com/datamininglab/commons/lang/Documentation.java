@@ -10,9 +10,17 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -20,22 +28,29 @@ import lombok.val;
 
 /**
  * A way of documenting a component (via annotations or by providing a {@link Documentation} bean) that is readable at
- * run time.
+ * run time. This class uses {@link CharSequence} instead of {@link String} so that the values can be customized
+ * dynamically (for example localized).
  * 
  * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
  * @since Mar 1, 2017
  */
 @Builder
 public class Documentation {
-	private Supplier<String> nameProvider;
+	private Supplier<CharSequence> nameProvider;
+	/** The type of the component. */
+	@Getter private Class<?> type;
 	/** A human-readable name for the component. */
-	@Getter private String displayName;
+	@Getter private CharSequence displayName;
 	/** A longer description of the component. */
-	@Getter private String description;
+	@Getter private CharSequence description;
 	/** The version of the component. */
-	@Getter private String version;
+	@Getter private CharSequence version;
 	/** Tags (short keywords) that relate to the component. */
-	@Getter private Set<String> tags;
+	@Getter private Set<CharSequence> tags;
+	/** Lists requirements for this component. */
+	@Getter private List<Documentation> requires;
+	/** Lists the output this component produces. */
+	@Getter private List<Documentation> produces;
 
 	/** 
 	 * The identifying name for the component. This is a {@link Supplier} since the documentation should not be the
@@ -44,54 +59,71 @@ public class Documentation {
 	 * @param nameProvider the name provider for the component.
 	 * @return thew new instance that is a copy of this instance with the new name provider
 	 */
-	public Documentation withNameProvider(Supplier<String> nameProvider) {
-		return new Documentation(nameProvider, displayName, description, version, tags);
+	public Documentation withNameProvider(Supplier<CharSequence> nameProvider) {
+		return new Documentation(nameProvider, type, displayName, description, version, tags, requires, produces);
 	}
 	
-	public Documentation withDisplayName(String displayName) {
-		return new Documentation(nameProvider, displayName, description, version, tags);
+	public Documentation withType(Class<?> type) {
+		return new Documentation(nameProvider, type, displayName, description, version, tags, requires, produces);
 	}
 	
-	public Documentation withDescription(String description) {
-		return new Documentation(nameProvider, displayName, description, version, tags);
+	public Documentation withDisplayName(CharSequence displayName) {
+		return new Documentation(nameProvider, type, displayName, description, version, tags, requires, produces);
 	}
 	
-	public Documentation withVersion(String version) {
-		return new Documentation(nameProvider, displayName, description, version, tags);
+	public Documentation withDescription(CharSequence description) {
+		return new Documentation(nameProvider, type, displayName, description, version, tags, requires, produces);
 	}
 	
-	public Documentation withTags(Set<String> tags) {
-		return new Documentation(nameProvider, displayName, description, version, tags);
+	public Documentation withVersion(CharSequence version) {
+		return new Documentation(nameProvider, type, displayName, description, version, tags, requires, produces);
+	}
+	
+	public Documentation withTags(Set<CharSequence> tags) {
+		return new Documentation(nameProvider, type, displayName, description, version, tags, requires, produces);
+	}
+	
+	public Documentation withRequires(List<Documentation> requires) {
+		return new Documentation(nameProvider, type, displayName, description, version, tags, requires, produces);
+	}
+	
+	public Documentation withProduces(List<Documentation> produces) {
+		return new Documentation(nameProvider, type, displayName, description, version, tags, requires, produces);
 	}
 	
 	/**
 	 * The identifying name for this component.
 	 * @return the component's name
 	 */
-	public String getName() { return LambdaUtils.get(nameProvider); }
+	public CharSequence getName() { return LambdaUtils.get(nameProvider); }
 	
-	/** A longer description of a component. */
+	/** A description of the requirements (or prerequisites or input) of this component. */
 	@Retention(RetentionPolicy.RUNTIME)
-	public static @interface Description {
-		String value();
-	}
-
-	/** The way to identify a component. */
-	@Retention(RetentionPolicy.RUNTIME)
-	public static @interface DisplayName {
-		String value();
+	public static @interface Requires {
+		Doc[] value();
 	}
 	
-	/** A human-readable name for the component. */
+	/** A description of what this component produces (or output). */
 	@Retention(RetentionPolicy.RUNTIME)
-	public static @interface Version {
-		String value();
+	public static @interface Produces {
+		Doc[] value();
 	}
 	
-	/** Tags (short keywords) that relate to the component. */
+	/** A "parent" annotation for all documentation-related annotations. */
 	@Retention(RetentionPolicy.RUNTIME)
-	public static @interface Tags {
-		String[] value();
+	public static @interface Doc {
+		/** The type of the component. */
+		Class<?> type() default Object.class;
+		/** The way to identify a component. */
+		String name() default StringUtils.EMPTY;
+		/** A human-readable name for the component. */
+		String displayName() default StringUtils.EMPTY;
+		/** A longer description of a component. */
+		String value() default StringUtils.EMPTY;
+		/** The version of the component. */
+		String version() default StringUtils.EMPTY;
+		/** Tags (short keywords) that relate to the component. */
+		String[] tags() default {};
 	}
 	
 	/**
@@ -127,26 +159,17 @@ public class Documentation {
 		void setDocumentation(Documentation d);
 	}
 	
+	private static void ifNotEmpty(String s, Consumer<String> c) {
+		if (StringUtils.isNotEmpty(s)) { c.accept(s); }
+	}
+	
 	private static Documentation get(AnnotatedElement ae) {
 		if (ae == null) { return null; }
 		
 		val db = Documentation.builder();
-		Optional.ofNullable(ae.getAnnotation(DisplayName.class))
-		        .map(DisplayName::value)
-		        .ifPresent(db::displayName);
-		Optional.ofNullable(ae.getAnnotation(Description.class))
-		        .map(Description::value)
-		        .ifPresent(db::description);
-		Optional.ofNullable(ae.getAnnotation(Version.class))
-		        .map(Version::value)
-		        .ifPresent(db::version);
-		Optional.ofNullable(ae.getAnnotation(Tags.class))
-		        .map(Tags::value)
-		        .ifPresent(tags -> {
-		        	val set = new HashSet<String>();
-		        	Collections.addAll(set, tags);
-		        	db.tags(set);
-		        });
+		Optional.ofNullable(ae.getAnnotation(Doc.class)).ifPresent(d -> DOC_ADAPTER.accept(d, db));
+		Optional.ofNullable(ae.getAnnotation(Requires.class)).ifPresent(r -> db.requires(DOC_LIST_ADAPTER.apply(r.value())));
+		Optional.ofNullable(ae.getAnnotation(Produces.class)).ifPresent(r -> db.produces(DOC_LIST_ADAPTER.apply(r.value())));
 		return db.build();
 	}
 	
@@ -182,4 +205,27 @@ public class Documentation {
 			hd.setDocumentation(d);
 		}
 	}
+	
+	private static final BiConsumer<Doc, Documentation.DocumentationBuilder> DOC_ADAPTER = (d, db) -> {
+		if (d.type() != Object.class) { db.type(d.type()); }
+		ifNotEmpty(d.name(), n -> db.nameProvider(() -> n));
+		ifNotEmpty(d.displayName(), db::displayName);
+		ifNotEmpty(d.value(), db::description);
+		ifNotEmpty(d.version(), db::version);
+		if (ArrayUtils.getLength(d.tags()) > 0) {
+			val set = new HashSet<CharSequence>();
+        	Collections.addAll(set, d.tags());
+        	db.tags(set);
+		}
+	};
+	
+	private static final Function<Doc[], List<Documentation>> DOC_LIST_ADAPTER = arr -> {
+		val ret = new LinkedList<Documentation>();
+		for (val d : arr) {
+			val db = Documentation.builder();
+			DOC_ADAPTER.accept(d, db);
+			ret.add(db.build());
+		}
+		return ret;
+	};
 }
