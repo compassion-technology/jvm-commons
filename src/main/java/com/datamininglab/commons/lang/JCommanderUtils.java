@@ -11,6 +11,7 @@ import com.beust.jcommander.ParameterException;
 import com.datamininglab.commons.logging.LogContext;
 
 import lombok.val;
+import lombok.experimental.UtilityClass;
 
 /**
  * Convenience utilities when using {@link JCommander} to parse command-line arguments.
@@ -18,11 +19,8 @@ import lombok.val;
  * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
  * @since Nov 15, 2016
  */
-public final class JCommanderUtils {
-	private JCommanderUtils() {
-		// Prevent initialization
-	}
-	
+@UtilityClass
+public class JCommanderUtils {
 	/**
 	 * Parses command-line arguments using JCommander, printing out the usage if there are any problems.
 	 * @param args the command line args
@@ -30,7 +28,7 @@ public final class JCommanderUtils {
 	 * @return whether or not the arguments parsed successfully
 	 * @see JCommander#addObject(Object)
 	 */
-	public static boolean parseArgs(String[] args, Object... objs) {
+	public boolean parseArgs(String[] args, Object... objs) {
 		val jc = new JCommander();
 		Arrays.asList(objs).forEach(o -> jc.addObject(o));
  		return parseArgs(args, jc);
@@ -47,7 +45,7 @@ public final class JCommanderUtils {
 	 * @see JCommander#addCommand(Object)
 	 */
 	@SafeVarargs
-	public static <T> T parseCommands(String[] args, T... commands) {
+	public <T> T parseCommands(String[] args, T... commands) {
 		val jc = new JCommander();
 		Arrays.asList(commands).forEach(c -> jc.addCommand(c));
 		if (parseArgs(args, jc)) {
@@ -71,7 +69,7 @@ public final class JCommanderUtils {
 	 * @see JCommander#addCommand(Object)
 	 * @see JCommander#addObject(Object)
 	 */
-	public static boolean parseArgs(String[] args, JCommander jc) {
+	public boolean parseArgs(String[] args, JCommander jc) {
 		try {
  			jc.parse(args);
 		} catch (ParameterException ex) {

@@ -11,24 +11,23 @@ import java.util.function.Supplier;
 
 import com.datamininglab.commons.logging.LogContext;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * Static container for utilities associated with accessing class components via reflection.
  * 
  * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
  * @since April 29, 2011
  */
-public final class ReflectionUtils {
-	private ReflectionUtils() {
-		// Prevent initialization
-	}
-	
+@UtilityClass
+public class ReflectionUtils {
 	/**
 	 * Gets the declared field with name <tt>name</tt> and sets it to be accessible.
 	 * @param c the class
 	 * @param name the field name
 	 * @return the field, or <tt>null</tt> if there was a problem getting the field or accessing it
 	 */
-	public static Field getField(Class<?> c, String name) {
+	public Field getField(Class<?> c, String name) {
 		if (c == null || name == null) { return null; }
 		
 		try {
@@ -47,7 +46,7 @@ public final class ReflectionUtils {
 	 * @return the set of fields as an array. If none are found, the an empty array is returned. If changing the 
 	 * accessibility flag encounters a problem, only debug logging is performed.
 	 */
-	public static Field[] getFields(Class<?> c) {
+	public Field[] getFields(Class<?> c) {
         if (c == null) { return null; }
         Field[] retval = null;
         retval = c.getDeclaredFields();
@@ -68,7 +67,7 @@ public final class ReflectionUtils {
 	 * @param o the object instance
 	 * @return the value of the field, or <tt>null</tt> if there was a problem accessing the value
 	 */
-	public static Object get(Field f, Object o) {
+	public Object get(Field f, Object o) {
 		if (f == null) { return null; }
 		
 		try {
@@ -87,7 +86,7 @@ public final class ReflectionUtils {
 	 * @param val the new value of the field
 	 * @return if the field was successfully set to the new value (no exceptions were thrown)
 	 */
-	public static boolean set(Field f, Object o, Object val) {
+	public boolean set(Field f, Object o, Object val) {
 		if (f == null) { return false; }
 		
 		try {
@@ -107,7 +106,7 @@ public final class ReflectionUtils {
 	 * @return the new instance, or <tt>null</tt> if there was a problem instantiating the object
 	 * @see #arg(Object)
 	 */
-	public static <T> T newInstance(Class<T> c, ConstructorArg... args) {
+	public <T> T newInstance(Class<T> c, ConstructorArg... args) {
 		Class<?>[] types  = new Class<?>[args.length];
 		Object[]   values = new Object[args.length];
 		for (int i = 0; i < args.length; i++) {
@@ -138,7 +137,7 @@ public final class ReflectionUtils {
 	 * @return a constructor argument
 	 * @see #newInstance(Class, ConstructorArg...)
 	 */
-	public static ConstructorArg arg(Object o) {
+	public ConstructorArg arg(Object o) {
 		return new ConstructorArg(o, o.getClass());
 	}
 	/**
@@ -149,7 +148,7 @@ public final class ReflectionUtils {
 	 * @return a constructor argument
 	 * @see #newInstance(Class, ConstructorArg...)
 	 */
-	public static ConstructorArg arg(Object o, Class<?> c) {
+	public ConstructorArg arg(Object o, Class<?> c) {
 		return new ConstructorArg(o, c);
 	}
 	
@@ -173,7 +172,7 @@ public final class ReflectionUtils {
 	 * @param args the parameters to pass to the method
 	 * @return the result of the method, or <tt>null</tt> if there was a problem invoking the method
 	 */
-	public static Object invoke(Object o, String methodName, Object... args) {
+	public Object invoke(Object o, String methodName, Object... args) {
 		return invoke(o, methodName, false, args);
 	}
 	
@@ -186,11 +185,11 @@ public final class ReflectionUtils {
 	 * @param args the parameters to pass to the method
 	 * @return the result of the method, or <tt>null</tt> if there was a problem invoking the method
 	 */
-	public static Object invokeIfExists(Object o, String methodName, Object... args) {
+	public Object invokeIfExists(Object o, String methodName, Object... args) {
 		return invoke(o, methodName, true, args);
 	}
 	
-	private static Object invoke(Object o, String methodName, boolean optional, Object[] args) {
+	private Object invoke(Object o, String methodName, boolean optional, Object[] args) {
 		try {
 			return o.getClass().getMethod(methodName, getTypes(args)).invoke(o, args);
 		} catch (NoSuchMethodException e) {
@@ -201,17 +200,19 @@ public final class ReflectionUtils {
 		return null;
 	}
 	
-	private static Class<?>[] getTypes(Object... args) {
+	private Class<?>[] getTypes(Object... args) {
 		Class<?>[] types = new Class<?>[args.length];
 		for (int i = 0; i < args.length; i++) {
 			types[i] = args[i].getClass();
 		}
+		
 		return types;
 	}
 
 	/**
 	 * Factory implementation that uses reflection to create new instances of
 	 * type <tt>T</tt>.
+	 * @param <T> the type of objects to create
 	 */
 	public static class ReflectionFactory<T> implements Supplier<T> {
 		private Class<T> c;
@@ -220,22 +221,5 @@ public final class ReflectionUtils {
 		
 		@Override
 		public T get() { return ReflectionUtils.newInstance(c); }
-	}
-
-	/**
-	 * Creating generic arrays is disallowed, so this is a strongly-typed way of
-	 * allocating arrays of the correct size and type.  Implementations should
-	 * be a single line:<br/>
-	 * <code>return new T[length];</code><br/>
-	 * where <tt>T</tt> is the type of the array.
-	 * @param <T> the type of the array
-	 */
-	public interface ArrayFactory<T> {
-		/**
-		 * Allocate a new array with the specified length.
-		 * @param length the array length
-		 * @return the new array
-		 */
-		T[] newArray(int length);
 	}
 }

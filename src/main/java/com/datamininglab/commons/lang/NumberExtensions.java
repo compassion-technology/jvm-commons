@@ -4,6 +4,8 @@
  *******************************************************************************/
 package com.datamininglab.commons.lang;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * Extends {@link Number} with utilities to convert the number to the boxed
  * primitive types, skipping unboxing/boxing if possible. 
@@ -11,38 +13,35 @@ package com.datamininglab.commons.lang;
  * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
  * @since Mar 8, 2016
  */
-public final class NumberExtensions {
-	private NumberExtensions() {
-		// Prevent initialization
-	}
-	
-	public static Long asLong(Number n) {
+@UtilityClass
+public class NumberExtensions {
+	public Long asLong(Number n) {
 		if (n instanceof Long) { return (Long) n; }
 		return n == null? null : Long.valueOf(n.longValue());
 	}
 	
-	public static Double asDouble(Number n) {
+	public Double asDouble(Number n) {
 		if (n instanceof Double) { return (Double) n; }
-		return n == null? null : Double.valueOf(n.doubleValue());
+		return LambdaUtils.apply(n, Number::doubleValue);
 	}
 	
-	public static Integer asInteger(Number n) {
+	public Integer asInteger(Number n) {
 		if (n instanceof Integer) { return (Integer) n; }
-		return n == null? null : Integer.valueOf(n.intValue());
+		return LambdaUtils.apply(n, Number::intValue);
 	}
 	
-	public static Float asFloat(Number n) {
+	public Float asFloat(Number n) {
 		if (n instanceof Float) { return (Float) n; }
-		return n == null? null : Float.valueOf(n.floatValue());
+		return LambdaUtils.apply(n, Number::floatValue);
 	}
 	
-	public static Short asShort(Number n) {
+	public Short asShort(Number n) {
 		if (n instanceof Short) { return (Short) n; }
-		return n == null? null : Short.valueOf(n.shortValue());
+		return LambdaUtils.apply(n, Number::shortValue);
 	}
 	
-	public static Byte asByte(Number n) {
+	public Byte asByte(Number n) {
 		if (n instanceof Byte) { return (Byte) n; }
-		return n == null? null : Byte.valueOf(n.byteValue());
+		return LambdaUtils.apply(n, Number::byteValue);
 	}
 }

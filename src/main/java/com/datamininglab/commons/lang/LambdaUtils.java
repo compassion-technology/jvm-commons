@@ -10,24 +10,23 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * Some utilities around interacting with Java 8's lambda/functional interfaces, mostly dealing with <tt>null</tt>.
  * 
  * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
  * @since Oct 19, 2016
  */
-public final class LambdaUtils {
-	private LambdaUtils() {
-		// Prevent initialization
-	}
-	
+@UtilityClass
+public class LambdaUtils {
 	/**
 	 * Invoke the supplier, returning <tt>null</tt> if the supplier is <tt>null</tt>.
 	 * @param supplier the supplier
 	 * @param <I> the supplier's return type
 	 * @return the result of the supplier, or <tt>null</tt> if it was <tt>null</tt>
 	 */
-	public static <I> I get(Supplier<I> supplier) {
+	public <I> I get(Supplier<I> supplier) {
 		return supplier == null? null : supplier.get();
 	}
 	
@@ -39,7 +38,7 @@ public final class LambdaUtils {
 	 * @param <O> the function's output type
 	 * @return the output of the function, or <tt>null</tt> if the input or functiona was <tt>null</tt>
 	 */
-	public static <I, O> O apply(I in, Function<I, O> fn) {
+	public <I, O> O apply(I in, Function<I, O> fn) {
 		return in == null || fn == null? null : fn.apply(in);
 	}
 	
@@ -49,7 +48,7 @@ public final class LambdaUtils {
 	 * @param consumer the consumer to invoke if the input is not <tt>null</tt>
 	 * @param <I> the consumer's input type
 	 */
-	public static <I> void accept(I in, Consumer<I> consumer) {
+	public <I> void accept(I in, Consumer<I> consumer) {
 		if (in != null && consumer != null) { consumer.accept(in); }
 	}
 	
@@ -62,7 +61,7 @@ public final class LambdaUtils {
 	 * @param closer the custom close method (for example <tt>dispose()</tt>)
 	 * @param <R> the resource type
 	 */
-	public static <R> void withResource(R resource, Consumer<R> consumer, Consumer<R> closer) {
+	public <R> void acceptResource(R resource, Consumer<R> consumer, Consumer<R> closer) {
 		try {
 			consumer.accept(resource);
 		} finally {
@@ -81,7 +80,7 @@ public final class LambdaUtils {
 	 * @param <T> the result type
 	 * @return the result of the function
 	 */
-	public static <R, T> T withResource(R resource, Function<R, T> function, Consumer<R> closer) {
+	public <R, T> T applyResource(R resource, Function<R, T> function, Consumer<R> closer) {
 		try {
 			return function.apply(resource);
 		} finally {
@@ -91,6 +90,7 @@ public final class LambdaUtils {
 	
 	// This class is needed because, when calling these methods, the compiler can't tell the difference of the method
 	// signatures based on throws or not for lambdas- would've needed to cast
+	@UtilityClass
 	public static class IO {
 		/**
 		 * Invoke the supplier, returning <tt>null</tt> if the supplier is <tt>null</tt>.
@@ -99,7 +99,7 @@ public final class LambdaUtils {
 		 * @return the result of the supplier, or <tt>null</tt> if it was <tt>null</tt>
 		 * @throws IOException if there was an I/O exception in the supplier's implementation
 		 */
-		public static <I> I get(IOSupplier<I> supplier) throws IOException {
+		public <I> I get(IOSupplier<I> supplier) throws IOException {
 			return supplier == null? null : supplier.get();
 		}
 		
@@ -112,7 +112,7 @@ public final class LambdaUtils {
 		 * @return the output of the function, or <tt>null</tt> if the input or functiona was <tt>null</tt>
 		 * @throws IOException if there was an I/O exception in the function's implementation
 		 */
-		public static <I, O> O apply(I in, IOFunction<I, O> fn) throws IOException {
+		public <I, O> O apply(I in, IOFunction<I, O> fn) throws IOException {
 			return in == null || fn == null? null : fn.apply(in);
 		}
 		
@@ -134,7 +134,7 @@ public final class LambdaUtils {
 		 * @param <C> the resource type
 		 * @throws IOException if <tt>consumer</tt> threw an exception
 		 */
-		public static <C extends Closeable> void withResource(C closeable, IOConsumer<C> consumer) throws IOException {
+		public <C extends Closeable> void withResource(C closeable, IOConsumer<C> consumer) throws IOException {
 			try (C c = closeable) {
 				consumer.accept(c);
 			}
@@ -149,7 +149,7 @@ public final class LambdaUtils {
 		 * @return the result of the function
 		 * @throws IOException if <tt>function</tt> threw an exception
 		 */
-		public static <C extends Closeable, T> T withResource(C closeable, IOFunction<C, T> function) throws IOException {
+		public <C extends Closeable, T> T withResource(C closeable, IOFunction<C, T> function) throws IOException {
 			try (C c = closeable) {
 				return function.apply(c);
 			}
@@ -165,7 +165,7 @@ public final class LambdaUtils {
 		 * @param <R> the resource type
 		 * @throws IOException if <tt>consumer</tt> threw an exception
 		 */
-		public static <R> void withResource(R resource, IOConsumer<R> consumer, IOConsumer<R> closer) throws IOException {
+		public <R> void acceptResource(R resource, IOConsumer<R> consumer, IOConsumer<R> closer) throws IOException {
 			try {
 				consumer.accept(resource);
 			} catch (IOException e) {
@@ -187,7 +187,7 @@ public final class LambdaUtils {
 		 * @return the result of the function
 		 * @throws IOException if <tt>function</tt> threw an exception
 		 */
-		public static <R, T> T withResource(R resource, IOFunction<R, T> function, IOConsumer<R> closer) throws IOException {
+		public <R, T> T applyResource(R resource, IOFunction<R, T> function, IOConsumer<R> closer) throws IOException {
 			try {
 				return function.apply(resource);
 			} catch (IOException e) {
