@@ -11,6 +11,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.val;
 
 /**
@@ -20,30 +22,42 @@ import lombok.val;
  * @param <T> the type of items to process
  * @since Aug 26, 2016
  */
-public class QueueDaemonWorker<T> implements Runnable {
+public class DaemonWorker<T> implements Runnable {
 	private static final long WAIT_TIME_MS = 100L;	
-	private static final ThreadGroup GROUP = new ThreadGroup(Utilities.pluralize(QueueDaemonWorker.class.getSimpleName())); 
+	private static final ThreadGroup GROUP = new ThreadGroup(Utilities.pluralize(DaemonWorker.class.getSimpleName()));
+	private static volatile int instances;
 	
+	private String name;
 	private int batchSize;
 	private BlockingQueue<T> queue;
 	private Consumer<List<T>> callback;
 	
 	private Thread thread;
 	private volatile boolean running;
-	
+
+	/**
+	 * Create a new worker.
+	 * @param queueSize the maximum size of the queue
+	 * @param callback callback for the each batch of items. This list will be no larger than <tt>batchSize</tt> but may
+	 * only have one item. 
+	 */
+	public DaemonWorker(int queueSize, Consumer<List<T>> callback) {
+		this(null, queueSize, queueSize, callback);
+	}
 	
 	/**
 	 * Create a new worker.
+	 * @param name the thread name
 	 * @param queueSize the maximum size of the queue
 	 * @param batchSize the maximum size of each batch of items to process
 	 * @param callback callback for the each batch of items. This list will be no larger than <tt>batchSize</tt> but may
 	 * only have one item. 
 	 */
-	public QueueDaemonWorker(int queueSize, int batchSize, Consumer<List<T>> callback) {
+	public DaemonWorker(String name, int queueSize, int batchSize, Consumer<List<T>> callback) {
+		this.name = StringUtils.defaultString(name, getClass().getSimpleName() + instances++);
 		this.queue = new ArrayBlockingQueue<>(queueSize);
 		this.batchSize = batchSize;
 		this.callback = callback;
-		
 	}
 	
 	/**
@@ -53,7 +67,7 @@ public class QueueDaemonWorker<T> implements Runnable {
 	public void start() {
 		if (thread == null || !thread.isAlive()) {
 			running = true;
-			thread = Utilities.startDaemon(GROUP, this, getClass().getSimpleName());
+			thread = Utilities.startDaemon(GROUP, this, name);
 		}
 	}
 	
