@@ -7,7 +7,6 @@ package com.datamininglab.commons.lang;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
@@ -18,6 +17,8 @@ import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.datamininglab.commons.logging.LogContext;
+
+import lombok.val;
 
 /**
  * <p>Interface designed to be used with an {@link Enum} that enumerates the
@@ -116,7 +117,7 @@ public interface PropertiesKey {
 	 * if it was loaded without error.
 	 */
 	static boolean load(Properties props, String file, PropertiesKey... keys) {
-		try (InputStream is = new FileInputStream(file)) {
+		try (val is = new FileInputStream(file)) {
 			props.load(is);
 		} catch (FileNotFoundException e) {
 			// Use defaults
@@ -125,12 +126,12 @@ public interface PropertiesKey {
 			return false;
 		}
 		
-		for (PropertiesKey key : keys) {
-			String sysProp = System.getProperty(key.key());
-			if (sysProp != null) { props.setProperty(key.key(), sysProp); }
-			
-			String envVar = System.getenv(key.key());
-			if (envVar != null) { props.setProperty(key.key(), envVar); }
+		for (PropertiesKey pk : keys) {
+			val key = pk.key();
+			// Allow system properties to override first
+			LambdaUtils.accept(System.getProperty(key), $ -> props.setProperty(key, $));
+			// Allow environment variables to override next
+			LambdaUtils.accept(System.getenv(key), $ -> props.setProperty(key, $));
 		}
 		return true;
 	}

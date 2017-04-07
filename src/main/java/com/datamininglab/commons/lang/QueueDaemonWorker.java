@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+
+import lombok.val;
 
 /**
  * Processes items in a queue with a daemon thread. 
@@ -17,23 +20,30 @@ import java.util.concurrent.TimeUnit;
  * @param <T> the type of items to process
  * @since Aug 26, 2016
  */
-public abstract class QueueDaemonWorker<T> implements Runnable {
+public class QueueDaemonWorker<T> implements Runnable {
 	private static final long WAIT_TIME_MS = 100L;	
 	private static final ThreadGroup GROUP = new ThreadGroup(Utilities.pluralize(QueueDaemonWorker.class.getSimpleName())); 
 	
 	private int batchSize;
 	private BlockingQueue<T> queue;
+	private Consumer<List<T>> callback;
+	
 	private Thread thread;
-	private volatile boolean running = true;
+	private volatile boolean running;
+	
 	
 	/**
 	 * Create a new worker.
 	 * @param queueSize the maximum size of the queue
 	 * @param batchSize the maximum size of each batch of items to process
+	 * @param callback callback for the each batch of items. This list will be no larger than <tt>batchSize</tt> but may
+	 * only have one item. 
 	 */
-	protected QueueDaemonWorker(int queueSize, int batchSize) {
-		this.batchSize = batchSize;
+	public QueueDaemonWorker(int queueSize, int batchSize, Consumer<List<T>> callback) {
 		this.queue = new ArrayBlockingQueue<>(queueSize);
+		this.batchSize = batchSize;
+		this.callback = callback;
+		
 	}
 	
 	/**
@@ -42,28 +52,22 @@ public abstract class QueueDaemonWorker<T> implements Runnable {
 	 */
 	public void start() {
 		if (thread == null || !thread.isAlive()) {
+			running = true;
 			thread = Utilities.startDaemon(GROUP, this, getClass().getSimpleName());
 		}
 	}
 	
 	@Override
 	public void run() {
-		List<T> batch = new ArrayList<>(batchSize);
+		val batch = new ArrayList<T>(batchSize);
 		while (running || !queue.isEmpty()) {
 			if (Utilities.pollBatch(queue, 1L, TimeUnit.SECONDS, batch, batchSize)) {
-				nextBatch(batch);
+				callback.accept(batch);
 				batch.clear();
 			}
 		}
 	}
 
-	/**
-	 * Do work on the next batch of items. This list will be no larger than the batch size passed to the constructor,
-	 * but may only have one item. 
-	 * @param batch the next batch of items to process
-	 */
-	protected abstract void nextBatch(List<T> batch); 
-	
 	/**
 	 * Enqueue an item for this worker to process. This method will block until space is available on the queue or
 	 * {@link #cancel()} is called.
@@ -73,6 +77,14 @@ public abstract class QueueDaemonWorker<T> implements Runnable {
 		while (running) {
 			if (Utilities.offer(queue, obj, WAIT_TIME_MS, TimeUnit.MILLISECONDS)) { return; }
 		}
+	}
+	
+	/**
+	 * Shuts down the worker thread once the current queue has been processed and waits for the thread to stop.
+	 */
+	public void shutdownAndWait() {
+		shutdown();
+		Utilities.join(thread);
 	}
 	
 	/**

@@ -10,21 +10,23 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Singular;
 import lombok.val;
+import lombok.experimental.Wither;
 
 /**
  * A way of documenting a component (via annotations or by providing a {@link Documentation} bean) that is readable at
@@ -34,8 +36,13 @@ import lombok.val;
  * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
  * @since Mar 1, 2017
  */
-@Builder
+@Builder @Wither
 public class Documentation {
+	/** 
+	 * The identifying name for the component. This is a {@link Supplier} since the documentation should not be the
+	 * authority on assigning names to components, yet the name of a component is important piece of metadata for
+	 * documenting it. This should generally be a method reference, like <tt>this::getName</tt>.
+	 */
 	private Supplier<CharSequence> nameProvider;
 	/** The type of the component. */
 	@Getter private Class<?> type;
@@ -48,49 +55,12 @@ public class Documentation {
 	/** Tags (short keywords) that relate to the component. */
 	@Getter private Set<CharSequence> tags;
 	/** Lists requirements for this component. */
-	@Getter private List<Documentation> requires;
+	@Getter @Singular private List<Documentation> requires;
 	/** Lists the output this component produces. */
-	@Getter private List<Documentation> produces;
+	@Getter @Singular private List<Documentation> produces;
+	/** More detail about the implementation of this component. */
+	@Getter private CharSequence implementationNotes;
 
-	/** 
-	 * The identifying name for the component. This is a {@link Supplier} since the documentation should not be the
-	 * authority on assigning names to components, yet the name of a component is important piece of metadata for
-	 * documenting it. This should generally be a method reference, like <tt>this::getName</tt>.
-	 * @param nameProvider the name provider for the component.
-	 * @return thew new instance that is a copy of this instance with the new name provider
-	 */
-	public Documentation withNameProvider(Supplier<CharSequence> nameProvider) {
-		return new Documentation(nameProvider, type, displayName, description, version, tags, requires, produces);
-	}
-	
-	public Documentation withType(Class<?> type) {
-		return new Documentation(nameProvider, type, displayName, description, version, tags, requires, produces);
-	}
-	
-	public Documentation withDisplayName(CharSequence displayName) {
-		return new Documentation(nameProvider, type, displayName, description, version, tags, requires, produces);
-	}
-	
-	public Documentation withDescription(CharSequence description) {
-		return new Documentation(nameProvider, type, displayName, description, version, tags, requires, produces);
-	}
-	
-	public Documentation withVersion(CharSequence version) {
-		return new Documentation(nameProvider, type, displayName, description, version, tags, requires, produces);
-	}
-	
-	public Documentation withTags(Set<CharSequence> tags) {
-		return new Documentation(nameProvider, type, displayName, description, version, tags, requires, produces);
-	}
-	
-	public Documentation withRequires(List<Documentation> requires) {
-		return new Documentation(nameProvider, type, displayName, description, version, tags, requires, produces);
-	}
-	
-	public Documentation withProduces(List<Documentation> produces) {
-		return new Documentation(nameProvider, type, displayName, description, version, tags, requires, produces);
-	}
-	
 	/**
 	 * The identifying name for this component.
 	 * @return the component's name
@@ -124,6 +94,8 @@ public class Documentation {
 		String version() default StringUtils.EMPTY;
 		/** Tags (short keywords) that relate to the component. */
 		String[] tags() default {};
+		/** More detail about the implementation of this component. */
+		String implNotes() default StringUtils.EMPTY;
 	}
 	
 	/**
@@ -167,9 +139,12 @@ public class Documentation {
 		if (ae == null) { return null; }
 		
 		val db = Documentation.builder();
-		Optional.ofNullable(ae.getAnnotation(Doc.class)).ifPresent(d -> DOC_ADAPTER.accept(d, db));
-		Optional.ofNullable(ae.getAnnotation(Requires.class)).ifPresent(r -> db.requires(DOC_LIST_ADAPTER.apply(r.value())));
-		Optional.ofNullable(ae.getAnnotation(Produces.class)).ifPresent(r -> db.produces(DOC_LIST_ADAPTER.apply(r.value())));
+		Optional.ofNullable(ae.getAnnotation(Doc.class)).ifPresent(d ->
+			DOC_BUILDER_ADAPTER.apply(d, db));
+		Optional.ofNullable(ae.getAnnotation(Requires.class)).ifPresent(r ->
+			Stream.of(r.value()).map(DOC_ADAPTER).forEach(db::require));
+		Optional.ofNullable(ae.getAnnotation(Produces.class)).ifPresent(r ->
+			Stream.of(r.value()).map(DOC_ADAPTER).forEach(db::produce));
 		return db.build();
 	}
 	
@@ -206,26 +181,20 @@ public class Documentation {
 		}
 	}
 	
-	private static final BiConsumer<Doc, Documentation.DocumentationBuilder> DOC_ADAPTER = (d, db) -> {
+	private static final BiFunction<Doc, Documentation.DocumentationBuilder, Documentation.DocumentationBuilder> DOC_BUILDER_ADAPTER = (d, db) -> {
 		if (d.type() != Object.class) { db.type(d.type()); }
 		ifNotEmpty(d.name(), n -> db.nameProvider(() -> n));
 		ifNotEmpty(d.displayName(), db::displayName);
 		ifNotEmpty(d.value(), db::description);
 		ifNotEmpty(d.version(), db::version);
+		ifNotEmpty(d.implNotes(), db::implementationNotes);
 		if (ArrayUtils.getLength(d.tags()) > 0) {
 			val set = new HashSet<CharSequence>();
         	Collections.addAll(set, d.tags());
         	db.tags(set);
 		}
+		return db;
 	};
 	
-	private static final Function<Doc[], List<Documentation>> DOC_LIST_ADAPTER = arr -> {
-		val ret = new LinkedList<Documentation>();
-		for (val d : arr) {
-			val db = Documentation.builder();
-			DOC_ADAPTER.accept(d, db);
-			ret.add(db.build());
-		}
-		return ret;
-	};
+	private static final Function<Doc, Documentation> DOC_ADAPTER = d -> DOC_BUILDER_ADAPTER.apply(d, Documentation.builder()).build();
 }
