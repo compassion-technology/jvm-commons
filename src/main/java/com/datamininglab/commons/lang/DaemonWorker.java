@@ -75,12 +75,14 @@ public class DaemonWorker<T> implements Runnable {
 	/**
 	 * Start (or restart) the worker thread. Subclasses are encouraged to call this once all initialization is finished.
 	 * This method has no effect if it has already been called and the thread is currently running.
+	 * @return this for method chaining
 	 */
-	public void start() {
+	public DaemonWorker<T> start() {
 		if (thread == null || !thread.isAlive()) {
 			running = true;
 			thread = Utilities.startDaemon(GROUP, this, name);
 		}
+		return this;
 	}
 	
 	@Override
