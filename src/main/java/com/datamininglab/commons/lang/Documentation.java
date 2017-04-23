@@ -4,6 +4,7 @@
  *******************************************************************************/
 package com.datamininglab.commons.lang;
 
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.AnnotatedElement;
@@ -68,19 +69,19 @@ public class Documentation {
 	public CharSequence getName() { return LambdaUtils.get(nameProvider); }
 	
 	/** A description of the requirements (or prerequisites or input) of this component. */
-	@Retention(RetentionPolicy.RUNTIME)
+	@Retention(RetentionPolicy.RUNTIME) @Inherited
 	public static @interface Requires {
 		Doc[] value();
 	}
 	
 	/** A description of what this component produces (or output). */
-	@Retention(RetentionPolicy.RUNTIME)
+	@Retention(RetentionPolicy.RUNTIME) @Inherited
 	public static @interface Produces {
 		Doc[] value();
 	}
 	
 	/** A "parent" annotation for all documentation-related annotations. */
-	@Retention(RetentionPolicy.RUNTIME)
+	@Retention(RetentionPolicy.RUNTIME) @Inherited
 	public static @interface Doc {
 		/** The type of the component. */
 		Class<?> type() default Object.class;
