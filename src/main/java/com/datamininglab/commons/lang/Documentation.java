@@ -136,7 +136,7 @@ public class Documentation {
 		if (StringUtils.isNotEmpty(s)) { c.accept(s); }
 	}
 	
-	private static Documentation get(AnnotatedElement ae) {
+	public static Documentation get(AnnotatedElement ae) {
 		if (ae == null) { return null; }
 		
 		val db = Documentation.builder();
