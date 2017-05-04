@@ -112,6 +112,12 @@ public class Documentation {
 		 * @return the documentation for this component (should not be <tt>null</tt>)
 		 */
 		default Documentation getDocumentation() {
+			// Special handling of per-constant annotations on enums. It should work because each constant has its own
+			// class (e.g. f.o.o.Enum$1) but yet it doesn't, so we have to go through the field instead.
+			if (this instanceof Enum<?>) {
+				Enum<?> e = Utilities.cast(this);
+				return Documentation.get(ReflectionUtils.getField(e.getDeclaringClass(), e.name()));
+			}
 			return Documentation.get(getClass());
 		}
 	}
