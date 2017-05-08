@@ -81,7 +81,7 @@ public class Documentation {
 	}
 	
 	/** A "parent" annotation for all documentation-related annotations. */
-	@Retention(RetentionPolicy.RUNTIME) @Inherited
+	@Retention(RetentionPolicy.RUNTIME)
 	public static @interface Doc {
 		/** The type of the component. */
 		Class<?> type() default Object.class;
