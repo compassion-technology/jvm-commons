@@ -188,7 +188,7 @@ public class Documentation {
 		}
 	}
 	
-	private static final BiFunction<Doc, Documentation.DocumentationBuilder, Documentation.DocumentationBuilder> DOC_BUILDER_ADAPTER = (d, db) -> {
+	private static final BiFunction<Doc, DocumentationBuilder, DocumentationBuilder> DOC_BUILDER_ADAPTER = (d, db) -> {
 		if (d.type() != Object.class) { db.type(d.type()); }
 		ifNotEmpty(d.name(), n -> db.nameProvider(() -> n));
 		ifNotEmpty(d.displayName(), db::displayName);

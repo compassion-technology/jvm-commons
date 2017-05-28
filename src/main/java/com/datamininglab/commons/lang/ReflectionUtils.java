@@ -7,10 +7,15 @@ package com.datamininglab.commons.lang;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.function.Supplier;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.datamininglab.commons.logging.LogContext;
 
+import lombok.val;
 import lombok.experimental.UtilityClass;
 
 /**
@@ -166,6 +171,19 @@ public class ReflectionUtils {
 	}
 	
 	/**
+	 * Find the method, regardless of what arguments/parameters it takes. If the method is overloaded, the returned
+	 * method will be arbitrary. The method is also set to be {@linkplain Method#setAccessible(boolean) accessible}.
+	 * @param c the class
+	 * @param methodName the name of the method
+	 * @return the method, or <tt>null</tt> if no method with that name was found
+	 */
+	public Method getMethodAnyParams(Class<?> c, String methodName) {
+		val match = Arrays.stream(c.getMethods()).filter($ -> StringUtils.equals($.getName(), methodName)).findAny();
+		match.ifPresent($ -> $.setAccessible(true));
+		return match.orElse(null);
+	}
+	
+	/**
 	 * Invokes the method with name <tt>methodName</tt> on object <tt>o</tt>.
 	 * @param o the object instance
 	 * @param methodName the name of the method
@@ -191,7 +209,9 @@ public class ReflectionUtils {
 	
 	private Object invoke(Object o, String methodName, boolean optional, Object[] args) {
 		try {
-			return o.getClass().getMethod(methodName, getTypes(args)).invoke(o, args);
+			val method = o.getClass().getMethod(methodName, getTypes(args));
+			method.setAccessible(true);
+			return method.invoke(o, args);
 		} catch (NoSuchMethodException e) {
 			if (!optional) { LogContext.warning(e, "Required method %s not found on type %s", methodName, o.getClass()); }
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
@@ -200,13 +220,13 @@ public class ReflectionUtils {
 		return null;
 	}
 	
-	private Class<?>[] getTypes(Object... args) {
-		Class<?>[] types = new Class<?>[args.length];
-		for (int i = 0; i < args.length; i++) {
-			types[i] = args[i].getClass();
-		}
-		
-		return types;
+	/**
+	 * Gets the types of each of the objects.
+	 * @param args the objects
+	 * @return the object's types (classes) in the same order
+	 */
+	public Class<?>[] getTypes(Object... args) {
+		return Arrays.stream(args).map(Object::getClass).toArray(i -> new Class<?>[i]);
 	}
 
 	/**
