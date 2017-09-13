@@ -235,6 +235,7 @@ public class LambdaUtils {
 		R apply(T in) throws IOException;
 	}
 	
+	/** Utilities that catch and log {@link InterruptedException}s using lambdas. */
 	@Log4j2
 	@UtilityClass
 	public class Interruptable {
