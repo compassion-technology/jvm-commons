@@ -7,6 +7,10 @@ package com.datamininglab.commons.lang;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 
 /**
@@ -38,15 +42,21 @@ public class StatusMonitor {
 		/** An error was encountered while the task was doing its work. */
 		ERROR
 	}
+
+	private Object name;
 	
 	private List<SMListenerWrapper> listeners;
 	private volatile boolean inAtomicUpdate;
-	
-	private Object    name;
-	private TaskState state;
-	private String    status;
-	private long      progress;
-	private long      size;
+
+	/** The current task state. */
+	@Getter private volatile TaskState state;
+	/** A string describing the current operation or status of the task, for example <tt>"Reading file..."</tt>. */
+	@Getter private volatile String status;
+	/** The current progress of the task. A <tt>-1</tt> is used to indicate this task has made indeterminate progress. */
+	@Getter private volatile long progress;
+	/** The number of operations that must be performed before the task will be finished or {@link #INDETERMINATE} if
+	 *  this task can run indefinitely or its size is not known. */
+	@Getter private volatile long size;
 	
 	/**
 	 * Creates a new status monitor that monitors the progress of some task.
@@ -114,35 +124,6 @@ public class StatusMonitor {
 	 * @return this monitor's task name
 	 */
 	public String getName() { return Objects.toString(name, "-"); }
-	
-	/**
-	 * Returns the current task state.
-	 * @return the current state
-	 */
-	public TaskState getState() { return state; }
-	
-	/**
-	 * Gets a string describing the current operation or
-	 * status of the task, for example <tt>"Reading file..."</tt>.
-	 * @return the current status of this task
-	 */
-	public String getStatus() { return status; }
-	
-	/**
-	 * Gets the current progress of the task. A <tt>-1</tt>
-	 * is used to indicate this task has made indeterminate
-	 * progress.
-	 * @return this task's progress
-	 */
-	public long getProgress() { return progress; }
-	
-	/**
-	 * Gets the number of operations that must be performed
-	 * before the task will be finished.
-	 * @return this task's size, or {@link #INDETERMINATE} if this task can run
-	 * indefinitely or its size is not known
-	 */
-	public long getSize() { return size; }
 	
 	/**
 	 * Changes the state of the task.
@@ -299,29 +280,31 @@ public class StatusMonitor {
 	}
 	
 	/**
+	 * Convenience method to see if the current state is one of the specified states.
+	 * @param states the states to test
+	 * @return if the task is in one of those states
+	 */
+	public boolean isAny(TaskState... states) {
+		return Stream.of(states).anyMatch(state::equals);
+	}
+	
+	/**
 	 * Convenience method to see if the task is dead, meaning it is in one
 	 * of the {@link TaskState#CANCELED}, {@link TaskState#FINISHED}, or
 	 * {@link TaskState#ERROR} states.
 	 * @return if the task is dead
 	 */
 	public boolean isDead() {
-		return getState() == TaskState.CANCELED
-		    || getState() == TaskState.FINISHED
-		    || getState() == TaskState.ERROR;
+		return isAny(TaskState.CANCELED, TaskState.FINISHED, TaskState.ERROR);
 	}
 	
+	@RequiredArgsConstructor
 	private static class SMListenerWrapper {
-		private StatusListener listener;
-		private long notifyInterval;
+		private final StatusListener listener;
 		private volatile long lastNotified;
 		
-		SMListenerWrapper(StatusListener l) {
-			this.listener = l;
-			this.notifyInterval = l.getNotifyIntervalNS();
-		}
-		
 		boolean shouldNotify() {
-			return System.nanoTime() - lastNotified > notifyInterval;
+			return System.nanoTime() - lastNotified > listener.getNotifyIntervalNS();
 		}
 		
 		void notify(StatusMonitor sm) {
