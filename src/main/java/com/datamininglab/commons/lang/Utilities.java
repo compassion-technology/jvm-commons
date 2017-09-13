@@ -4,23 +4,17 @@
  *******************************************************************************/
 package com.datamininglab.commons.lang;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileChannel.MapMode;
-import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -31,6 +25,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -43,6 +38,10 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
 
+import com.datamininglab.commons.lang.LambdaUtils.Interruptable;
+
+import lombok.val;
+import lombok.experimental.UtilityClass;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -52,6 +51,7 @@ import lombok.extern.log4j.Log4j2;
  * @since Sep 26, 2012
  */
 @Log4j2
+@UtilityClass
 public final class Utilities {
 	private static final DateFormat DF = new SimpleDateFormat("yyyy-MM-dd");
 	// The following isn't 0 since it's the epoch in our time zone, not GMT
@@ -59,16 +59,10 @@ public final class Utilities {
 	public static final long DATE_1900_1_1 = Utilities.parseDate(DF, "1900-01-01", null).getTime();
 	public static final long DATE_2000_1_1 = Utilities.parseDate(DF, "2000-01-01", null).getTime();
 	
-	//10 MB (1 char = 2 bytes)
-	private static final int DEFAULT_BUFFER = 5242880;
 	public static final String DEFAULT_CONTENT_TYPE = "text/plain; charset=us-ascii";
 	
 	private static final Pattern SSN = Pattern.compile(".*(\\d{3})-?(\\d{2})-?(\\d{4}).*");
 	private static final Pattern PAIRED_QUOTES = Pattern.compile("^[\\s]*['\"](.*)['\"][\\s]*$");
-	
-	private Utilities() {
-		// Prevent initialization
-	}
 	
 	/**
 	 * Removes leading and trailing whitespace and matching single and
@@ -77,7 +71,7 @@ public final class Utilities {
 	 * @param s the string to clean
 	 * @return the cleaned string
 	 */
-	public static String stripQuotes(String s) {
+	public String stripQuotes(String s) {
 		if (s == null) { return null; }
 		
 		Matcher m = PAIRED_QUOTES.matcher(s);
@@ -95,7 +89,7 @@ public final class Utilities {
 	 * means the tokens closely match the expected distribution.
 	 * @see #getTokenLengthScore(long[], long)
 	 */
-	public static float getTokenLengthScore(String[] tokens) {
+	public float getTokenLengthScore(String[] tokens) {
 		if (tokens.length == 0) { return Float.MAX_VALUE; }
 		
 		long[] counts = new long[24];
@@ -119,7 +113,7 @@ public final class Utilities {
 	 * means the token lengths closely match the expected distribution.
 	 * @see #getTokenLengthScore(String[])
 	 */
-	public static float getTokenLengthScore(long[] tokenLenDist, long tokens) {
+	public float getTokenLengthScore(long[] tokenLenDist, long tokens) {
 		double score = 0.0;
 		double denom = 1.0 / tokens;
 		for (int i = 1; i < tokenLenDist.length; i++) {
@@ -139,7 +133,7 @@ public final class Utilities {
 	 * @return a formatted string
 	 * @see String#format(String, Object...)
 	 */
-	public static String deepFormat(String format, String delim, Object[] array) {
+	public String deepFormat(String format, String delim, Object[] array) {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < array.length; i++) {
 			if (i > 0) { sb.append(delim); }
@@ -161,7 +155,7 @@ public final class Utilities {
 	 * @param l the number to format
 	 * @return the compacted number
 	 */
-	public static String compactLargeNumber(long l) {
+	public String compactLargeNumber(long l) {
 		String s = String.valueOf(l);
 		int i = -1;
 		int n;
@@ -183,7 +177,7 @@ public final class Utilities {
 	 * @param s the <tt>Content-Type</tt> string to parse
 	 * @return the encoding
 	 */
-	public static String getEncoding(String s) {
+	public String getEncoding(String s) {
 		if (s == null) { return getEncoding(DEFAULT_CONTENT_TYPE); }
 		int semi = s.indexOf('=');
 		if (semi < 0) { return getEncoding(DEFAULT_CONTENT_TYPE); }
@@ -200,7 +194,7 @@ public final class Utilities {
 	 * @param filename a file name 
 	 * @return the file's extension, including the <tt>'.'</tt>
 	 */
-	public static String getExtension(String filename) {
+	public String getExtension(String filename) {
 		int i = filename.lastIndexOf('.');
 		int j = filename.length();
 		if (i < 0) { return ""; }
@@ -242,7 +236,7 @@ public final class Utilities {
 	 * @param costReplace the cost of a replacement operation
 	 * @return the edit distance between the two strings
 	 */
-	public static float getEditDistance(String s1, String s2, float costDelete, float costInsert, float costReplace) {
+	public float getEditDistance(String s1, String s2, float costDelete, float costInsert, float costReplace) {
 		s1 = s1.toLowerCase();
 		s2 = s2.toLowerCase();
 		int n1 = s1.length();
@@ -272,7 +266,7 @@ public final class Utilities {
 	 *  @param s1 the first string
 	 *  @param s2 the second string
 	 *  @return the edit distance between the two strings*/
-	public static float getEditDistance(String s1, String s2) {
+	public float getEditDistance(String s1, String s2) {
 		return getEditDistance(s1, s2, 1.0f, 1.0f, 1.0f);
 	}
 	
@@ -282,7 +276,7 @@ public final class Utilities {
 	 * @param c the character to test
 	 * @return if <tt>c</tt> is an <tt>a</tt>, <tt>e</tt>, <tt>i</tt>, <tt>o</tt> or <tt>u</tt> (case-insensitive)  
 	 */
-	public static boolean isVowel(char c) {
+	public boolean isVowel(char c) {
 		return Arrays.binarySearch(vowels, c) >= 0;
 	}
 	
@@ -293,7 +287,7 @@ public final class Utilities {
 	 * @param s the string
 	 * @return the string enclosed with single quotes (if it is not a number)
 	 */
-	public static String addQuotes(String s) {
+	public String addQuotes(String s) {
 		if (s == null) { return null; }
 		
 		double d;
@@ -316,7 +310,7 @@ public final class Utilities {
 	 * @param s a singular string
 	 * @return the pluralized form of <tt>s</tt>
 	 */
-	public static String pluralize(String s) {
+	public String pluralize(String s) {
 		if (s == null) { return null; }
 		
 		if (StringUtils.endsWith(s, "x")
@@ -349,7 +343,7 @@ public final class Utilities {
 	 * @return the pluralized form if applicable
 	 * @see #pluralize(String)
 	 */
-	public static String pluralizeIf(String s, Number n) {
+	public String pluralizeIf(String s, Number n) {
 		return (n != null && n.longValue() == 1L)? s : pluralize(s);
 	}
 	
@@ -362,7 +356,7 @@ public final class Utilities {
 	 * this is less than <tt>0</tt> or <tt>Integer.MAX_VALUE</tt>, the default string is returned
 	 * @return the formatted object, or <tt>null</tt> if <tt>o</tt> is <tt>null</tt>
 	 */
-	public static String stringValue(Object o, int precision) {
+	public String stringValue(Object o, int precision) {
 		if (o == null) { return null; }
 		
 		if (o instanceof Number) {
@@ -382,7 +376,7 @@ public final class Utilities {
 	 * this is less than <tt>0</tt> or <tt>Integer.MAX_VALUE</tt>, the default string is returned
 	 * @return the formatted number
 	 */
-	public static String stringValue(double d, int precision) {
+	public String stringValue(double d, int precision) {
 		long l = Math.round(d);
 		if (l == d) {  return String.valueOf(l); }
 		
@@ -400,7 +394,7 @@ public final class Utilities {
 	 * @see Character#isDigit(char)
 	 * @see #containsLetters(String)
 	 */
-	public static boolean containsDigits(String s) {
+	public boolean containsDigits(String s) {
 		if (s == null) { return false; }
 		
 		for (int i = 0; i < s.length(); i++) {
@@ -417,7 +411,7 @@ public final class Utilities {
 	 * @see Character#isLetter(char)
 	 * @see #containsDigits(String)
 	 */
-	public static boolean containsLetters(String s) {
+	public boolean containsLetters(String s) {
 		if (s == null) { return false; }
 		
 		for (int i = 0; i < s.length(); i++) {
@@ -434,7 +428,7 @@ public final class Utilities {
 	 * convention
 	 * @return a more user-friendly version of the string
 	 */
-	public static String getFriendlyString(Enum<?> e) {
+	public String getFriendlyString(Enum<?> e) {
 		return getFriendlyString(e.name());
 	}
 	
@@ -444,7 +438,7 @@ public final class Utilities {
 	 * @param s a string following the constant naming convention
 	 * @return a more user-friendly version of the string
 	 */
-	public static String getFriendlyString(String s) {
+	public String getFriendlyString(String s) {
 		if (s == null) { return null; }
 		s = s.replace('_', ' ').trim();
 		return Character.toUpperCase(s.charAt(0)) + s.substring(1).toLowerCase();
@@ -460,7 +454,7 @@ public final class Utilities {
 	 * (can be <tt>null</tt>)
 	 * @return the matching enum, or <tt>defaultValue</tt>
 	 */
-	public static <T extends Enum<T>> T valueOf(Class<T> c, String name, T defaultValue) {
+	public <T extends Enum<T>> T valueOf(Class<T> c, String name, T defaultValue) {
 		if (name == null) {  return defaultValue; }
 		try {
 			return Enum.valueOf(c, name.toUpperCase().replace(' ', '_'));
@@ -479,7 +473,7 @@ public final class Utilities {
 	 * @return the 11-character formatted SSN, or the original string if it does
 	 * not appear to be a valid SSN
 	 */
-	public static String formatSSN(String s) {
+	public String formatSSN(String s) {
 		if (s == null) { return null; }
 		
 		Matcher m = SSN.matcher(s);
@@ -492,7 +486,7 @@ public final class Utilities {
 	 * @param s the string to encode
 	 * @return the Soundex encoding
 	 */
-	public static String getSoundex(String s) {
+	public String getSoundex(String s) {
 		if (s == null || s.isEmpty()) { return null; }
 		
         s = s.toUpperCase();
@@ -539,7 +533,7 @@ public final class Utilities {
 	 * @param i the number to convert
 	 * @return a string corresponding to number <tt>i</tt>
 	 */
-	public static String getLetters(int i) {
+	public String getLetters(int i) {
 		//Taken from AbstractTableModel.getColumnName(int column)
 		String result = "";
 		for (i = i - 1; i >= 0; i = i / 26 - 1) {
@@ -560,7 +554,7 @@ public final class Utilities {
 	 * @param raw the byte array
 	 * @return its hex representation (lower case)
 	 */
-	public static String getHexString(byte[] raw) {
+	public String getHexString(byte[] raw) {
 		byte[] hex = new byte[2 * raw.length];
 		for (int i = 0, j = 0; i < raw.length; i++) {
 			int v = raw[i] & 0xFF;
@@ -580,7 +574,7 @@ public final class Utilities {
 	 * @param hex the hex representation of a byte array
 	 * @return a byte array
 	 */
-	public static byte[] getByteArray(String hex) {
+	public byte[] getByteArray(String hex) {
 		byte[] arr;
 		try {
 			arr = hex.getBytes("ASCII");
@@ -616,7 +610,7 @@ public final class Utilities {
 	 * @return a new instance of the child class with all inherited
 	 * fields set to the values of the parent's fields
 	 */
-	public static <T, S extends T> S asSubclass(T instance, Class<T> clazz, Class<S> subClass) {
+	public <T, S extends T> S asSubclass(T instance, Class<T> clazz, Class<S> subClass) {
 		S sub = ReflectionUtils.newInstance(subClass);
 		
 		Field[] fields = clazz.getDeclaredFields();
@@ -637,88 +631,8 @@ public final class Utilities {
 	 * @return the casted objectS
 	 */
 	@SuppressWarnings("unchecked")
-	public static <S, T> T cast(S toCast) {
+	public <S, T> T cast(S toCast) {
 	    return (T) toCast;
-	}
-	
-	/**
-	 * Reads and returns the entire contents of a text file as a UTF-8, UTF-16 etc. string
-	 * using the NIO utilities.
-	 * @param file the file to read
-	 * @param charset the charset name to use as an interpreter eg. UTF-8, UTF-16
-	 * @return a string with the entire contents of the file
-	 * @throws IOException if there was a problem reading the file
-	 */
-	public static String readNIO(File file, String charset) throws IOException {
-		try (FileInputStream stream  = new FileInputStream(file);
-		     FileChannel     channel = stream.getChannel()) {
-			MappedByteBuffer buffer  = channel.map(MapMode.READ_ONLY, 0, file.length());
-        	return Charset.forName(charset).decode(buffer).toString();
-        }
-	}
-	
-	/**
-	 * Reads and returns the entire contents of a text file as a byte array.
-	 * @param file the file to read
-	 * @return a byte array with the entire contents of the file
-	 * @throws IOException if there was a problem reading the file
-	 */
-	public static byte[] readBytes(File file) throws IOException {
-	    try (FileInputStream stream = new FileInputStream(file);
-	         FileChannel channel = stream.getChannel()) {
-
-	        long fileSize = file.length();
-	        MappedByteBuffer buffer = channel.map(MapMode.READ_ONLY, 0L, fileSize);
-		    byte[] data = new byte[(int) fileSize];
-	        for (int i = 0; i < fileSize; i++) {
-	            data[i] = buffer.get();
-	        }
-	        return data;
-	    }
-	}
-
-	/**
-	 * Creates a buffered text writer object to write text to a file.
-	 * @param file the file to write text to
-	 * @param buffer the size of the buffer
-	 * @return a buffered text writer
-	 * @throws FileNotFoundException if the file specified cannot be written to
-	 */
-	public static PrintStream write(File file, int buffer) throws FileNotFoundException {
-		return new PrintStream(new BufferedOutputStream(new FileOutputStream(file), buffer));
-	}
-	
-	/**
-	 * Creates a buffered text writer object to write text to a file,
-	 * using the default buffer size.
-	 * @param file the file to write text to
-	 * @return a buffered text writer
-	 * @throws FileNotFoundException if the file specified can not be written to
-	 */
-	public static PrintStream write(File file) throws FileNotFoundException {
-		return write(file, DEFAULT_BUFFER);
-	}
-	
-	/**
-	 * Creates a buffered text writer object to write text to a file. 
-	 * @param file the path of the file to write text to
-	 * @param buffer the size of the buffer
-	 * @return a buffered text writer
-	 * @throws FileNotFoundException if the file specified can not be written to
-	 */
-	public static PrintStream write(String file, int buffer) throws FileNotFoundException {
-		return write(new File(file), buffer);
-	}
-	
-	/**
-	 * Creates a buffered text writer object to write text to a file,
-	 * using the default buffer size.
-	 * @param file the path of the file to write text to
-	 * @return a buffered text writer
-	 * @throws FileNotFoundException if the file specified can not be written to
-	 */
-	public static PrintStream write(String file) throws FileNotFoundException {
-		return write(file, DEFAULT_BUFFER);
 	}
 	
 	/**
@@ -728,15 +642,11 @@ public final class Utilities {
 	 * @param unit the time unit of the duration
 	 * @return the actual time (in milliseconds) the thread spent sleeping
 	 */
-	public static long sleep(long duration, TimeUnit unit) {
+	public long sleep(long duration, TimeUnit unit) {
 		if (duration <= 0L) { return 0L; }
 		
-		long start = System.nanoTime();
-		try {
-			Thread.sleep(TimeUnit.MILLISECONDS.convert(duration, unit));
-		} catch (InterruptedException e) {
-			// Silently ignore interrupted exception
-		}
+		val start = System.nanoTime();
+		Interruptable.accept(Thread::sleep, TimeUnit.MILLISECONDS.convert(duration, unit), "sleeping for (in ms)");
 		return TimeUnit.MILLISECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS);
 	}
 	
@@ -747,7 +657,7 @@ public final class Utilities {
 	 * @param name the name of the thread
 	 * @return the created thread
 	 */
-	public static Thread startDaemon(ThreadGroup g, Runnable r, String name) {
+	public Thread startDaemon(ThreadGroup g, Runnable r, String name) {
 		Thread t = new Thread(g, r, name);
 		t.setDaemon(true);
 		t.start();
@@ -762,13 +672,9 @@ public final class Utilities {
 	 * if the thread should wait indefinitely
 	 * @param unit the unit of the timeout amount
 	 */
-	public static void wait(Object obj, long timeout, TimeUnit unit) {
-		try {
-			synchronized (obj) {
-				obj.wait(TimeUnit.MILLISECONDS.convert(timeout, unit));
-			}
-		} catch (InterruptedException e) {
-			LogContext.warning("Interrupted while waiting on object " + obj);
+	public void wait(Object obj, long timeout, TimeUnit unit) {
+		synchronized (obj) {
+			Interruptable.accept($ -> $.wait(TimeUnit.MILLISECONDS.convert(timeout, unit)), obj, "waiting on");
 		}
 	}
 	
@@ -777,7 +683,7 @@ public final class Utilities {
 	 * wrapping the call in a synchronized block on the object.
 	 * @param obj the object on which to synchronize and notify all
 	 */
-	public static void notifyAll(Object obj) {
+	public void notifyAll(Object obj) {
 		synchronized (obj) {
 			obj.notifyAll();
 		}
@@ -787,12 +693,8 @@ public final class Utilities {
 	 * Joins the thread, handling the interrupted exception.
 	 * @param t the thread to join
 	 */
-	public static void join(Thread t) {
-		try {
-			t.join();
-		} catch (InterruptedException e) {
-			LogContext.warning("Interrupted while joining thread " + t);
-		}
+	public void join(Thread t) {
+		Interruptable.accept(Thread::join, t, "joining");
 	}
 	
 	/**
@@ -806,14 +708,8 @@ public final class Utilities {
 	 * elapsed or an {@link InterruptedException} was thrown
 	 * @see BlockingQueue#poll(long, TimeUnit)
 	 */
-	public static <T> T poll(BlockingQueue<T> queue, long time, TimeUnit unit) {
-		T o = null;
-        try {
-            o = queue.poll(time, unit);
-        } catch (InterruptedException ex) {
-        	LogContext.warning("Interrupted while polling queue " + queue);
-        }
-        return o;
+	public <T> T poll(BlockingQueue<T> queue, long time, TimeUnit unit) {
+		return Interruptable.apply($ -> $.poll(time, unit), queue, "polling", null); 
 	}
 	
 	/**
@@ -831,11 +727,11 @@ public final class Utilities {
 	 * @see BlockingQueue#poll(long, TimeUnit)
 	 * @see BlockingQueue#drainTo(Collection, int)
 	 */
-	public static <T> boolean pollBatch(BlockingQueue<T> queue, long time, TimeUnit unit, Collection<T> batch, int maxBatchSize) {
+	public <T> boolean pollBatch(BlockingQueue<T> queue, long time, TimeUnit unit, Collection<T> batch, int maxBatchSize) {
 		// If there are any rows in the queue, drain them to the batch
 		if (queue.drainTo(batch, maxBatchSize) < 1) {
 			// If empty, wait up to a the specified time for an entry to appear
-			T first = Utilities.poll(queue, time, unit);
+			T first = poll(queue, time, unit);
 			// If one is added, add it to the list, and drain any others into the batch that have since been added
 			if (first != null) {
 				batch.add(first);
@@ -858,13 +754,8 @@ public final class Utilities {
 	 * @return if the object was successfully added to the queue
 	 * @see BlockingQueue#offer(Object, long, TimeUnit)
 	 */
-	public static <T> boolean offer(BlockingQueue<T> queue, T obj, long time, TimeUnit unit) {
-		try {
-			return queue.offer(obj, time, unit);
-		} catch (InterruptedException e) {
-			LogContext.warning("Interrupted while offering %s to %s", obj, queue);
-			return false;
-		}
+	public <T> boolean offer(BlockingQueue<T> queue, T obj, long time, TimeUnit unit) {
+		return Interruptable.apply($ -> queue.offer($, time, unit), obj, "offering", false);
 	}
 	
 	/**
@@ -874,14 +765,14 @@ public final class Utilities {
 	 * @param <T> the type of objects in the queue
 	 * @param queue the queue
 	 * @param obj the object to add
-	 * @param rm the task's status monitor, which can be <tt>null</tt>. If so,
+	 * @param sm the task's status monitor, which can be <tt>null</tt>. If so,
 	 * this method has the same effect as {@link BlockingQueue#offer(Object)}
 	 * @return if the object was successfully added to the queue
 	 * @see BlockingQueue#offer(Object, long, TimeUnit)
 	 * @see StatusMonitor#isRunning(StatusMonitor)
 	 */
-	public static <T> boolean offer(BlockingQueue<T> queue, T obj, StatusMonitor rm) {
-		while (rm == null || rm.isRunning()) {
+	public <T> boolean offer(BlockingQueue<T> queue, T obj, StatusMonitor sm) {
+		while (sm == null || sm.isRunning()) {
 			if (offer(queue, obj, 1L, TimeUnit.SECONDS)) { return true; }
 		}
 		return false;
@@ -893,7 +784,7 @@ public final class Utilities {
 	 * @param <T> the type of items in the set
 	 * @return the ordered list of values
 	 */
-	public static <T extends Comparable<T>> List<T> getOrderedList(Set<T> set) {
+	public <T extends Comparable<T>> List<T> getOrderedList(Set<T> set) {
 		List<T> list = new ArrayList<>(set);
 		Collections.sort(list);
 		return list;
@@ -906,7 +797,7 @@ public final class Utilities {
 	 * @param <T> the type of items in the set
 	 * @return the ordered list of values
 	 */
-	public static <T> List<T> getOrderedList(Set<T> set, Comparator<T> comp) {
+	public <T> List<T> getOrderedList(Set<T> set, Comparator<T> comp) {
 		List<T> list = new ArrayList<>(set);
 		Collections.sort(list, comp);
 		return list;
@@ -920,7 +811,7 @@ public final class Utilities {
 	 * @param option the option to test
 	 * @return whether or not <tt>option</tt> is turned on
 	 */
-	public static boolean isOn(int group, int option) {
+	public boolean isOn(int group, int option) {
 		return (group & option) > 0;
 	}
 	
@@ -932,7 +823,7 @@ public final class Utilities {
 	 * @param e an enum value to test
 	 * @return whether or not the enum is turned on
 	 */
-	public static boolean isOn(long group, Enum<?> e) {
+	public boolean isOn(long group, Enum<?> e) {
 		return (group & (1L << e.ordinal())) > 0L;
 	}
 	
@@ -943,7 +834,7 @@ public final class Utilities {
 	 * @param max the maximum value
 	 * @return the interpolated value
 	 */
-	public static double linterp(double amount, double min, double max) {
+	public double linterp(double amount, double min, double max) {
 		return amount * (max - min) + min;
 	}
 	/**
@@ -953,7 +844,7 @@ public final class Utilities {
 	 * @param max the maximum value
 	 * @return the interpolated value
 	 */
-	public static float linterp(float amount, float min, float max) {
+	public float linterp(float amount, float min, float max) {
 		return (float) linterp((double) amount, (double) min, (double) max);
 	}
 	
@@ -966,7 +857,7 @@ public final class Utilities {
 	 * @param max the maximum amount
 	 * @return the normalized value
 	 */
-	public static double normalize(double amount, double min, double max) {
+	public double normalize(double amount, double min, double max) {
 		return (amount - min) / (max - min);
 	}
 	
@@ -979,7 +870,7 @@ public final class Utilities {
 	 * @param max the maximum amount
 	 * @return the normalized value
 	 */
-	public static float normalize(float amount, float min, float max) {
+	public float normalize(float amount, float min, float max) {
 		return (float) normalize((double) amount, (double) min, (double) max);
 	}
 	
@@ -991,7 +882,7 @@ public final class Utilities {
 	 * @return the clamped value (the min if the value was less than the min,
 	 * the max if the value was greater than the max, or the original value)
 	 */
-	public static int clamp(int value, int min, int max) {
+	public int clamp(int value, int min, int max) {
 		return value > max? max : (value < min? min : value);
 	}
 	
@@ -1003,7 +894,7 @@ public final class Utilities {
 	 * @return the clamped value (the min if the value was less than the min,
 	 * the max if the value was greater than the max, or the original value)
 	 */
-	public static <T> T clamp(T value, Range<T> range) {
+	public <T> T clamp(T value, Range<T> range) {
 		return range.isBefore(value)? range.getMaximum() : (range.isAfter(value)? range.getMinimum() : value);
 	}
 	
@@ -1016,7 +907,7 @@ public final class Utilities {
 	 * @param overrides Property set to source overrides.
 	 * @return <tt>true</tt> if any properties were overridden, <tt>false</tt> otherwise.
 	 */
-	public static boolean applyPropertyOverrides(Properties target, Properties overrides) {
+	public boolean applyPropertyOverrides(Properties target, Properties overrides) {
 	    boolean retval = false;
 	    for (Object key : target.keySet()) {
 	        if (key instanceof String && overrides.containsKey(key)) {
@@ -1029,43 +920,48 @@ public final class Utilities {
 	}
 	
 	/**
+	 * Converts a URL to a URI, swallowing and logging any exceptions and returning <tt>null</tt> if it is not valid.
+	 * @param u the URL to convert
+	 * @return the corresponding URI, or <tt>null</tT> if there was a problem converting it
+	 */
+	public URI toURI(URL u) {
+		try {
+			return u.toURI();
+		} catch (URISyntaxException | IllegalArgumentException e) {
+			log.warn("Invalid URI: {}", u, e);
+			return null;
+		}
+	}
+	
+	/**
 	 * Loads a resource file relative to the current class loader's root directory.
 	 * @param relativeFileName the file to load
 	 * @return the resource as a file, or <tt>null</tt> if the resource couldn't be found
 	 */
-	public static File getResourceFile(String relativeFileName) {
-		try {
-			URL url = Utilities.class.getClassLoader().getResource(relativeFileName);
-			if (url != null) { return new File(url.toURI()); }
-		} catch (URISyntaxException ex) {
-			LogContext.warning("Warning: resource URI malformed: %s", ex.getMessage());
-		}
-		return null;
+	public Path getResourceFile(String relativeFileName) {
+		return Optional.ofNullable(Utilities.class.getClassLoader().getResource(relativeFileName))
+				.map(Utilities::toURI)
+				.map(Paths::get)
+				.orElse(null);
 	}
 	
 	/**
-	 * Loads a resource relative to the specified class. If it is not found,
-	 * and the resource has a relative path, it attempts to look in the
-	 * <tt>resources</tt> folder. This is useful when using projects that conform
-	 * to the Maven standard, yet aren't properly packaged by Maven but by
-	 * Eclipse.
-	 * @param c the class that specifies where to look for the resource
-	 * @param name the path and name of the resource
-	 * @return the resource, or <tt>null</tt> if it was not found
+	 * Attempts to load the resource relative to the specified class. If it is not found, the path is treated as a file
+	 * path instead (relative or absolute).
+	 * @param c the class that specifies where to look
+	 * @param name the path of the resource or file
+	 * @return a stream to the resource, or <tt>null</tt> if it was not found as either a resource or a file
 	 */
-	@SuppressWarnings("resource")
-	public static InputStream getResourceAsStream(Class<?> c, String name) {
-	    InputStream is = c.getResourceAsStream(name);
-	    if (is == null) {
-	        if (!name.startsWith("/")) {
-	            String pack = c.getPackage().getName();
-	            name = String.format("/%s/%s", pack.replace('.', '/'), name);
-	        }
-	        is = c.getResourceAsStream("/resources" + name);
-	    }
-	    return is;
+	public InputStream getResourceOrFile(Class<?> c, String name) {
+		return Optional.ofNullable(c.getResourceAsStream(name)).orElseGet(() -> {
+			try {
+				return Files.newInputStream(Paths.get(name));
+			} catch (IOException e) {
+				return null;
+			}
+		});
 	}
-
+	
 	/**
 	 * Attempts to parse the date, returning the default value in case of an 
 	 * unparseable string or an error.
@@ -1074,7 +970,7 @@ public final class Utilities {
 	 * @param defVal the default date value in the case of an error
 	 * @return the parsed date, or <tt>defVal</tt>
 	 */
-	public static Date parseDate(DateFormat fmt, String s, Date defVal) {
+	public Date parseDate(DateFormat fmt, String s, Date defVal) {
 		try {
 			return fmt.parse(s);
 		} catch (ParseException e) {
@@ -1090,7 +986,7 @@ public final class Utilities {
 	 * @param t the thrown exception
 	 * @return the exception's message
 	 */
-	public static String getMessage(Throwable t) {
+	public String getMessage(Throwable t) {
 		Throwable hasMsg = t;
 		while (hasMsg != null && hasMsg.getMessage() == null) {
 			hasMsg = hasMsg.getCause();
@@ -1105,7 +1001,7 @@ public final class Utilities {
 	 * @return the first element, or <tt>null</tt> if <tt>col</tt> is <tt>null</tt>
 	 * or empty
 	 */
-	public static <T> T first(Collection<T> col) {
+	public <T> T first(Collection<T> col) {
 		return col == null || col.isEmpty()? null : col.iterator().next();
 	}
 	
@@ -1117,7 +1013,7 @@ public final class Utilities {
 	 * @param <T> the type of objects in <tt>arr</tt>
 	 */
 	@SafeVarargs
-	public static <T> T first(T... arr) {
+	public <T> T first(T... arr) {
 		return arr == null || arr.length == 0? null : arr[0];
 	}
 	
@@ -1129,7 +1025,7 @@ public final class Utilities {
 	 * @param <T> the type of objects in the collections
 	 */
 	@SafeVarargs
-	public static <T> List<T> concat(Collection<T>... collections) {
+	public <T> List<T> concat(Collection<T>... collections) {
 		List<T> ret = new ArrayList<>();
 		for (Collection<T> c : collections) { ret.addAll(c); }
 		return ret;

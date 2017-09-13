@@ -11,6 +11,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import lombok.experimental.UtilityClass;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Some utilities around interacting with Java 8's lambda/functional interfaces, mostly dealing with <tt>null</tt>.
@@ -91,7 +92,7 @@ public class LambdaUtils {
 	// This class is needed because, when calling these methods, the compiler can't tell the difference of the method
 	// signatures based on throws or not for lambdas- would've needed to cast
 	@UtilityClass
-	public static class IO {
+	public class IO {
 		/**
 		 * Invoke the supplier, returning <tt>null</tt> if the supplier is <tt>null</tt>.
 		 * @param supplier the supplier
@@ -232,5 +233,79 @@ public class LambdaUtils {
 	 */
 	public interface IOFunction<T, R> {
 		R apply(T in) throws IOException;
+	}
+	
+	@Log4j2
+	@UtilityClass
+	public class Interruptable {
+		public void run(InterruptableRunnable runnable, String verb) {
+			try {
+				runnable.run();
+			} catch (InterruptedException e) {
+				log.warn("Interrupted while {}", verb, e);
+			}
+		}
+		
+		public <T> void accept(InterruptableConsumer<T> consumer, T obj, String verb) {
+			try {
+				consumer.accept(obj);
+			} catch (InterruptedException e) {
+				log.warn("Interrupted while {} {}", verb, obj, e);
+			}
+		}
+		
+		public <T> T get(InterruptableSupplier<T> supplier, String verb, T defVal) {
+			try {
+				return supplier.get();
+			} catch (InterruptedException e) {
+				log.warn("Interrupted while {}", verb, e);
+				return defVal;
+			}
+		}
+		
+		public <I, O> O apply(InterruptableFunction<I, O> function, I in, String verb, O defVal) {
+			try {
+				return function.apply(in);
+			} catch (InterruptedException e) {
+				log.warn("Interrupted while {} {}", verb, in, e);
+				return defVal;
+			}
+		}
+	}
+	
+	/**
+	 * Runnable that throws an {@link InterruptedException}.
+	 * @see Runnable
+	 */
+	public interface InterruptableRunnable {
+		void run() throws InterruptedException;
+	}
+	
+	/**
+	 * Consumer that throws an {@link InterruptedException}.
+	 * @param <T> the type of the input to the operation
+	 * @see Consumer 
+	 */
+	public interface InterruptableConsumer<T> {
+		void accept(T obj) throws InterruptedException;
+	}
+	
+	/**
+	 * Supplier that throws an {@link InterruptedException}.
+	 * @param <T> the type of the input to the operation
+	 * @see Supplier 
+	 */
+	public interface InterruptableSupplier<T> {
+		T get() throws InterruptedException;
+	}
+	
+	/**
+	 * Function that throws an {@link InterruptedException}.
+	 * @param <T> the type of the input to the function
+	 * @param <R> the type of the result of the function
+	 * @see Function 
+	 */
+	public interface InterruptableFunction<T, R> {
+		R apply(T in) throws InterruptedException;
 	}
 }

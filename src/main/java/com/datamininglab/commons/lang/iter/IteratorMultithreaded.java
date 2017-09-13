@@ -10,8 +10,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import com.datamininglab.commons.lang.LambdaUtils.Interruptable;
 import com.datamininglab.commons.lang.Utilities;
-import com.datamininglab.commons.logging.LogContext;
 
 /**
  * This class will consume an iterator, spawn multiple worker threads, and then
@@ -98,11 +98,7 @@ public abstract class IteratorMultithreaded<T> {
 		}
 		iterHasNext = false;
 		
-		try {
-			liveThreads.await();
-		} catch (InterruptedException e) {
-			LogContext.warning("Interrupted while waiting for iterator worker threads");
-		}
+		Interruptable.run(liveThreads::await, "waiting for iterator worker threads");
 	}
 	
 

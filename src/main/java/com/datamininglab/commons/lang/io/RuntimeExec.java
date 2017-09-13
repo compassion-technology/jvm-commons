@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import com.datamininglab.commons.lang.LambdaUtils.Interruptable;
+
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -59,11 +61,6 @@ public final class RuntimeExec extends Thread {
 		new RuntimeExec(p.getErrorStream(), true).start();
 		new RuntimeExec(p.getInputStream(), false).start();
 		
-		try {
-			return p.waitFor();
-		} catch (InterruptedException e) {
-			LogContext.warning(e, "Interrupted waiting for process");
-			return -1;
-		}
+		return Interruptable.get(p::waitFor, "waiting for process", -1);
 	}
 }
