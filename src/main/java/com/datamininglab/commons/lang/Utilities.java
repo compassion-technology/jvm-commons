@@ -43,7 +43,7 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
 
-import com.datamininglab.commons.logging.LogContext;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * A collection of common stateless utilities.
@@ -51,6 +51,7 @@ import com.datamininglab.commons.logging.LogContext;
  * @author <a href="dimeo@datamininglab.com">John Dimeo</a>
  * @since Sep 26, 2012
  */
+@Log4j2
 public final class Utilities {
 	private static final DateFormat DF = new SimpleDateFormat("yyyy-MM-dd");
 	// The following isn't 0 since it's the epoch in our time zone, not GMT

@@ -13,10 +13,9 @@ import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.datamininglab.commons.logging.LogContext;
-
 import lombok.val;
 import lombok.experimental.UtilityClass;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Static container for utilities associated with accessing class components via reflection.
@@ -24,6 +23,7 @@ import lombok.experimental.UtilityClass;
  * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
  * @since April 29, 2011
  */
+@Log4j2
 @UtilityClass
 public class ReflectionUtils {
 	/**
@@ -59,7 +59,7 @@ public class ReflectionUtils {
 		    try {
 		        f.setAccessible(true);
 		    } catch (SecurityException ex) {
-		        LogContext.fine("Couldn't modify accessibility of field %s", f.getName());                    
+		    	log.debug("Couldn't modify accessibility of field {}", f);                    
 		    }
 		}
 		return retval;
@@ -78,7 +78,7 @@ public class ReflectionUtils {
 		try {
 			return f.get(o);
 		} catch (IllegalArgumentException | IllegalAccessException e) {
-            LogContext.warning(e,  "Couldn't access field %s", f.getName());
+            log.warn("Couldn't access field {}", f, e);
 		}
 		return null;
 	}
@@ -98,7 +98,7 @@ public class ReflectionUtils {
 			f.set(o, val);
 			return true;
 		} catch (IllegalArgumentException | IllegalAccessException e) {
-            LogContext.warning(e,  "Couldn't access field %s", f.getName());
+			log.warn("Couldn't access field {}", f, e);
 		}
 		return false;
 	}
@@ -123,7 +123,7 @@ public class ReflectionUtils {
 		try {
 			ctr = c.getConstructor(types);
 		} catch (NoSuchMethodException | SecurityException e) {
-			LogContext.warning(e, "Could not find constructor for %s with the provided types", c);
+			log.warn("Could not find constructor with the provided types for {}", c, e);
 			return null;
 		}
 		
@@ -131,7 +131,7 @@ public class ReflectionUtils {
 			return ctr.newInstance(values);
 		} catch (InstantiationException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException e) {
-			LogContext.warning(e, "Could not instantiate %s instance", c);
+			log.warn("Could not instantiate {}", c, e);
 			return null;
 		}
 	}
@@ -213,9 +213,9 @@ public class ReflectionUtils {
 			method.setAccessible(true);
 			return method.invoke(o, args);
 		} catch (NoSuchMethodException e) {
-			if (!optional) { LogContext.warning(e, "Required method %s not found on type %s", methodName, o.getClass()); }
+			if (!optional) { log.warn("Required method {} not found on type {}", methodName, o.getClass(), e); }
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
-            LogContext.warning(e,  "Couldn't invoke method %s on type %s", methodName, o.getClass());			
+            log.warn("Couldn't invoke method {} on type {}", methodName, o.getClass(), e);			
 		}
 		return null;
 	}

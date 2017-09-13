@@ -12,7 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import com.datamininglab.commons.logging.LogContext;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * This class tries every available number format to parse a date from a string.
@@ -23,6 +23,7 @@ import com.datamininglab.commons.logging.LogContext;
  * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
  * @since Mar 8, 2016
  */
+@Log4j2
 public class NumberExtractor extends Extractor<NumberFormat, Number> {
 	/** Specifies which type(s) of numbers to extract. */
 	public enum NumberFormatType {
@@ -48,7 +49,7 @@ public class NumberExtractor extends Extractor<NumberFormat, Number> {
 	
 	public void setFormatTypes(NumberFormatType... types) {
 		if (types.length == 0) {
-			LogContext.warning("Disabling all format types will cause the number extractor to not extract any numbers unless custom formats are specified via setCustomFormats()");
+			log.warn("Disabling all format types will cause the number extractor to not extract any numbers unless custom formats are specified via setCustomFormats()");
 		}
 		
 		this.types = new BitSet(NumberFormatType.values().length);

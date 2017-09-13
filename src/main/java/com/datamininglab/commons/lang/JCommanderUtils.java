@@ -8,10 +8,10 @@ import java.util.Arrays;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import com.datamininglab.commons.logging.LogContext;
 
 import lombok.val;
 import lombok.experimental.UtilityClass;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Convenience utilities when using {@link JCommander} to parse command-line arguments.
@@ -19,6 +19,7 @@ import lombok.experimental.UtilityClass;
  * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
  * @since Nov 15, 2016
  */
+@Log4j2
 @UtilityClass
 public class JCommanderUtils {
 	/**
@@ -73,7 +74,7 @@ public class JCommanderUtils {
 		try {
  			jc.parse(args);
 		} catch (ParameterException ex) {
-			LogContext.warning("Argument error: " + ex.getMessage());
+			log.warn("Argument error: {}", ex.getMessage());
 			jc.usage();
 			return false;
 		}

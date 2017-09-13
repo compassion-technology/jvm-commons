@@ -16,8 +16,6 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import com.datamininglab.commons.logging.LogContext;
-
 import lombok.val;
 
 /**
@@ -113,17 +111,13 @@ public interface PropertiesKey {
 	 * @param props the properties to populate
 	 * @param file the file from which to load
 	 * @param keys the keys to check for overrides in the system properties and environment variables
-	 * @return if the properties were loaded. This returns <tt>true</tt> if no properties file was found or
-	 * if it was loaded without error.
+	 * @throws IOException if there was an error loading the properties from the file
 	 */
-	static boolean load(Properties props, String file, PropertiesKey... keys) {
+	static void load(Properties props, String file, PropertiesKey... keys) throws IOException {
 		try (val is = new FileInputStream(file)) {
 			props.load(is);
 		} catch (FileNotFoundException e) {
 			// Use defaults
-		} catch (IOException e) {
-			LogContext.warning(e, "Error loading config from %s", file);
-			return false;
 		}
 		
 		for (PropertiesKey pk : keys) {
@@ -133,6 +127,5 @@ public interface PropertiesKey {
 			// Allow environment variables to override next
 			LambdaUtils.accept(System.getenv(key), $ -> props.setProperty(key, $));
 		}
-		return true;
 	}
 }

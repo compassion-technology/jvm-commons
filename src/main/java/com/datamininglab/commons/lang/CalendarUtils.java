@@ -15,10 +15,9 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.datamininglab.commons.logging.LogContext;
-
 import lombok.val;
 import lombok.experimental.UtilityClass;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * Contains some time/date utilities using the {@link Calendar} API.
@@ -26,6 +25,7 @@ import lombok.experimental.UtilityClass;
  * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
  * @since Jan 6, 2016
  */
+@Log4j2
 @UtilityClass
 public class CalendarUtils {
 	/**
@@ -158,7 +158,7 @@ public class CalendarUtils {
 					try {
 						fieldMap.put(f.getName(), f.getInt(null));
 					} catch (IllegalArgumentException | IllegalAccessException e) {
-						LogContext.warning(e, "Error accessing calendar field");
+						log.warn("Error accessing calendar field", e);
 					}
 				}
 			}

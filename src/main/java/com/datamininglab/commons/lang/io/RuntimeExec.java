@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import com.datamininglab.commons.logging.LogContext;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * This class calls {@link Runtime#exec(String)} but pipes output and error
@@ -18,6 +18,7 @@ import com.datamininglab.commons.logging.LogContext;
  * @author <a href="dimeo@datamininglab.com">John Dimeo</a>
  * @since Mar 3, 2013
  */
+@Log4j2
 public final class RuntimeExec extends Thread {
 	private boolean isError;
 	private InputStream stream;
@@ -36,13 +37,13 @@ public final class RuntimeExec extends Thread {
 			String line = null;
 			while ((line = br.readLine()) != null) {
 				if (isError) {
-					LogContext.warning(line);
+					log.warn(line);
 				} else {
-					LogContext.info(line);
+					log.info(line);
 				}
 			}
 		} catch (IOException e) {
-			LogContext.severe(e, "Error reading process stream");
+			log.error("Error reading process stream", e);
 		}
 	}
 
@@ -51,7 +52,7 @@ public final class RuntimeExec extends Thread {
 		try {
 			p = Runtime.getRuntime().exec(cmd);
 		} catch (IOException e) {
-			LogContext.warning(e, "Error executing command");
+			log.warn("Error executing command", e);
 			return -1;
 		}
 		
