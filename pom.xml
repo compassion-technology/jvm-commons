@@ -2,12 +2,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.datamininglab</groupId>
+		<groupId>com.elderresearch</groupId>
 		<artifactId>eri-maven-base</artifactId>
-		<version>3.4.0</version>
+		<version>3.4.2</version>
 	</parent>
 
-	<groupId>com.datamininglab.commons</groupId>
+	<groupId>com.elderresearch.commons</groupId>
 	<artifactId>eri-commons-lang</artifactId>
 	<name>ERI Commons - Language Extensions</name>
 	<description>Shared Java language extensions</description>
@@ -35,14 +35,6 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>23.0</version>
-		</dependency>
-
-		<!-- Convenient management of manifest for service implementations. Not needed after compilation. -->		
-		<dependency>
-			<groupId>com.google.auto.service</groupId>
-			<artifactId>auto-service</artifactId>
-			<version>1.0-rc2</version>
-			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>
