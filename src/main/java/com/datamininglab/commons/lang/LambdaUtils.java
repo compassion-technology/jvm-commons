@@ -6,9 +6,16 @@ package com.datamininglab.commons.lang;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.DoubleStream;
+import java.util.stream.Stream;
+
+import org.apache.commons.lang3.ObjectUtils;
 
 import lombok.experimental.UtilityClass;
 
@@ -88,14 +95,25 @@ public class LambdaUtils {
 		}
 	}
 	
+		
 	/**
-	 * Return the input {@link Number} or the ifNull value if the input is null.
-	 * @param in input number to be checked for null
-	 * @param ifNull the value returned if 'in' is null. 
-	 * @return Either the input number of the ifNull value
+	 * Returns either a stream with the input value or an empty stream
+	 * if the input is null or any other pesky {@link Number} values 
+	 * (Such as {@link Double#NaN NaN} or {@link Double#POSITIVE_INFINITY infinite}
+	 *  
+	 * @param in
+	 * @return
 	 */
-	public <T extends Number> T numberNullTo(T in, T ifNull){
-		return in == null ? ifNull : in;
+	public <T extends Number> Stream<T> filterInvalid(T in){
+		List<T> empty = new ArrayList<T>();
+		if(in==null) return empty.stream();
+		List<T> l = Arrays.asList(in);
+		
+		if(in instanceof Double && (((Double) in).isInfinite() || ((Double) in).isNaN())) l = empty;
+		
+		else if(in instanceof Float && (((Float) in).isInfinite() || ((Float) in).isNaN())) l = empty;
+		
+		return l.stream();
 	}
 	
 	// This class is needed because, when calling these methods, the compiler can't tell the difference of the method
