@@ -105,15 +105,8 @@ public class LambdaUtils {
 	 * @return
 	 */
 	public <T extends Number> Stream<T> filterInvalid(T in){
-		List<T> empty = new ArrayList<T>();
-		if(in==null) return empty.stream();
-		List<T> l = Arrays.asList(in);
-		
-		if(in instanceof Double && (((Double) in).isInfinite() || ((Double) in).isNaN())) l = empty;
-		
-		else if(in instanceof Float && (((Float) in).isInfinite() || ((Float) in).isNaN())) l = empty;
-		
-		return l.stream();
+		 if (in == null || !Double.isFinite(in.doubleValue())) { return Stream.empty(); }
+	     return Stream.of(in);
 	}
 	
 	// This class is needed because, when calling these methods, the compiler can't tell the difference of the method
