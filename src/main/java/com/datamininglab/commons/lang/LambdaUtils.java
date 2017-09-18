@@ -88,6 +88,16 @@ public class LambdaUtils {
 		}
 	}
 	
+	/**
+	 * Return the input {@link Number} or the ifNull value if the input is null.
+	 * @param in input number to be checked for null
+	 * @param ifNull the value returned if 'in' is null. 
+	 * @return Either the input number of the ifNull value
+	 */
+	public <T extends Number> T numberNullTo(T in, T ifNull){
+		return in == null ? ifNull : in;
+	}
+	
 	// This class is needed because, when calling these methods, the compiler can't tell the difference of the method
 	// signatures based on throws or not for lambdas- would've needed to cast
 	@UtilityClass
