@@ -5,7 +5,8 @@
 package com.elderresearch.commons.lang;
 
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
+
+import org.apache.logging.log4j.util.Supplier;
 
 import lombok.extern.log4j.Log4j2;
 
