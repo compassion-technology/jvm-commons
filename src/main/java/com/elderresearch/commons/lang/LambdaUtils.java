@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.log4j.Log4j2;
@@ -87,6 +88,20 @@ public class LambdaUtils {
 		} finally {
 			closer.accept(resource);
 		}
+	}
+	
+		
+	/**
+	 * Returns either a stream with the input value or an empty stream
+	 * if the input is null or any other pesky {@link Number} values 
+	 * (Such as {@link Double#NaN NaN} or {@link Double#POSITIVE_INFINITY infinite}
+	 *  
+	 * @param in
+	 * @return
+	 */
+	public <T extends Number> Stream<T> filterInvalid(T in){
+		 if (in == null || !Double.isFinite(in.doubleValue())) { return Stream.empty(); }
+	     return Stream.of(in);
 	}
 	
 	// This class is needed because, when calling these methods, the compiler can't tell the difference of the method
