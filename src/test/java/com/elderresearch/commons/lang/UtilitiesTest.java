@@ -38,14 +38,6 @@ public class UtilitiesTest extends TestCase {
 		assertEquals("the | cat |  | chased | the | mouse", StringUtils.join(l, " | "));
 	}
 	
-	public void testEditDistance() {
-		assertEquals(4.0f, Utilities.getEditDistance("cow", "house"));
-		assertEquals(1.0f, Utilities.getEditDistance("now", "cow"));
-		assertEquals(4.0f, Utilities.getEditDistance("cow", "house", 1.0f, 1.0f, 1.0f));
-		assertEquals(5.0f, Utilities.getEditDistance("cow", "house", 1.0f, 2.0f, 1.5f));
-		assertEquals(6.0f, Utilities.getEditDistance("cow", "house", 1.0f, 1.0f, 2.0f));
-	}
-	
 	public void testFormatSSN() {
 		assertEquals("123-45-6785", Utilities.formatSSN(" 123456785___"));
 		assertEquals("123-45-6785", Utilities.formatSSN("123-456785"));

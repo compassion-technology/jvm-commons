@@ -4,11 +4,10 @@
  *******************************************************************************/
 package com.elderresearch.commons.lang;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -21,19 +20,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
@@ -204,70 +199,6 @@ public final class Utilities {
 			}
 		}
 		return filename.substring(i, j);
-	}
-	
-	/**
-	 * Finds the Edit Distance between strings s1 and s2. The Edit Distance
-	 * is defined as the minimum number of single-character edit operations 
-	 * (deletions, insertions, and/or replacements) that would convert
-	 * <tt>s1</tt> into <tt>s2</tt> or vice-versa. Uses an efficient dynamic
-	 * programming algorithm. Useful for gene sequence matching, among other
-	 * applications.<br><br>Examples:<br>
-	 * <code>getEditDistance("cow", "house")</code> returns a value of <tt>4</tt>.<br>
-	 * <code>getEditDistance("now", "cow")</code> returns a value of <tt>1</tt>.<br>
-	 * <code>getEditDistance("ATTTGCATTA","ATTGCTT")</code> returns a value of <tt>3</tt>.<br>
-	 * <br>If there are more than two inputs, the 3d, 4th, and 5th inputs will be
-	 * interpreted as the costs of the three edit operations: DELETION, INSERTION,
-	 * and REPLACEMENT respectively. The default is <tt>1</tt> for all three
-	 * operations. Note that if the cost of replacement is at least twice the
-	 * respective costs of deletion and insertion, replacements will never be
-	 * performed.<br><br>Examples:<br>
-	 * <code>getEditDistance("cow", "house", 1, 1, 1)</code> returns a value of <tt>4</tt>.<br>
-	 * <code>getEditDistance("cow", "house", 1, 2, 1.5)</code> returns a value of <tt>5</tt>.<br>
-	 * <code>getEditDistance("cow", "house", 1, 1, 2)</code> returns a value of <tt>6</tt>.<br>
-	 * <br>Written and tested in Matlab 5.3, Release 11.1 (should work with earlier versions).
-	 * @author Miguel A. Castro (talk2miguel@yahoo.com)
-	 * @author John Dimeo (translated to Java)
-	 * @version 6/4/2000
-	 * @param s1 the first string
-	 * @param s2 the second string
-	 * @param costDelete the cost of a deletion operation
-	 * @param costInsert the cost of an insertion operation
-	 * @param costReplace the cost of a replacement operation
-	 * @return the edit distance between the two strings
-	 */
-	public float getEditDistance(String s1, String s2, float costDelete, float costInsert, float costReplace) {
-		s1 = s1.toLowerCase();
-		s2 = s2.toLowerCase();
-		int n1 = s1.length();
-		int n2 = s2.length();
-		
-		float[][] d = new float[n1 + 1][n2 + 1];
-		for (int i = 0; i < n1; i++) {
-			d[i + 1][0] = d[i][0] + costDelete;
-		}
-		for (int j = 0; j < n2; j++) {
-			d[0][j + 1] = d[0][j] + costInsert;
-		}
-		for (int i = 0; i < n1; i++) {
-			for (int j = 0; j < n2; j++) {
-				float rep = (s1.charAt(i) == s2.charAt(j))? 0.0f : costReplace;
-				float c1 = d[i][j] + rep;
-				float c2 = d[i + 1][j] + costDelete;
-				float c3 = d[i][j + 1] + costInsert;
-				d[i + 1][j + 1] = Math.min(c1, Math.min(c2, c3));
-			}
-		}
-		return d[n1][n2];
-	}
-	
-	/** See {@link #getEditDistance(String, String, float, float, float)} for the full
-	 *  documentation for this method.  
-	 *  @param s1 the first string
-	 *  @param s2 the second string
-	 *  @return the edit distance between the two strings*/
-	public float getEditDistance(String s1, String s2) {
-		return getEditDistance(s1, s2, 1.0f, 1.0f, 1.0f);
 	}
 	
 	private static char[] vowels = "aeiouAEIOU".toCharArray();
@@ -542,87 +473,6 @@ public final class Utilities {
 	    return result;
 	}
 	
-	private static final byte[] HEX_CHAR_TABLE = {
-			(byte) '0', (byte) '1', (byte) '2', (byte) '3',
-			(byte) '4', (byte) '5', (byte) '6', (byte) '7',
-			(byte) '8', (byte) '9', (byte) 'a', (byte) 'b',
-			(byte) 'c',	(byte) 'd', (byte) 'e', (byte) 'f' };
-	/**
-	 * Converts a byte array to its corresponding hex representation. This implementation
-	 * is faster than {@link DatatypeConverter#printHexBinary(byte[])}, but may be
-	 * deprecated in the future.
-	 * @param raw the byte array
-	 * @return its hex representation (lower case)
-	 */
-	public String getHexString(byte[] raw) {
-		byte[] hex = new byte[2 * raw.length];
-		for (int i = 0, j = 0; i < raw.length; i++) {
-			int v = raw[i] & 0xFF;
-			hex[j++] = HEX_CHAR_TABLE[v >>> 4];
-			hex[j++] = HEX_CHAR_TABLE[v & 0xF];
-		}
-		try {
-			return new String(hex, "ASCII");
-		} catch (UnsupportedEncodingException ex) {
-			throw new IllegalStateException();
-		}
-	}
-	
-	/**
-	 * Converts a hex string to its corresponding byte array.
-	 * The length of <tt>hex</tt> must be divisible by two.
-	 * @param hex the hex representation of a byte array
-	 * @return a byte array
-	 */
-	public byte[] getByteArray(String hex) {
-		byte[] arr;
-		try {
-			arr = hex.getBytes("ASCII");
-		} catch (UnsupportedEncodingException e) {
-			throw new IllegalStateException();
-		}
-		
-		int b0 = HEX_CHAR_TABLE[0];
-		int ba = HEX_CHAR_TABLE[10] - 10;
-		for (int i = 0; i < arr.length; i++) {
-			arr[i] = (byte) (arr[i] - (arr[i] > '9'? ba : b0));
-		}
-		
-		byte[] raw = new byte[arr.length / 2];
-		for (int i = 0, j = 0; i < raw.length; i++) {
-			raw[i] = (byte) ((arr[j++] << 4) | arr[j++]);
-		}
-		return raw;
-	}
-	
-	/**
-	 * Instantiates a new object that subclasses a parent object,
-	 * copying the value all of the parent's fields into the
-	 * subclass' fields.<br>
-	 * <b>Note:</b> This class shallow copies all non-static fields,
-	 * so any modification to the returned instance's fields will
-	 * also modify the parent's fields
-	 * @param instance an instance of the parent class
-	 * @param clazz the "parent" class
-	 * @param subClass the "child" class which extends <tt>T</tt>
-	 * @param <T> the "parent" type
-	 * @param <S> the "child" type which extends <tt>T</tt>
-	 * @return a new instance of the child class with all inherited
-	 * fields set to the values of the parent's fields
-	 */
-	public <T, S extends T> S asSubclass(T instance, Class<T> clazz, Class<S> subClass) {
-		S sub = ReflectionUtils.newInstance(subClass);
-		
-		Field[] fields = clazz.getDeclaredFields();
-		for (Field f : fields) {
-			if (Modifier.isStatic(f.getModifiers())) { continue; }
-			
-			f.setAccessible(true);
-			ReflectionUtils.set(f, sub, ReflectionUtils.get(f, instance));
-		}
-		return sub;
-	}
-
 	/**
 	 * Generic cast method. Use with caution as it bypasses compiler checks.
 	 * @param toCast the object to cast
@@ -776,31 +626,6 @@ public final class Utilities {
 			if (offer(queue, obj, 1L, TimeUnit.SECONDS)) { return true; }
 		}
 		return false;
-	}
-	
-	/**
-	 * Converts an unordered set into an ordered list using the natural ordering.
-	 * @param set the set to convert
-	 * @param <T> the type of items in the set
-	 * @return the ordered list of values
-	 */
-	public <T extends Comparable<T>> List<T> getOrderedList(Set<T> set) {
-		List<T> list = new ArrayList<>(set);
-		Collections.sort(list);
-		return list;
-	}
-
-	/**
-	 * Converts an unordered set into an ordered list using the specified comparator.
-	 * @param set the set to convert
-	 * @param comp the comparator to use to compare values in the set
-	 * @param <T> the type of items in the set
-	 * @return the ordered list of values
-	 */
-	public <T> List<T> getOrderedList(Set<T> set, Comparator<T> comp) {
-		List<T> list = new ArrayList<>(set);
-		Collections.sort(list, comp);
-		return list;
 	}
 	
 	/**
@@ -960,6 +785,22 @@ public final class Utilities {
 				return null;
 			}
 		});
+	}
+	
+	/**
+	 * Reads each line of the resource stream or file and invokes a callback for each non-blank line.
+	 * @param c the class for resource loading
+	 * @param resourceOrFile the reasource path or file path
+	 * @param callback the callback to invoke for each line
+	 */
+	public void forEachLine(Class<?> c, String resourceOrFile, Consumer<String> callback) {
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(getResourceOrFile(c, resourceOrFile)))) {
+			for (String line = br.readLine(); line != null; line = br.readLine()) {
+				LambdaUtils.accept(StringUtils.stripToNull(line), callback::accept);
+			}
+		} catch (IOException e) {
+			log.warn("Error reading lines of {}", resourceOrFile, e);
+		}
 	}
 	
 	/**
