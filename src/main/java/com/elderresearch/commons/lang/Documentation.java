@@ -51,8 +51,7 @@ public class Documentation {
 	@Getter private CharSequence displayName;
 	/** A longer description of the component. */
 	@Getter private CharSequence description;
-	/** The version of the component. */
-	@Getter private CharSequence version;
+	private CharSequence version;
 	/** Tags (short keywords) that relate to the component. */
 	@Getter private Set<CharSequence> tags;
 	/** Lists requirements for this component. */
@@ -67,6 +66,18 @@ public class Documentation {
 	 * @return the component's name
 	 */
 	public CharSequence getName() { return LambdaUtils.get(nameProvider); }
+	
+	/**
+	 * The version of the component. If this is <tt>null</tt>, the {@linkplain Package#getImplementationVersion()
+	 * implementation version} of the {@linkplain #getType() type} (or the version of this instance, if the type is not
+	 * defined) is used instead.
+	 * @return the component's version
+	 */	
+	public CharSequence getVersion() {
+		if (version != null) { return version; }
+		if (type != null) { return type.getPackage().getImplementationVersion(); }
+		return getClass().getPackage().getImplementationVersion();
+	}
 	
 	/** A description of the requirements (or prerequisites or input) of this component. */
 	@Retention(RetentionPolicy.RUNTIME) @Inherited
