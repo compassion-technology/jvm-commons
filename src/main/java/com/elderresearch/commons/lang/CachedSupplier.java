@@ -4,9 +4,14 @@
  *******************************************************************************/
 package com.elderresearch.commons.lang;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableList;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,6 +34,7 @@ public class CachedSupplier<T> implements Supplier<T> {
     }
     
     public synchronized void reset() {
+		// Note: Suppliers.memoize still expects a Guava supplier, so #lambdas :)
         memoized = Suppliers.memoize(delegate::get);
     }
     
@@ -42,6 +48,18 @@ public class CachedSupplier<T> implements Supplier<T> {
         }
         return retval.getResult();
     }
+    
+    public ResultType getResultType() {
+		return memoized.get().getType();
+	}
+	
+	public Optional<Throwable> getError() {
+		return Optional.ofNullable(memoized.get().getError());
+	}
+	
+	public List<String> getIssues() {
+		return memoized.get().getIssues();
+	}
     
     /**
      * Enumeration of the results of the calculation.
@@ -66,14 +84,22 @@ public class CachedSupplier<T> implements Supplier<T> {
     @Getter
     @AllArgsConstructor(staticName = "of")
     public static class Result<T> {
-        private static final Result<?> FAILED = of(ResultType.FAILED, null);
+        private static final Result<?> FAILED = of(ResultType.FAILED, null, null, Collections.emptyList());
         
         public static <T> Result<T> completed(T result) {
-            return of(ResultType.COMPLETED, result);
+            return of(ResultType.COMPLETED, result, null, Collections.emptyList());
+        }
+        
+        public static <T> Result<T> completed(T result, Collection<String> issues) {
+            return of(ResultType.COMPLETED, result, null, ImmutableList.copyOf(issues));
         }
         
         public static <T> Result<T> failed() {
             return Utilities.cast(FAILED);
+        }
+        
+        public static <T> Result<T> failed(Throwable ex) {
+        	return of(ResultType.FAILED, null, ex, Collections.emptyList());
         }
         
         public static <T> Result<T> inProgress() {
@@ -81,10 +107,12 @@ public class CachedSupplier<T> implements Supplier<T> {
         }
         
         public static <T> Result<T> inProgress(T intermediary) {
-            return of(ResultType.IN_PROGRESS, intermediary);
+            return of(ResultType.IN_PROGRESS, intermediary, null, Collections.emptyList());
         }
         
         private final ResultType type;
         private final T result;
+        private final Throwable error;
+		private final List<String> issues;
     }
 }
