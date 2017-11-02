@@ -563,6 +563,27 @@ public final class Utilities {
 	}
 	
 	/**
+	 * Waits up to the specified time for the next available object in the queue, handling the
+	 * interrupted exception. This method will continue to wait
+	 * for the next available object to become available as long as the status monitor is running.
+	 * @param <T> the type of objects in the queue
+	 * @param queue the queue
+	 * @param sm the task's status monitor, which can be <tt>null</tt>. If so,
+	 * this method has the same effect as {@link BlockingQueue#poll()}
+	 * @return the next available object from the queue, or <tt>null</tt> if the specified time
+	 * elapsed or an {@link InterruptedException} was thrown
+	 * @see BlockingQueue#poll(long, TimeUnit)
+	 * @see StatusMonitor#isRunning()
+	 */
+	public <T> T poll(BlockingQueue<T> queue, StatusMonitor sm) {
+		while (sm == null || sm.isRunning()) {
+			val next = poll(queue, 1L, TimeUnit.SECONDS);
+			if (next != null) { return next; }
+		}
+		return null;
+	}
+	
+	/**
 	 * Waits the up to specified time for the next available objects in the queue. The batch may only have one item,
 	 * but if there are more available in the queue they will also be added (up until the max batch size). An empty
 	 * list will only be returned if there are no available objects and the specified time has elapsed.
@@ -619,7 +640,7 @@ public final class Utilities {
 	 * this method has the same effect as {@link BlockingQueue#offer(Object)}
 	 * @return if the object was successfully added to the queue
 	 * @see BlockingQueue#offer(Object, long, TimeUnit)
-	 * @see StatusMonitor#isRunning(StatusMonitor)
+	 * @see StatusMonitor#isRunning()
 	 */
 	public <T> boolean offer(BlockingQueue<T> queue, T obj, StatusMonitor sm) {
 		while (sm == null || sm.isRunning()) {
