@@ -21,7 +21,7 @@ import lombok.extern.log4j.Log4j2;
  */
 @Log4j2
 @UtilityClass
-public class JCommanderUtils {
+public class CLIUtils {
 	/**
 	 * Parses command-line arguments using JCommander, printing out the usage if there are any problems.
 	 * @param args the command line args
