@@ -7,8 +7,9 @@ package com.elderresearch.commons.lang.jackson;
 import org.yaml.snakeyaml.DumperOptions.LineBreak;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
-import lombok.experimental.UtilityClass;
+import lombok.AllArgsConstructor;
 
 /**
  * Utilities for using Jackson and its {@link ObjectMapper} to use YAML.
@@ -16,16 +17,16 @@ import lombok.experimental.UtilityClass;
  * @author <a href="mailto:dimeo@elderresearch.com">John Dimeo</a>
  * @since Nov 14, 2017
  */
-@UtilityClass
-public class YAMLMapper {
+@AllArgsConstructor
+public class YAMLUtils {
 	/**
 	 * Gets an {@link ObjectMapper} configured to read and write YAML. When writing YAML, the mapper will use the
 	 * default line breaks for the platform on which the code is running.
 	 * @return a YAML-enabled object mapper
 	 * @see LineBreak#getPlatformLineBreak()
 	 */
-	public ObjectMapper get() {
-		return get(LineBreak.getPlatformLineBreak());
+	public YAMLMapper newMapper() {
+		return newMapper(LineBreak.getPlatformLineBreak());
 	}
 	
 	/**
@@ -34,7 +35,7 @@ public class YAMLMapper {
 	 * @param lineBreak the line breaks to use when writing YAML
 	 * @return a YAML-enabled object mapper
 	 */
-	public ObjectMapper get(LineBreak lineBreak) {
-		return new ObjectMapper(new YAMLFactoryCustom(lineBreak));
+	public YAMLMapper newMapper(LineBreak lineBreak) {
+		return new YAMLMapper(new YAMLFactoryCustom(lineBreak));
 	}
 }
