@@ -72,6 +72,9 @@ public interface PropertiesKey {
 	default Path getPath() {
 		return getPath(props());
 	}
+	default <T extends Enum<T>> T getEnum(Class<T> c) {
+		return getEnum(props(), c);
+	}
 	
 	default String get(Properties props) {
 		return props.getProperty(key(), Objects.toString(defVal(), null));
@@ -96,6 +99,9 @@ public interface PropertiesKey {
 	}
 	default Path getPath(Properties props) {
 		return Paths.get(get(props));
+	}
+	default <T extends Enum<T>> T getEnum(Properties props, Class<T> c) {
+		return Utilities.valueOf(c, get(props), Utilities.cast(defVal()));
 	}
 	
 	default void set(String val) {

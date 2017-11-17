@@ -38,6 +38,7 @@ public class DateExtractor extends Extractor<DateFormat, Date> {
 		// Default Java toString() format
 		new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy"),
 		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"),
+		new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ"),
 		new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"),
 		new SimpleDateFormat("yyyy-MM-dd")
 	);
