@@ -9,7 +9,7 @@ import org.yaml.snakeyaml.DumperOptions.LineBreak;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
-import lombok.AllArgsConstructor;
+import lombok.experimental.UtilityClass;
 
 /**
  * Utilities for using Jackson and its {@link ObjectMapper} to use YAML.
@@ -17,7 +17,7 @@ import lombok.AllArgsConstructor;
  * @author <a href="mailto:dimeo@elderresearch.com">John Dimeo</a>
  * @since Nov 14, 2017
  */
-@AllArgsConstructor
+@UtilityClass
 public class YAMLUtils {
 	/**
 	 * Gets an {@link ObjectMapper} configured to read and write YAML. When writing YAML, the mapper will use the
