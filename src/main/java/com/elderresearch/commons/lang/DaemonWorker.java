@@ -116,7 +116,7 @@ public class DaemonWorker<T> implements Runnable {
 	 */
 	public void shutdownAndWait() {
 		shutdown();
-		Utilities.join(thread);
+		LambdaUtils.accept(thread, Utilities::join);
 	}
 	
 	/**
