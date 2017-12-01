@@ -11,7 +11,7 @@
 	<artifactId>eri-commons-lang</artifactId>
 	<name>ERI Commons - Language Extensions</name>
 	<description>Shared Java language extensions</description>
-	<version>1.7.5-SNAPSHOT</version>
+	<version>1.7.6-SNAPSHOT</version>
 
 	<scm>
 		<developerConnection>scm:git:https://${scm}/eri-commons/eri-lang.git</developerConnection>
@@ -29,7 +29,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.5</version>
+			<version>3.7</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>

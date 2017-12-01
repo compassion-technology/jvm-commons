@@ -47,29 +47,50 @@ public class DaemonWorker<T> implements Runnable {
 	/**
 	 * Create a new worker.
 	 * @param queueSize the maximum size of the queue
-	 * @param callback callback for the each batch of items. This list will be no larger than <tt>batchSize</tt> but may
-	 * only have one item. 
+	 * @param callback callback for the each batch of items. This list will have between one and the capacity of the
+	 * queue elements when the callback is invoked.
 	 */
 	public DaemonWorker(int queueSize, Consumer<List<T>> callback) {
 		this(null, queueSize, callback);
+	}
+
+	/**
+	 * Create a new worker.
+	 * @param queue the queue from which to poll for work
+	 * @param callback callback for the each batch of items. This list will have between one and the capacity of the
+	 * queue elements when the callback is invoked.
+	 */
+	public DaemonWorker(BlockingQueue<T> queue, Consumer<List<T>> callback) {
+		this(null, queue, callback);
 	}
 	
 	/**
 	 * Create a new worker.
 	 * @param name the thread name
 	 * @param queueSize the maximum size of the queue
-	 * @param callback callback for the each batch of items. This list will be no larger than <tt>batchSize</tt> but may
-	 * only have one item. 
+	 * @param callback callback for the each batch of items. This list will have between one and the capacity of the
+	 * queue elements when the callback is invoked.
 	 */
 	public DaemonWorker(String name, int queueSize, Consumer<List<T>> callback) {
+		this(name, new ArrayBlockingQueue<>(queueSize), callback);
+	}
+	
+	/**
+	 * Create a new worker.
+	 * @param name the thread name
+	 * @param queue the queue from which to poll for work
+	 * @param callback callback for the each batch of items. This list will have between one and the capacity of the
+	 * queue elements when the callback is invoked.
+	 */
+	public DaemonWorker(String name, BlockingQueue<T> queue, Consumer<List<T>> callback) {
 		this.name = StringUtils.defaultString(name, getClass().getSimpleName() + instances++);
-		this.queue = new ArrayBlockingQueue<>(queueSize);
-		this.maxBatchSize = queueSize;
+		this.queue = queue;
+		this.maxBatchSize = queue.remainingCapacity();
 		this.callback = callback;
 	}
 	
 	protected DaemonWorker(int queueSize) {
-		this(null, queueSize, null);
+		this(queueSize, null);
 	}
 	
 	/**
@@ -116,7 +137,7 @@ public class DaemonWorker<T> implements Runnable {
 	 */
 	public void shutdownAndWait() {
 		shutdown();
-		Utilities.join(thread);
+		LambdaUtils.accept(thread, Utilities::join);
 	}
 	
 	/**
