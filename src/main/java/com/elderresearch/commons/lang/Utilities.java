@@ -870,13 +870,39 @@ public final class Utilities {
 	/**
 	 * Returns the first element of the array.
 	 * @param arr the array
+	 * @param <T> the type of objects in <tt>arr</tt>
 	 * @return the first element, or <tt>null</tt> if <tt>arr</tt> is <tt>null</tt>
 	 * or has a length of <tt>0</tt>
-	 * @param <T> the type of objects in <tt>arr</tt>
 	 */
 	@SafeVarargs
 	public <T> T first(T... arr) {
-		return arr == null || arr.length == 0? null : arr[0];
+		return get(arr, 0);
+	}
+	
+	/**
+	 * Returns the <tt>i</tt><sup>th</sup> element of the array, if it is not <tt>null</tt> and has at least
+	 * <tt>i + 1</tt> elements.
+	 * @param arr the array
+	 * @param i the index
+	 * @param <T> the type of objects in the array
+	 * @return the element at the index, or <tt>null</tt> if the array is null or the index is out of bounds
+	 */
+	public <T> T get(T[] arr, int i) {
+		if (arr == null || i < 0 || i >= arr.length) { return null; }
+		return arr[i];
+	}
+	
+	/**
+	 * Returns the <tt>i</tt><sup>th</sup> element of the list, if it is not <tt>null</tt> and has at least
+	 * <tt>i + 1</tt> elements.
+	 * @param list the list
+	 * @param i the index
+	 * @param <T> the type of objects in the array
+	 * @return the element at the index, or <tt>null</tt> if the list is null or the index is out of bounds
+	 */
+	public <T> T get(List<T> list, int i) {
+		if (list == null || i < 0 || i >= list.size()) { return null; }
+		return list.get(i);
 	}
 	
 	/**
