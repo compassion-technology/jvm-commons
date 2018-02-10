@@ -131,6 +131,7 @@ public interface PropertiesKey {
 			// Allow system properties to override first
 			LambdaUtils.accept(System.getProperty(key), $ -> props.setProperty(key, $));
 			// Allow environment variables to override next
+			LambdaUtils.accept(System.getenv(key.toUpperCase()), $ -> props.setProperty(key, $));
 			LambdaUtils.accept(System.getenv(key), $ -> props.setProperty(key, $));
 		}
 	}
