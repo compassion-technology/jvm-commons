@@ -5,8 +5,7 @@
 package com.elderresearch.commons.lang;
 
 import java.util.concurrent.TimeUnit;
-
-import org.apache.logging.log4j.util.Supplier;
+import java.util.function.Consumer;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -36,12 +35,18 @@ public interface StatusListener {
 	class DefaultStatusListener implements StatusListener {
 		private static final double PCT_COEFF = 100.0;
 		
+		private Consumer<String> printer;
+		
+		public DefaultStatusListener(Consumer<String> printer) {
+			this.printer = printer;
+		}
+		
 		@Override
 		public void statusChanged(StatusMonitor sm) {
 			if (sm.getSize() < 0L) {
-				print(() -> String.format("[%-9s] %s", sm.getState(), sm.getStatus()));
+				printer.accept(String.format("[%-9s] %s", sm.getState(), sm.getStatus()));
 			} else {
-				print(() -> String.format("[%-9s] %6s/%6s (%6.2f%%) %s",
+				printer.accept(String.format("[%-9s] %6s/%6s (%6.2f%%) %s",
 					sm.getState(),
 					Utilities.compactLargeNumber(sm.getProgress()),
 					Utilities.compactLargeNumber(sm.getSize()),
@@ -49,9 +54,8 @@ public interface StatusListener {
 					sm.getStatus()));
 			}
 		}
-		
-		protected void print(Supplier<String> str) {
-			log.info(str);
-		}
 	}
+	
+	public static final DefaultStatusListener LOG = new DefaultStatusListener(DefaultStatusListener.log::info);
+	public static final DefaultStatusListener CONSOLE = new DefaultStatusListener(System.out::println);
 }
