@@ -32,7 +32,7 @@ public class DaemonWorker<T> implements Runnable {
 	private static volatile int instances;
 	
 	/** The worker thread name. Defaults to the class name. */
-	@Setter private String name;
+	@Setter @Getter private String name;
 	/** The callback to invoke for the each batch of items. This list will be no larger than {@link #setMaxBatchSize(int)}
 	 *  but may only have one item. */ 
 	@Setter private Consumer<List<T>> callback;
@@ -43,6 +43,8 @@ public class DaemonWorker<T> implements Runnable {
 	
 	private BlockingQueue<T> queue;
 	private volatile boolean running;
+	
+	private DaemonWorker<?>[] waitFor;
 
 	/**
 	 * Create a new worker.
@@ -87,10 +89,22 @@ public class DaemonWorker<T> implements Runnable {
 		this.queue = queue;
 		this.maxBatchSize = queue.remainingCapacity();
 		this.callback = callback;
+		waitFor();
 	}
 	
 	protected DaemonWorker(int queueSize) {
 		this(queueSize, null);
+	}
+	
+	/**
+	 * Indicate an upstream workers on which this worker should wait before exiting.
+	 * @param upstream one or more threads that should prevent this worker from exiting while it is still 
+	 * running
+	 * @return this for method chaining
+	 */
+	public DaemonWorker<T> waitFor(DaemonWorker<?>... upstream) {
+		this.waitFor = upstream;
+		return this;
 	}
 	
 	/**
@@ -109,14 +123,22 @@ public class DaemonWorker<T> implements Runnable {
 	@Override
 	public void run() {
 		val batch = new ArrayList<T>(maxBatchSize);
-		while (running || !queue.isEmpty()) {
+		while (running || !queue.isEmpty() || anyRunningUpstreamWorkers()) {
 			if (Utilities.pollBatch(queue, 1L, TimeUnit.SECONDS, batch, maxBatchSize)) {
 				process(batch);
 				batch.clear();
 			}
 		}
+		running = false;
 	}
-
+	
+	private boolean anyRunningUpstreamWorkers() {
+		for (val w : waitFor) {
+			if (w.running) { return true; }
+		}
+		return false;
+	}
+	
 	protected void process(List<T> batch) {
 		callback.accept(batch);
 	}
