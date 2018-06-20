@@ -69,4 +69,10 @@ public class UtilitiesTest extends TestCase {
 		assertEquals("bushes", Utilities.pluralizeIf("bush", 0.3));
 		assertEquals("pizza", Utilities.pluralizeIf("pizza", 1));
 	}
+	
+	public void testLetterFreq() {
+		assertEquals(0.4233f, Utilities.getLetterFrequencyScore("Hello, this is a test".toCharArray()), 0.001f);
+		assertEquals(0.2108f, Utilities.getLetterFrequencyScore("ABA12341255asf2sfgerq".toCharArray()), 0.001f);
+		assertEquals(0.0043f, Utilities.getLetterFrequencyScore("908&9876875676%$463*7".toCharArray()), 0.001f);
+	}
 }
