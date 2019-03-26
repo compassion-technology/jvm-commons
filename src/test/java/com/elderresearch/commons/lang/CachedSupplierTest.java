@@ -1,13 +1,19 @@
 package com.elderresearch.commons.lang;
 
-import junit.framework.TestCase;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.elderresearch.commons.lang.CachedSupplier.Result;
 import com.elderresearch.commons.lang.CachedSupplier.ResultType;
 
+import junit.framework.TestCase;
+
+/**
+ * tests for CachedSupplier Utility
+ * 
+ * @author <a href=mailto:colin.thomas@elderresearch.com>Colin Thomas</a>
+ * @since March 26, 2019
+ *
+ */
 public class CachedSupplierTest extends TestCase {
 
 	public void testBasicCalculation() {

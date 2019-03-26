@@ -35,6 +35,11 @@ public class CachedSupplier<T> implements Supplier<T> {
     	this(delegate, null);
     }
     
+    /**
+     * @param delegate
+     * @param beforeReset - consumer to run just before resetting the cache (helpful for native
+     * 		objects that require smarter memory management than the JVM garbage collector can provide)
+     */
     public CachedSupplier(Supplier<Result<T>> delegate, Consumer<T> beforeReset) {
         this.delegate = delegate;
         this.beforeReset = Optional.ofNullable(beforeReset);
