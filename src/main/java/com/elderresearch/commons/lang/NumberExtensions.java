@@ -17,7 +17,7 @@ import lombok.experimental.UtilityClass;
 public class NumberExtensions {
 	public Long asLong(Number n) {
 		if (n instanceof Long) { return (Long) n; }
-		return n == null? null : Long.valueOf(n.longValue());
+		return LambdaUtils.apply(n, Number::longValue);
 	}
 	
 	public Double asDouble(Number n) {

@@ -21,7 +21,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
@@ -30,8 +32,12 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
+import org.jooq.lambda.Seq;
+import org.jooq.lambda.tuple.Tuple;
+import org.jooq.lambda.tuple.Tuple2;
 
 import com.elderresearch.commons.lang.LambdaUtils.Interruptable;
 
@@ -118,7 +124,45 @@ public final class Utilities {
 		}
 		return (float) score;
 	}
-
+	
+	private static final float ENGLISH_OTHER_FREQ = 0.091f;
+	private static final Map<Character, Float> ENGLISH_LETTER_FREQS = Seq.of(
+		Tuple.tuple('a', 0.074f), Tuple.tuple('b', 0.014f), Tuple.tuple('c', 0.025f),
+		Tuple.tuple('d', 0.039f), Tuple.tuple('e', 0.115f), Tuple.tuple('f', 0.020f),
+		Tuple.tuple('g', 0.018f), Tuple.tuple('h', 0.055f), Tuple.tuple('i', 0.063f),
+		Tuple.tuple('j', 0.001f), Tuple.tuple('k', 0.007f), Tuple.tuple('l', 0.037f),
+		Tuple.tuple('m', 0.022f), Tuple.tuple('n', 0.061f), Tuple.tuple('o', 0.068f),
+		Tuple.tuple('p', 0.018f), Tuple.tuple('q', 0.001f), Tuple.tuple('r', 0.054f),
+		Tuple.tuple('s', 0.058f), Tuple.tuple('t', 0.082f), Tuple.tuple('u', 0.025f),
+		Tuple.tuple('v', 0.009f), Tuple.tuple('w', 0.021f), Tuple.tuple('x', 0.001f),
+		Tuple.tuple('y', 0.018f), Tuple.tuple('z', 0.001f)
+	).toMap(Tuple2::v1, Tuple2::v2);
+	
+	public float getLetterFrequencyScore(char[] chars) {
+		if (ArrayUtils.isEmpty(chars)) { return 0.0f; }
+		
+		val map = new HashMap<Character, Integer>();
+		int otherFreq = 0;
+		for (val c : chars) {
+			val lower = Character.toLowerCase(c);
+			if (ENGLISH_LETTER_FREQS.containsKey(lower)) {
+				map.merge(lower, 1, (i, j) -> i + j);
+			} else {
+				otherFreq++;
+			}
+		}
+		
+		float n = chars.length;
+		float ret = 1.0f;
+		for (val e : map.entrySet()) {
+			val baseFreq = ENGLISH_LETTER_FREQS.get(e.getKey());
+			val thisFreq = e.getValue() / n;
+			ret -= Math.abs(thisFreq - baseFreq);
+		}
+		ret -= Math.abs(otherFreq - ENGLISH_OTHER_FREQ) / n;
+		return Math.max(ret, 0.0f);
+	}
+	
 	/**
 	 * Applies the same format string to each element of an array,
 	 * concatenating each formatted string together with a space.

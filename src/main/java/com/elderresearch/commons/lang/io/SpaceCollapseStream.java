@@ -21,7 +21,8 @@ public class SpaceCollapseStream extends InputStream {
 	private static final int SPACE = ' ';
 	
 	private InputStream wrapped;
-	private int prev = NONE, next = NONE;
+	// Since this also trims lines, initialize prev to space so that leading spaces on the first line are skipped
+	private int prev = SPACE, next = NONE;
 
 	public SpaceCollapseStream(InputStream wrapped) { this.wrapped = wrapped; }
 	

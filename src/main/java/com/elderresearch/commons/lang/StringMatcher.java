@@ -7,6 +7,7 @@ package com.elderresearch.commons.lang;
 import java.util.Arrays;
 import java.util.function.BiFunction;
 
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -186,7 +187,7 @@ public class StringMatcher {
 			s = StringUtils.lowerCase(s);
 		}
 		if (cleanRegex != null) {
-			s = StringUtils.replaceAll(s, cleanRegex, cleanReplacement);
+			s = RegExUtils.replaceAll(s, cleanRegex, cleanReplacement);
 		}
 		return s;
 	}

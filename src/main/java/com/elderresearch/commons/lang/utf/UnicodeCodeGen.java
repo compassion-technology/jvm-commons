@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.text.WordUtils;
 
 import com.elderresearch.commons.lang.ReflectionUtils;
 import com.elderresearch.commons.lang.Utilities;
@@ -75,7 +75,7 @@ final class UnicodeCodeGen {
     		String clsName = "Unicode" + WordUtils.capitalizeFully(e.getKey());
     		try (PrintStream ps = new PrintStream(clsName + ".java", "UTF-8")) {
     			ps.println("/*******************************************************************************");
-    			ps.println(" * Copyright (c) 2017 Elder Research, Inc.");
+    			ps.println(" * Copyright (c) 2019 Elder Research, Inc.");
     			ps.println(" * All rights reserved.");
     			ps.println(" *******************************************************************************/");
     			ps.println(UnicodeCodeGen.class.getPackage() + ";");
