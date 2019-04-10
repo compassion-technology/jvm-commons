@@ -135,4 +135,18 @@ public interface PropertiesKey {
 			LambdaUtils.accept(System.getenv(key), $ -> props.setProperty(key, $));
 		}
 	}
+	
+	/**
+	 * Concatenate two sets of property keys together into one array. This is useful if you have several sets
+	 * of enums that implement this interface but need to pass all keys to {@link #load(Properties, String, PropertiesKey...)}.
+	 * @param keys1 the first set of keys
+	 * @param keys2 the second set of keys
+	 * @return an array with the keys concatenated together
+	 */
+	static PropertiesKey[] concat(PropertiesKey[] keys1, PropertiesKey[] keys2) {
+		val ret = new PropertiesKey[keys1.length + keys2.length];
+		System.arraycopy(keys1, 0, ret, 0, keys1.length);
+		System.arraycopy(keys2, 0, ret, keys1.length, keys2.length);
+		return ret;
+	}
 }

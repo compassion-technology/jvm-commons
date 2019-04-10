@@ -75,7 +75,7 @@ final class UnicodeCodeGen {
     		String clsName = "Unicode" + WordUtils.capitalizeFully(e.getKey());
     		try (PrintStream ps = new PrintStream(clsName + ".java", "UTF-8")) {
     			ps.println("/*******************************************************************************");
-    			ps.println(" * Copyright (c) 2017 Elder Research, Inc.");
+    			ps.println(" * Copyright (c) 2019 Elder Research, Inc.");
     			ps.println(" * All rights reserved.");
     			ps.println(" *******************************************************************************/");
     			ps.println(UnicodeCodeGen.class.getPackage() + ";");
