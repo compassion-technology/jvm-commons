@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.elderresearch</groupId>
 		<artifactId>eri-maven-base</artifactId>
-		<version>3.4.2</version>
+		<version>3.5.0</version>
 	</parent>
 
 	<groupId>com.elderresearch.commons</groupId>
@@ -27,19 +27,26 @@
 			<version>1.48</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.7</version>
+		   <groupId>org.apache.commons</groupId>
+		   <artifactId>commons-text</artifactId>
+		   <version>1.6</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>23.0</version>
+			<version>27.1-jre</version>
+			<exclusions>
+			    <!-- See https://groups.google.com/forum/#!topic/guava-discuss/AKBGPca9unw -->
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>listenablefuture</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.jooq</groupId>
 			<artifactId>jool</artifactId>
-			<version>0.9.12</version>
+			<version>0.9.14</version>
 		</dependency>
 	</dependencies>
 </project>
