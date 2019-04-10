@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.text.WordUtils;
 
 import com.elderresearch.commons.lang.ReflectionUtils;
 import com.elderresearch.commons.lang.Utilities;
