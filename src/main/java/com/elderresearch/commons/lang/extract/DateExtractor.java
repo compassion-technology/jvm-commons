@@ -40,6 +40,7 @@ public class DateExtractor extends Extractor<DateFormat, Date> {
 		new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"),
 		new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ"),
 		new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"),
+		new SimpleDateFormat("yyyy-MM-dd HH:mm"),
 		new SimpleDateFormat("yyyy-MM-dd")
 	);
 	public static final Supplier<Collection<DateFormat>> MONTH_YEAR_FORMATS = () -> Arrays.asList(
