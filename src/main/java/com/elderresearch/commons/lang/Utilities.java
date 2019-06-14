@@ -853,6 +853,22 @@ public final class Utilities {
 	}
 	
 	/**
+	 * Recurses through the object, invoking the callback for each one. If the object is not iterable, the callback
+	 * is invoked with the parameter object <tt>o</tt>. If it is iterable, this method is recursively invoked
+	 * for each element in the collection.
+	 * @param o the object to recurse
+	 * @param callback the callback to invoke for each object
+	 */
+	public void forEach(Object o, Consumer<Object> callback) {
+		if (o instanceof Iterable<?>) {
+			Iterable<?> i = cast(o);
+			i.forEach($ -> forEach($, callback));
+		} else {
+			callback.accept(o);
+		}
+	}
+	
+	/**
 	 * Reads each line of the resource stream or file and invokes a callback for each non-blank line.
 	 * @param c the class for resource loading
 	 * @param resourceOrFile the reasource path or file path
