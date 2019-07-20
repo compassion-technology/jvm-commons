@@ -8,9 +8,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.function.Consumer;
 
 import com.elderresearch.commons.lang.LambdaUtils.Interruptable;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.val;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -21,35 +25,29 @@ import lombok.extern.log4j.Log4j2;
  * @since Mar 3, 2013
  */
 @Log4j2
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RuntimeExec extends Thread {
-	private boolean isError;
 	private InputStream stream;
-	
-	private RuntimeExec(InputStream stream, boolean isError) {
-		this.stream = stream;
-		this.isError = isError;
-	}
+	private Consumer<String> lineHandler;
 
 	@Override
 	public void run() {
 		try {
-			InputStreamReader isr = new InputStreamReader(stream);
-			BufferedReader br = new BufferedReader(isr);
+			val isr = new InputStreamReader(stream);
+			val br = new BufferedReader(isr);
 
 			String line = null;
-			while ((line = br.readLine()) != null) {
-				if (isError) {
-					log.warn(line);
-				} else {
-					log.info(line);
-				}
-			}
+			while ((line = br.readLine()) != null) { lineHandler.accept(line); }
 		} catch (IOException e) {
 			log.error("Error reading process stream", e);
 		}
 	}
 
 	public static int exec(String cmd) {
+		return exec(cmd, log::info, log::warn);
+	}
+	
+	public static int exec(String cmd, Consumer<String> outHandler, Consumer<String> errorHandler) {
 		Process p;
 		try {
 			p = Runtime.getRuntime().exec(cmd);
@@ -58,8 +56,8 @@ public final class RuntimeExec extends Thread {
 			return -1;
 		}
 		
-		new RuntimeExec(p.getErrorStream(), true).start();
-		new RuntimeExec(p.getInputStream(), false).start();
+		new RuntimeExec(p.getInputStream(), outHandler).start();
+		new RuntimeExec(p.getErrorStream(), errorHandler).start();
 		
 		return Interruptable.get(p::waitFor, "waiting for process", -1);
 	}
