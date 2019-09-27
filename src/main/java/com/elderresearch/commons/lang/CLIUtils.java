@@ -31,7 +31,7 @@ public class CLIUtils {
 	 */
 	public boolean parseArgs(String[] args, Object... objs) {
 		val jc = new JCommander();
-		Arrays.asList(objs).forEach(o -> jc.addObject(o));
+		Arrays.asList(objs).forEach(jc::addObject);
  		return parseArgs(args, jc);
 	}
 	
@@ -48,7 +48,7 @@ public class CLIUtils {
 	@SafeVarargs
 	public <T> T parseCommands(String[] args, T... commands) {
 		val jc = new JCommander();
-		Arrays.asList(commands).forEach(c -> jc.addCommand(c));
+		Arrays.asList(commands).forEach(jc::addCommand);
 		if (parseArgs(args, jc)) {
 			val pc = jc.getParsedCommand();
 			if (pc == null) {
