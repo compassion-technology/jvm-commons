@@ -10,7 +10,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
+
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -40,7 +43,7 @@ public class NumberExtractor extends Extractor<NumberFormat, Number> {
 	private BitSet types;
 	
 	public NumberExtractor() {
-		super(Comparator.comparing(Number::doubleValue), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 1.0);
+		super(Comparator.comparing(Number::doubleValue), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 	}
 	public NumberExtractor(LocalityLevel locality) {
 		this();
@@ -65,7 +68,7 @@ public class NumberExtractor extends Extractor<NumberFormat, Number> {
 	@Override
 	protected void addFormatsFor(Locale l, Consumer<NumberFormat> adder) {
 		if (isEnabled(NumberFormatType.DECIMAL)) {
-			adder.accept(NumberFormat.getInstance(l));	
+			adder.accept(NumberFormat.getInstance(l));
 		}
 		if (isEnabled(NumberFormatType.INTEGER)) {
 			adder.accept(NumberFormat.getIntegerInstance(l));	
@@ -79,6 +82,16 @@ public class NumberExtractor extends Extractor<NumberFormat, Number> {
 	}
 	private boolean isEnabled(NumberFormatType type) {
 		return types == null || types.get(type.ordinal());
+	}
+
+	// Scientific notation expects capital E
+	@Override
+	public Number parse(String text) {
+		return super.parse(StringUtils.upperCase(text));
+	}
+	@Override
+	public Set<Match<Number>> extractAll(String text) {
+		return super.extractAll(StringUtils.upperCase(text));
 	}
 	
 	private static Map<LocalityLevel, ThreadLocal<NumberExtractor>> map;
