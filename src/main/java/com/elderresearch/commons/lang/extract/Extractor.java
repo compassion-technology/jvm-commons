@@ -37,19 +37,18 @@ import com.elderresearch.commons.lang.Utilities;
 abstract class Extractor<F extends Format, T> {
 	private List<Locale> locales;
 	private Comparator<T> comp;
-	private T min, max, defVal;
+	private T min, max;
 	
 	private Supplier<Collection<F>> customFormats;
-	private ThreadLocal<FormatList<F>> formats;
+	private ThreadLocal<List<F>> formats;
 	
-	protected Extractor(Comparator<T> comp, T min, T max, T defVal) {
-		this.comp   = comp;
-		this.min    = min;
-		this.max    = max;
-		this.defVal = defVal;
+	protected Extractor(Comparator<T> comp, T min, T max) {
+		this.comp = comp;
+		this.min  = min;
+		this.max  = max;
 		this.customFormats = () -> Collections.emptyList();
 		this.formats = ThreadLocal.withInitial(() -> {
-			FormatList<F> ret = new FormatList<>();
+			List<F> ret = new LinkedList<>();
 			Set<F> set = new HashSet<>();
 			for (F f : customFormats.get()) {
 				add(ret, f, set);
@@ -62,10 +61,10 @@ abstract class Extractor<F extends Format, T> {
 		
 		setLocalityLevel(LocalityLevel.LOCAL);
 	}
-	private void add(FormatList<F> fl, F f, Set<F> unique) {
+	private void add(List<F> fl, F f, Set<F> unique) {
 		if (unique.add(f)) {
 			initFormat(f);
-			fl.getFormats(f.format(defVal)).add(f);	
+			fl.add(f);
 		}
 	}
 	
@@ -140,7 +139,7 @@ abstract class Extractor<F extends Format, T> {
 		if (StringUtils.isEmpty(text)) { return null; }
 		
 		ParsePosition pp = new ParsePosition(0);
-		for (F f : formats.get().getFormats(text)) {
+		for (F f : formats.get()) {
 			pp.setIndex(0);
 			T val = Utilities.cast(f.parseObject(text, pp));
 			// Return the extracted value if the value is valid
@@ -165,9 +164,7 @@ abstract class Extractor<F extends Format, T> {
 	 */
 	public Set<Match<T>> extractAll(String text) {
 		Set<Match<T>> ret = new HashSet<>();
-		FormatList<F> fl = formats.get();
-		for (F f : fl.numbersOnly) { extractAll(text, f, ret); }
-		for (F f : fl.withLetters) { extractAll(text, f, ret); }
+		for (F f : formats.get()) { extractAll(text, f, ret); }
 		return ret;
 	}
 	
@@ -186,15 +183,6 @@ abstract class Extractor<F extends Format, T> {
 			
 			// Only try parsing dates after non-alphanumeric characters
 			tryParse = !Character.isLetterOrDigit(text.charAt(c));
-		}
-	}
-	
-	private static class FormatList<F extends Format> {
-		List<F> numbersOnly = new LinkedList<>();
-		List<F> withLetters = new LinkedList<>();
-		
-		List<F> getFormats(String s) {
-			return Utilities.containsLetters(s)? withLetters : numbersOnly;
 		}
 	}
 	

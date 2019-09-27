@@ -27,8 +27,6 @@ import java.util.stream.Collectors;
  * @since Jun 30, 2012
  */
 public class DateExtractor extends Extractor<DateFormat, Date> {
-	// Epoch- to test formatting
-	private static final Date DEF_DATE = new Date(0);
 	// Jan 1, 1500
 	private static final Date MIN_DATE = new Date(-14828295600000L);
 	// Jan 1, 3000
@@ -67,7 +65,7 @@ public class DateExtractor extends Extractor<DateFormat, Date> {
 	}
 	
 	public DateExtractor() {
-		super(Comparator.naturalOrder(), MIN_DATE, MAX_DATE, DEF_DATE);
+		super(Comparator.naturalOrder(), MIN_DATE, MAX_DATE);
 	}
 	public DateExtractor(LocalityLevel lvl) {
 		this();

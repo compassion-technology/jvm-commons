@@ -245,7 +245,7 @@ public final class Utilities {
 		return filename.substring(i, j);
 	}
 	
-	private static char[] vowels = "aeiouAEIOU".toCharArray();
+	private final char[] vowels = "aeiouAEIOU".toCharArray();
 	/**
 	 * Returns if the character is a vowel.
 	 * @param c the character to test
