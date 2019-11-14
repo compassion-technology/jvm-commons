@@ -21,7 +21,7 @@ public interface UnicodeChars {
     /** & of type OTHER_PUNCTUATION */
     char AMPERSAND = '\u0026';
     /** ' of type OTHER_PUNCTUATION */
-    char APOSTROPHE = '\u0027';
+    char APOSTROPHE = '\'';
     /** ( of type START_PUNCTUATION */
     char LEFT_PARENTHESIS = '\u0028';
     /** ) of type END_PUNCTUATION */
@@ -74,8 +74,6 @@ public interface UnicodeChars {
     char COMMERCIAL_AT = '\u0040';
     /** [ of type START_PUNCTUATION */
     char LEFT_SQUARE_BRACKET = '\u005B';
-    /** \ of type OTHER_PUNCTUATION */
-    char REVERSE_SOLIDUS = '\u005C';
     /** ] of type END_PUNCTUATION */
     char RIGHT_SQUARE_BRACKET = '\u005D';
     /** ^ of type MODIFIER_SYMBOL */
