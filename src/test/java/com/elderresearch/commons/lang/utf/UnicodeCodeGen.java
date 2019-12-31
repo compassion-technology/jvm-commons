@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.Character.UnicodeBlock;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,9 @@ import org.apache.commons.text.WordUtils;
 import com.elderresearch.commons.lang.ReflectionUtils;
 import com.elderresearch.commons.lang.Utilities;
 
+import lombok.val;
+import lombok.experimental.UtilityClass;
+
 /**
  * This class code generates Java interfaces with declared character constants for each unicode character, the majority
  * of which are declared in {@link UnicodeChars}. However, some are split into separate files to limit memory usage
@@ -30,14 +34,20 @@ import com.elderresearch.commons.lang.Utilities;
  * @author <a href="dimeo@datamininglab.com">John Dimeo</a>
  * @since Dec 29, 2012
  */
+@UtilityClass
 final class UnicodeCodeGen {
-	private UnicodeCodeGen() {
-		// Prevent initialization
-	}
-	
 	private static String cleanName(String name) { return name.replace(' ', '_').replace('-', '_'); }
 	
 	public static void main(String[] args) throws IOException {
+		Map<Integer, String> types = new HashMap<>();
+		for (Field f : ReflectionUtils.getFields(Character.class)) {
+			if (Modifier.isStatic(f.getModifiers())
+			&& !StringUtils.startsWithAny(f.getName(), "$", "MIN_", "MAX_", "DIRECTIONALITY_", "TYPE", "BYTES", "SIZE")) {
+				val b = (Number) ReflectionUtils.get(f, null);
+				types.put(b.intValue(), f.getName());
+			}
+		}
+		
 		Map<String, Integer> counts = new HashMap<>();
 		for (Field f : ReflectionUtils.getFields(UnicodeBlock.class)) {
 			if (f.getType() == UnicodeBlock.class) {
@@ -63,7 +73,7 @@ final class UnicodeCodeGen {
 			if (t == Character.PRIVATE_USE
 			 || t == Character.CONTROL
 			 || t == Character.SURROGATE) { continue; }
-    		
+			
 			String name = cleanName(Character.getName(i));
 			String group = StringUtils.substringBefore(name, "_");
 			grouped.getOrDefault(group, other).add((char) i);
@@ -84,7 +94,8 @@ final class UnicodeCodeGen {
     			ps.println("public interface " + clsName + " {");
     			for (Character c : e.getValue()) {
     				String name = cleanName(Character.getName(c.charValue()));
-    				ps.format("    /** %c */ char %s = '\\u%04X';%n", c, name, (int) c.charValue());
+    				ps.format("    /** %c of type %s */%n    char %s = '\\u%04X';%n",
+    					c, types.get(Character.getType(c)), name, (int) c.charValue());
     			}
     			ps.println("}");
     			ps.println("// CHECKSTYLE:ON");

@@ -26,8 +26,8 @@ import org.apache.commons.lang3.StringUtils;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
+import lombok.With;
 import lombok.val;
-import lombok.experimental.Wither;
 
 /**
  * A way of documenting a component (via annotations or by providing a {@link Documentation} bean) that is readable at
@@ -37,7 +37,7 @@ import lombok.experimental.Wither;
  * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
  * @since Mar 1, 2017
  */
-@Builder @Wither
+@Builder @With
 public class Documentation {
 	/** 
 	 * The identifying name for the component. This is a {@link Supplier} since the documentation should not be the
