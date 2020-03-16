@@ -10,6 +10,8 @@ import java.util.Iterator;
 
 import com.elderresearch.commons.lang.LambdaUtils.IORunnable;
 
+import lombok.extern.log4j.Log4j2;
+
 /**
  * Wraps an iterator but calls a callback after no more data is available (auto closing). This iterator can also be
  * closed manually before all data has been iterated over. You should generally use this in a try-with-resource
@@ -19,6 +21,7 @@ import com.elderresearch.commons.lang.LambdaUtils.IORunnable;
  * @param <T> the type of data being iterated over
  * @since Jan 5, 2017
  */
+@Log4j2
 public class IteratorCloseable<T> implements IteratorWithSize<T>, AutoCloseable {
 	private Iterator<T> iter;
 	private IORunnable closer;
@@ -49,7 +52,11 @@ public class IteratorCloseable<T> implements IteratorWithSize<T>, AutoCloseable 
 	
 	@Override
 	public boolean hasNext() {
-		if (iter.hasNext()) { return true; }
+		try {
+			if (iter.hasNext()) { return true; }
+		} catch (RuntimeException e) {
+			log.warn("Unable to get next row of wrapped iterator", e);
+		}
 		
 		// Auto close once the iterator doesn't have any more data to return
 		try {
