@@ -45,6 +45,7 @@ public class DaemonWorker<T> implements Runnable {
 	private volatile boolean running;
 	
 	private DaemonWorker<?>[] waitFor;
+	@Setter private Runnable beforeWork, afterWork;
 
 	/**
 	 * Create a new worker.
@@ -122,6 +123,8 @@ public class DaemonWorker<T> implements Runnable {
 	
 	@Override
 	public void run() {
+		if (beforeWork != null) { beforeWork.run(); }
+		
 		val batch = new ArrayList<T>(maxBatchSize);
 		while (running || !queue.isEmpty() || anyRunningUpstreamWorkers()) {
 			if (Utilities.pollBatch(queue, 1L, TimeUnit.SECONDS, batch, maxBatchSize)) {
@@ -130,6 +133,8 @@ public class DaemonWorker<T> implements Runnable {
 			}
 		}
 		running = false;
+		
+		if (afterWork != null) { afterWork.run(); }
 	}
 	
 	private boolean anyRunningUpstreamWorkers() {
@@ -168,4 +173,12 @@ public class DaemonWorker<T> implements Runnable {
 	 * To stop the thread immediately, use {@link #getThread()}. 
 	 */
 	public void shutdown() { running = false; }
+	
+	/**
+	 * Gets the number of objects in the queue.
+	 * @return the pending work for this worker
+	 */
+	public int getPendingWork() {
+		return queue.size();
+	}
 }
