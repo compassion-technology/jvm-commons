@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.function.Supplier;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.val;
@@ -63,6 +64,11 @@ public class ReflectionUtils {
 		    }
 		}
 		return retval;
+	}
+	
+	public Field[] getAllFields(Class<?> c) {
+		Class<?> superClass = c.getSuperclass();
+		return superClass == null? getFields(c) : ArrayUtils.addAll(getAllFields(superClass), getFields(c));
 	}
 	
 	/**

@@ -18,10 +18,10 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jooq.lambda.Seq;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -51,7 +51,10 @@ public class Documentation {
 	@Getter private CharSequence displayName;
 	/** A longer description of the component. */
 	@Getter private CharSequence description;
-	private CharSequence version;
+	/** The date or version the component was introduced. */
+	@Getter private CharSequence created;
+	/** The date or version the component was last changed. */
+	@Getter private CharSequence modified;
 	/** Tags (short keywords) that relate to the component. */
 	@Getter private Set<CharSequence> tags;
 	/** Lists requirements for this component. */
@@ -59,7 +62,7 @@ public class Documentation {
 	/** Lists the output this component produces. */
 	@Getter @Singular private List<Documentation> produces;
 	/** More detail about the implementation of this component. */
-	@Getter private CharSequence implementationNotes;
+	@Getter private CharSequence[] implementationNotes;
 
 	/**
 	 * The identifying name for this component.
@@ -74,7 +77,8 @@ public class Documentation {
 	 * @return the component's version
 	 */	
 	public CharSequence getVersion() {
-		if (version != null) { return version; }
+		if (modified != null) { return modified; }
+		if (created != null) { return created; }
 		if (type != null) { return type.getPackage().getImplementationVersion(); }
 		return getClass().getPackage().getImplementationVersion();
 	}
@@ -102,12 +106,14 @@ public class Documentation {
 		String displayName() default StringUtils.EMPTY;
 		/** A longer description of a component. */
 		String value() default StringUtils.EMPTY;
-		/** The version of the component. */
-		String version() default StringUtils.EMPTY;
+		/** The date or version the component was introduced. */
+		String created() default StringUtils.EMPTY;
+		/** The date or version the component was last changed. */
+		String modified() default StringUtils.EMPTY;
 		/** Tags (short keywords) that relate to the component. */
 		String[] tags() default {};
 		/** More detail about the implementation of this component. */
-		String implNotes() default StringUtils.EMPTY;
+		String[] implNotes() default {};
 	}
 	
 	/**
@@ -156,13 +162,13 @@ public class Documentation {
 	public static Documentation get(AnnotatedElement ae) {
 		if (ae == null) { return null; }
 		
+		val doc = Optional.ofNullable(ae.getAnnotation(Doc.class));
+		if (!doc.isPresent()) { return null; }
+		
 		val db = Documentation.builder();
-		Optional.ofNullable(ae.getAnnotation(Doc.class)).ifPresent(d ->
-			DOC_BUILDER_ADAPTER.apply(d, db));
-		Optional.ofNullable(ae.getAnnotation(Requires.class)).ifPresent(r ->
-			Stream.of(r.value()).map(DOC_ADAPTER).forEach(db::require));
-		Optional.ofNullable(ae.getAnnotation(Produces.class)).ifPresent(r ->
-			Stream.of(r.value()).map(DOC_ADAPTER).forEach(db::produce));
+		doc.ifPresent(d -> DOC_BUILDER_ADAPTER.apply(d, db));
+		LambdaUtils.accept(ae.getAnnotation(Requires.class), $ -> Seq.of($.value()).map(DOC_ADAPTER).forEach(db::require));
+		LambdaUtils.accept(ae.getAnnotation(Produces.class), $ -> Seq.of($.value()).map(DOC_ADAPTER).forEach(db::produce));
 		return db.build();
 	}
 	
@@ -204,8 +210,11 @@ public class Documentation {
 		ifNotEmpty(d.name(), n -> db.nameProvider(() -> n));
 		ifNotEmpty(d.displayName(), db::displayName);
 		ifNotEmpty(d.value(), db::description);
-		ifNotEmpty(d.version(), db::version);
-		ifNotEmpty(d.implNotes(), db::implementationNotes);
+		ifNotEmpty(d.created(), db::created);
+		ifNotEmpty(d.modified(), db::modified);
+		if (ArrayUtils.getLength(d.implNotes()) > 0) {
+			db.implementationNotes(d.implNotes());
+		}
 		if (ArrayUtils.getLength(d.tags()) > 0) {
 			val set = new HashSet<CharSequence>();
         	Collections.addAll(set, d.tags());

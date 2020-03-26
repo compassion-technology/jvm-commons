@@ -6,6 +6,8 @@ package com.elderresearch.commons.lang;
 
 import java.util.concurrent.TimeUnit;
 
+import lombok.Synchronized;
+
 /**
  * This class is very similar to Apache Common's stopwatch but with three differences
  * that make it easier to use.<ul>
@@ -69,6 +71,7 @@ public class StopWatch {
 	 * Stops the stop watch if it is running and resets the elapsed time.
 	 * @return this instance for method chaining
 	 */
+	@Synchronized
 	public StopWatch reset() {
 		if (isRunning) { stop(); }
 		time = 0L;
@@ -79,6 +82,7 @@ public class StopWatch {
 	 * Starts the stop watch.
 	 * @return this instance for method chaining
 	 */
+	@Synchronized
 	public StopWatch start() {
 		if (isRunning) {
 			throw new IllegalStateException("Cannot start a running stop watch");
@@ -91,9 +95,19 @@ public class StopWatch {
 	}
 	
 	/**
+	 * Stops and starts the stop watch in a single atomic operation.
+	 * @return this for method chaining
+	 */
+	@Synchronized
+	public StopWatch lap() {
+		return stop().start();
+	}
+	
+	/**
 	 * Stops the stop watch.
 	 * @return this instance for method chaining
 	 */
+	@Synchronized
 	public StopWatch stop() {
 		if (!isRunning) {
 			throw new IllegalStateException("Cannot stop an idle stop watch");	

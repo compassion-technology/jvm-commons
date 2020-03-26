@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -62,7 +63,6 @@ public final class Utilities {
 	
 	public static final String DEFAULT_CONTENT_TYPE = "text/plain; charset=us-ascii";
 	
-	private static final Pattern SSN = Pattern.compile(".*(\\d{3})-?(\\d{2})-?(\\d{4}).*");
 	private static final Pattern PAIRED_QUOTES = Pattern.compile("^[\\s]*['\"](.*)['\"][\\s]*$");
 	
 	/**
@@ -432,27 +432,10 @@ public final class Utilities {
 	public <T extends Enum<T>> T valueOf(Class<T> c, String name, T defaultValue) {
 		if (name == null) {  return defaultValue; }
 		try {
-			return Enum.valueOf(c, name.toUpperCase().replace(' ', '_'));
+			return Enum.valueOf(c, name.toUpperCase().replace(' ', '_').replace('.', '_'));
 		} catch (IllegalArgumentException ex) {
 			return defaultValue;
 		}
-	}
-	
-	/**
-	 * Formats a string as a social security number.  If <tt>s</tt> is <tt>null</tt>
-	 * or does not appear to be a SSN, it is returned.  Otherwise, the matching
-	 * group of 9 numbers, with hyphens ("<tt>-</tt>") added after the first
-	 * group of 3 and the second group of 2, is returned with any leading or
-	 * trailing characters removed.
-	 * @param s the string to format
-	 * @return the 11-character formatted SSN, or the original string if it does
-	 * not appear to be a valid SSN
-	 */
-	public String formatSSN(String s) {
-		if (s == null) { return null; }
-		
-		Matcher m = SSN.matcher(s);
-		return m.matches()? m.group(1) + "-" + m.group(2) + "-" + m.group(3) : s;
 	}
 	
 	/**
@@ -569,6 +552,22 @@ public final class Utilities {
 	public void wait(Object obj, long timeout, TimeUnit unit) {
 		synchronized (obj) {
 			Interruptable.accept($ -> $.wait(TimeUnit.MILLISECONDS.convert(timeout, unit)), obj, "waiting on");
+		}
+	}
+	
+	/**
+	 * Wait for the count down latch as long as the status monitor is still running
+	 * and the wait is not interrupted.
+	 * @param latch the latch on which to wait
+	 * @param sm the status monitor that allows the caller to cancel the wait (can be <tt>null</tt>)
+	 */
+	public void await(CountDownLatch latch, StatusMonitor sm) {
+		while (sm == null || sm.isRunning()) {
+			try {
+				if (latch.await(1L, TimeUnit.SECONDS)) { return; }
+			} catch (InterruptedException e) {
+				return;
+			}
 		}
 	}
 	
@@ -936,7 +935,7 @@ public final class Utilities {
 	 */
 	@SafeVarargs
 	public <T> T first(T... arr) {
-		return get(arr, 0);
+		return arr == null || arr.length == 0? null : arr[0];
 	}
 	
 	/**
@@ -968,9 +967,9 @@ public final class Utilities {
 	/**
 	 * Concatenates two or more collections together into a list.
 	 * @param collections the collections to concatenate
+	 * @param <T> the type of objects in the collections
 	 * @return the collections concatenated together into a list in order that
 	 * collections are specified and the order of their default iterator behavior
-	 * @param <T> the type of objects in the collections
 	 */
 	@SafeVarargs
 	public <T> List<T> concat(Collection<T>... collections) {

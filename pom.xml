@@ -4,14 +4,14 @@
 	<parent>
 		<groupId>com.elderresearch</groupId>
 		<artifactId>eri-maven-base</artifactId>
-		<version>4.0.3</version>
+		<version>4.1.0</version>
 	</parent>
 
 	<groupId>com.elderresearch.commons</groupId>
 	<artifactId>eri-commons-lang</artifactId>
 	<name>ERI Commons - Language Extensions</name>
 	<description>Shared Java language extensions</description>
-	<version>1.8.5-SNAPSHOT</version>
+	<version>1.8.6-SNAPSHOT</version>
 
 	<scm>
 		<developerConnection>scm:git:https://${scm}/eri-commons/eri-lang.git</developerConnection>
@@ -29,7 +29,7 @@
 		<dependency>
 		   <groupId>org.apache.commons</groupId>
 		   <artifactId>commons-text</artifactId>
-		   <version>1.6</version>
+		   <version>1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>

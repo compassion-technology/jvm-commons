@@ -23,6 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.elderresearch.commons.lang.Utilities;
 
+import lombok.val;
+
 /**
  * Abstract parent class that contains shared functionality between 
  * {@link DateExtractor} and {@link NumberExtractor}. This class
@@ -34,7 +36,7 @@ import com.elderresearch.commons.lang.Utilities;
  * @param <T> the type of value extracted by the extractor
  * @since Mar 8, 2016
  */
-abstract class Extractor<F extends Format, T> {
+public abstract class Extractor<F extends Format, T> {
 	private List<Locale> locales;
 	private Comparator<T> comp;
 	private T min, max;
@@ -170,8 +172,8 @@ abstract class Extractor<F extends Format, T> {
 	
 	private void extractAll(String text, F f, Set<Match<T>> out) {
 		boolean tryParse = true;
-		int c = 0;
-		for (ParsePosition pp = new ParsePosition(0); c < text.length(); c++) {
+		val pp = new ParsePosition(0);
+		for (int c = 0; c < text.length(); c++) {
 			if (tryParse) {
 				pp.setIndex(c); pp.setErrorIndex(-1);
 				T val = Utilities.cast(f.parseObject(text, pp));

@@ -38,14 +38,6 @@ public class UtilitiesTest extends TestCase {
 		assertEquals("the | cat |  | chased | the | mouse", StringUtils.join(l, " | "));
 	}
 	
-	public void testFormatSSN() {
-		assertEquals("123-45-6785", Utilities.formatSSN(" 123456785___"));
-		assertEquals("123-45-6785", Utilities.formatSSN("123-456785"));
-		assertEquals("123-45-6785", Utilities.formatSSN("123-45-6785"));
-		assertEquals("1234-56785", Utilities.formatSSN("1234-56785"));
-		assertEquals("#123456", Utilities.formatSSN("#123456"));
-	}
-	
 	public void testStripQuotes() {
 		assertEquals("Hello", Utilities.stripQuotes(" 'Hello'"));
 		assertEquals("Hello", Utilities.stripQuotes("\"Hello \""));
