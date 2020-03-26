@@ -1,6 +1,8 @@
 ERI Commons - Language Extensions
 ------------------------------------------
 
+![Build](https://github.com/ElderResearch/commons-jvm/workflows/Java%20CI%20with%20Maven/badge.svg)
+
 A "toolbox" of langauge extensions and utilities for JVM-based languages, like Java.
 
 This sends the following transitive dependencies:
