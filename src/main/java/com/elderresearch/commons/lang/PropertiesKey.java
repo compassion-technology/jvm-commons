@@ -16,6 +16,8 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import com.elderresearch.commons.lang.Documentation.IsDocumented;
+
 import lombok.val;
 
 /**
@@ -29,7 +31,7 @@ import lombok.val;
  * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
  * @since Sep 22, 2016
  */
-public interface PropertiesKey {
+public interface PropertiesKey extends IsDocumented {
 	/**
 	 * Returns the properties node to use for the singleton-style methods that do not take a {@link Properties} parameter.
 	 * @return the properties node to use, or <tt>null</tt> by default if you always will pass in a table to each method
@@ -41,6 +43,14 @@ public interface PropertiesKey {
 	 * @return the property key
 	 */
 	default String key() { return toString().toLowerCase(); }
+	
+	/**
+	 * Gets a masked or obscured version of the value if it is sensitive. The default implementation is to return {@link #get()}.
+	 * @return the obscured value of the property
+	 */
+	default String getObscured() {
+		return get();
+	}
 	
 	/**
 	 * Gets the default value for this key as a string.
@@ -131,11 +141,16 @@ public interface PropertiesKey {
 			// Allow system properties to override first
 			LambdaUtils.accept(System.getProperty(key), $ -> props.setProperty(key, $));
 			// Allow environment variables to override next
+			/*
+			 * This is duplicated, because windows has no case requirement, but unix systems do.
+			 * By convention env vars are normally UPPERCASE_SNAKE_CASE, so first attempt
+			 * fetching by this standard case, before a second permissive check.
+			 */
 			LambdaUtils.accept(System.getenv(key.toUpperCase()), $ -> props.setProperty(key, $));
 			LambdaUtils.accept(System.getenv(key), $ -> props.setProperty(key, $));
 		}
 	}
-	
+
 	/**
 	 * Concatenate two sets of property keys together into one array. This is useful if you have several sets
 	 * of enums that implement this interface but need to pass all keys to {@link #load(Properties, String, PropertiesKey...)}.
@@ -143,7 +158,7 @@ public interface PropertiesKey {
 	 * @param keys2 the second set of keys
 	 * @return an array with the keys concatenated together
 	 */
-	static PropertiesKey[] concat(PropertiesKey[] keys1, PropertiesKey[] keys2) {
+	static PropertiesKey[] concat(PropertiesKey[] keys1, PropertiesKey... keys2) {
 		val ret = new PropertiesKey[keys1.length + keys2.length];
 		System.arraycopy(keys1, 0, ret, 0, keys1.length);
 		System.arraycopy(keys2, 0, ret, keys1.length, keys2.length);
