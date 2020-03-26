@@ -23,6 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.elderresearch.commons.lang.Utilities;
 
+import lombok.val;
+
 /**
  * Abstract parent class that contains shared functionality between 
  * {@link DateExtractor} and {@link NumberExtractor}. This class
