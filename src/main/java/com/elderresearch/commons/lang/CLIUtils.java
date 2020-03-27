@@ -35,32 +35,34 @@ public class CLIUtils {
  		return parseArgs(args, jc);
 	}
 	
-	/**
-	 * Parses a series of separate "commands"- each one being an annotated with {@link JCommander}. The first arg is
-	 * considered the command name and the subsequent args are specific to that command.
-	 * @param args the command line args
-	 * @param commands one or more commands annotated with JCommander
-	 * @param <T> the common type among all commands
-	 * @return the parsed command (one of the objects passed as the parameter) or <tt>null</tt> if there was a problem
-	 * parsing the arguments
-	 * @see JCommander#addCommand(Object)
-	 */
-	@SafeVarargs
-	public <T> T parseCommands(String[] args, T... commands) {
-		val jc = new JCommander();
-		Arrays.asList(commands).forEach(jc::addCommand);
-		if (parseArgs(args, jc)) {
-			val pc = jc.getParsedCommand();
-			if (pc == null) {
-				jc.usage();
-				return null;
-			}
-			
-			JCommander jcc = jc.getCommands().get(pc);
-			return Utilities.cast(Utilities.first(jcc.getObjects()));
-		}
-		return null;
-	}
+    /**
+     * Parses a series of separate "commands"- each one being an annotated with {@link JCommander}. The first arg is
+     * considered the command name and the subsequent args are specific to that command.
+     * @param args the command line args
+     * @param shared optionally a shared parameter object common to all commands
+     * @param commands one or more commands annotated with JCommander
+     * @param <T> the common type among all commands
+     * @return the parsed command (one of the objects passed as the parameter) or <tt>null</tt> if there was a problem
+     * parsing the arguments
+     * @see JCommander#addCommand(Object)
+     */
+    @SafeVarargs
+    public <T> T parseCommands(String[] args, Object shared, T... commands) {
+        val jc = new JCommander();
+        LambdaUtils.accept(shared, jc::addObject);
+        Arrays.asList(commands).forEach(jc::addCommand);
+        if (parseArgs(args, jc)) {
+            val pc = jc.getParsedCommand();
+            if (pc == null) {
+                jc.usage();
+                return null;
+            }
+            
+            JCommander jcc = jc.getCommands().get(pc);
+            return Utilities.cast(Utilities.first(jcc.getObjects()));
+        }
+        return null;
+    }
 	
 	/**
 	 * Parses command-line arguments using JCommander, printing out the usage if there are any problems.
