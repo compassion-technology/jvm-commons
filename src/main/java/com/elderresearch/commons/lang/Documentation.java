@@ -126,7 +126,7 @@ public class Documentation {
 		/**
 		 * Provides documentation for this component (like its name and a description of what it does). The default
 		 * implementation inspects any documentation annotations on this type to derive the returned documentation.
-		 * @return the documentation for this component (should not be <tt>null</tt>)
+		 * @return the documentation for this component (can be <tt>null</tt>)
 		 */
 		default Documentation getDocumentation() {
 			// Special handling of per-constant annotations on enums. It should work because each constant has its own
