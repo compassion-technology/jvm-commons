@@ -232,6 +232,16 @@ public class LambdaUtils {
 	}
 	
 	/**
+	 * BiConsumer that throws an {@link IOException}
+	 * @param <T> the type of the first parameter
+	 * @param <U> the type of the second parameter
+	 * @see BiConsumer
+	 */
+	public interface IOBiConsumer<T, U> {
+		void accept(T obj1, U obj2) throws IOException;
+	}
+	
+	/**
 	 * Supplier that throws an {@link IOException}.
 	 * @param <T> the type of the input to the operation
 	 * @see Supplier 
@@ -248,6 +258,17 @@ public class LambdaUtils {
 	 */
 	public interface IOFunction<T, R> {
 		R apply(T in) throws IOException;
+	}
+	
+	/**
+	 * Bi-function that throws an {@link IOException}.
+	 * @param <T> the type of the first input to the function
+	 * @param <U> the type of the second input to the function
+	 * @param <R> the type of the result of the function
+	 * @see BiFunction
+	 */
+	public interface IOBiFunction<T, U, R> {
+		R apply(T in1, U in2) throws IOException;
 	}
 	
 	/** Utilities that catch and log {@link InterruptedException}s using lambdas. */
