@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2016 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2016-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang;
 
 import java.io.Closeable;
@@ -16,7 +13,7 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * Some utilities around interacting with Java 8's lambda/functional interfaces, mostly dealing with <tt>null</tt>.
+ * Some utilities around interacting with Java 8's lambda/functional interfaces, mostly dealing with {@code null}.
  * 
  * @author <a href="mailto:dimeo@datamininglab.com">John Dimeo</a>
  * @since Oct 19, 2016
@@ -24,31 +21,31 @@ import lombok.extern.log4j.Log4j2;
 @UtilityClass
 public class LambdaUtils {
 	/**
-	 * Invoke the supplier, returning <tt>null</tt> if the supplier is <tt>null</tt>.
+	 * Invoke the supplier, returning {@code null} if the supplier is {@code null}.
 	 * @param supplier the supplier
 	 * @param <I> the supplier's return type
-	 * @return the result of the supplier, or <tt>null</tt> if it was <tt>null</tt>
+	 * @return the result of the supplier, or {@code null} if it was {@code null}
 	 */
 	public <I> I get(Supplier<I> supplier) {
 		return supplier == null? null : supplier.get();
 	}
 	
 	/**
-	 * Invoke the function to the input, returning <tt>null</tt> if either the input or the function are <tt>null</tt>. 
+	 * Invoke the function to the input, returning {@code null} if either the input or the function are {@code null}. 
 	 * @param in the input
 	 * @param fn the function
 	 * @param <I> the function's input type
 	 * @param <O> the function's output type
-	 * @return the output of the function, or <tt>null</tt> if the input or functiona was <tt>null</tt>
+	 * @return the output of the function, or {@code null} if the input or functiona was {@code null}
 	 */
 	public <I, O> O apply(I in, Function<I, O> fn) {
 		return in == null || fn == null? null : fn.apply(in);
 	}
 	
 	/**
-	 * Invoke the consumer if both the input and the consumer are not <tt>null</tt>.
+	 * Invoke the consumer if both the input and the consumer are not {@code null}.
 	 * @param in the input
-	 * @param consumer the consumer to invoke if the input is not <tt>null</tt>
+	 * @param consumer the consumer to invoke if the input is not {@code null}
 	 * @param <I> the consumer's input type
 	 */
 	public <I> void accept(I in, Consumer<I> consumer) {
@@ -61,7 +58,7 @@ public class LambdaUtils {
 	 * held resources.
 	 * @param resource the resource on which to operate
 	 * @param consumer the operation to perform on the resource
-	 * @param closer the custom close method (for example <tt>dispose()</tt>)
+	 * @param closer the custom close method (for example {@code dispose()})
 	 * @param <R> the resource type
 	 */
 	public <R> void acceptResource(R resource, Consumer<R> consumer, Consumer<R> closer) {
@@ -78,7 +75,7 @@ public class LambdaUtils {
 	 * held resources.
 	 * @param resource the resource on which to operate
 	 * @param function the operation to perform on the resource
-	 * @param closer the custom close method (for example <tt>dispose()</tt>)
+	 * @param closer the custom close method (for example {@code dispose()})
 	 * @param <R> the resource type
 	 * @param <T> the result type
 	 * @return the result of the function
@@ -109,10 +106,10 @@ public class LambdaUtils {
 	@UtilityClass
 	public class IO {
 		/**
-		 * Invoke the supplier, returning <tt>null</tt> if the supplier is <tt>null</tt>.
+		 * Invoke the supplier, returning {@code null} if the supplier is {@code null}.
 		 * @param supplier the supplier
 		 * @param <I> the supplier's return type
-		 * @return the result of the supplier, or <tt>null</tt> if it was <tt>null</tt>
+		 * @return the result of the supplier, or {@code null} if it was {@code null}
 		 * @throws IOException if there was an I/O exception in the supplier's implementation
 		 */
 		public <I> I get(IOSupplier<I> supplier) throws IOException {
@@ -120,12 +117,12 @@ public class LambdaUtils {
 		}
 		
 		/**
-		 * Invoke the function to the input, returning <tt>null</tt> if either the input or the function are <tt>null</tt>. 
+		 * Invoke the function to the input, returning {@code null} if either the input or the function are {@code null}. 
 		 * @param in the input
 		 * @param fn the function
 		 * @param <I> the function's input type
 		 * @param <O> the function's output type
-		 * @return the output of the function, or <tt>null</tt> if the input or functiona was <tt>null</tt>
+		 * @return the output of the function, or {@code null} if the input or functiona was {@code null}
 		 * @throws IOException if there was an I/O exception in the function's implementation
 		 */
 		public <I, O> O apply(I in, IOFunction<I, O> fn) throws IOException {
@@ -133,9 +130,9 @@ public class LambdaUtils {
 		}
 		
 		/**
-		 * Invoke the consumer if both the input and the consumer are not <tt>null</tt>.
+		 * Invoke the consumer if both the input and the consumer are not {@code null}.
 		 * @param in the input
-		 * @param consumer the consumer to invoke if the input is not <tt>null</tt>
+		 * @param consumer the consumer to invoke if the input is not {@code null}
 		 * @param <I> the consumer's input type
 		 * @throws IOException if there was an I/O exception in the consumer's implementation
 		 */
@@ -148,7 +145,7 @@ public class LambdaUtils {
 		 * @param closeable the closeable resource
 		 * @param consumer the operation to perform on the resource
 		 * @param <C> the resource type
-		 * @throws IOException if <tt>consumer</tt> threw an exception
+		 * @throws IOException if {@code consumer} threw an exception
 		 */
 		public <C extends Closeable> void withResource(C closeable, IOConsumer<C> consumer) throws IOException {
 			try (C c = closeable) {
@@ -163,7 +160,7 @@ public class LambdaUtils {
 		 * @param <C> the resource type
 		 * @param <T> the result type
 		 * @return the result of the function
-		 * @throws IOException if <tt>function</tt> threw an exception
+		 * @throws IOException if {@code function} threw an exception
 		 */
 		public <C extends Closeable, T> T withResource(C closeable, IOFunction<C, T> function) throws IOException {
 			try (C c = closeable) {
@@ -177,9 +174,9 @@ public class LambdaUtils {
 		 * held resources.
 		 * @param resource the resource on which to operate
 		 * @param consumer the operation to perform on the resource, which may throw an {@link IOException}
-		 * @param closer the custom close method (for example <tt>dispose()</tt>)
+		 * @param closer the custom close method (for example {@code dispose()})
 		 * @param <R> the resource type
-		 * @throws IOException if <tt>consumer</tt> threw an exception
+		 * @throws IOException if {@code consumer} threw an exception
 		 */
 		public <R> void acceptResource(R resource, IOConsumer<R> consumer, IOConsumer<R> closer) throws IOException {
 			try {
@@ -197,11 +194,11 @@ public class LambdaUtils {
 		 * held resources.
 		 * @param resource the resource on which to operate
 		 * @param function the operation to perform on the resource, which may throw an {@link IOException}
-		 * @param closer the custom close method (for example <tt>dispose()</tt>)
+		 * @param closer the custom close method (for example {@code dispose()})
 		 * @param <R> the resource type
 		 * @param <T> the result type
 		 * @return the result of the function
-		 * @throws IOException if <tt>function</tt> threw an exception
+		 * @throws IOException if {@code function} threw an exception
 		 */
 		public <R, T> T applyResource(R resource, IOFunction<R, T> function, IOConsumer<R> closer) throws IOException {
 			try {

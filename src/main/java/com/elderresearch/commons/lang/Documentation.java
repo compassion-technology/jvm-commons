@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2017 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2017-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang;
 
 import java.lang.annotation.Inherited;
@@ -42,7 +39,7 @@ public class Documentation {
 	/** 
 	 * The identifying name for the component. This is a {@link Supplier} since the documentation should not be the
 	 * authority on assigning names to components, yet the name of a component is important piece of metadata for
-	 * documenting it. This should generally be a method reference, like <tt>this::getName</tt>.
+	 * documenting it. This should generally be a method reference, like {@code this::getName}.
 	 */
 	private Supplier<CharSequence> nameProvider;
 	/** The type of the component. */
@@ -71,7 +68,7 @@ public class Documentation {
 	public CharSequence getName() { return LambdaUtils.get(nameProvider); }
 	
 	/**
-	 * The version of the component. If this is <tt>null</tt>, the {@linkplain Package#getImplementationVersion()
+	 * The version of the component. If this is {@code null}, the {@linkplain Package#getImplementationVersion()
 	 * implementation version} of the {@linkplain #getType() type} (or the version of this instance, if the type is not
 	 * defined) is used instead.
 	 * @return the component's version
@@ -126,7 +123,7 @@ public class Documentation {
 		/**
 		 * Provides documentation for this component (like its name and a description of what it does). The default
 		 * implementation inspects any documentation annotations on this type to derive the returned documentation.
-		 * @return the documentation for this component (can be <tt>null</tt>)
+		 * @return the documentation for this component (can be {@code null})
 		 */
 		default Documentation getDocumentation() {
 			// Special handling of per-constant annotations on enums. It should work because each constant has its own

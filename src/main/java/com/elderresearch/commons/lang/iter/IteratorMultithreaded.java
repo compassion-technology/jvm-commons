@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2016 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2013-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang.iter;
 
 import java.util.Iterator;
@@ -45,7 +42,7 @@ public abstract class IteratorMultithreaded<T> {
 	}
 	
 	/**
-	 * Sets the size of the worker thread's queue. The default is <tt>1024</tt>
+	 * Sets the size of the worker thread's queue. The default is {@code 1024}
 	 * @param size the new size
 	 * @return this for method chaining
 	 */
@@ -55,7 +52,7 @@ public abstract class IteratorMultithreaded<T> {
 	}
 	
 	/**
-	 * Sets the number of worker threads. The default is <tt>1</tt>, thus not
+	 * Sets the number of worker threads. The default is {@code 1}, thus not
 	 * requiring the callback to be thread-safe, but still benefitting from
 	 * having the main thread devoted to consuming the iterator.
 	 * @param threads the number of worker threads
@@ -106,14 +103,14 @@ public abstract class IteratorMultithreaded<T> {
 	 * Called before each object is enqueued.
 	 * @param object the next object from the iterator
 	 * @return the object after preprocessing, a different object of the same
-	 * type, or <tt>null</tt> to skip this object
+	 * type, or {@code null} to skip this object
 	 */
 	protected T preprocess(T object) { return object; }
 	
 	/**
-	 * The callback to be invoked for each element. This <tt>must</tt> be
+	 * The callback to be invoked for each element. This {@code must} be
 	 * thread-safe if there are multiple worker threads. If any invocation of 
-	 * callback returns <tt>false</tt>, iteration will stop at the next
+	 * callback returns {@code false}, iteration will stop at the next
 	 * opportunity.
 	 * @param object the next object to process
 	 * @return if iteration should continue

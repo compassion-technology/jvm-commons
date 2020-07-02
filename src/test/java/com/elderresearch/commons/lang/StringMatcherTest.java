@@ -1,15 +1,17 @@
-/*******************************************************************************
- * Copyright (c) 2017 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2017-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 
 import com.elderresearch.commons.lang.StringMatcher.StringMatchStrat;
 
-import junit.framework.TestCase;
 import lombok.val;
 
-public class StringMatcherTest extends TestCase {
+public class StringMatcherTest {
+	@Test
 	public void test() {
 		StringMatcher sm = new StringMatcher();
 		assertFalse(sm.does("jo").match("John"));
@@ -23,6 +25,7 @@ public class StringMatcherTest extends TestCase {
 		assertTrue(sm.test("hn"));
 	}
 	
+	@Test
 	public void testExample() {
 		 assertTrue(new StringMatcher(StringMatchStrat.STARTS_WITH).does("Jo").match("John"));
 		 

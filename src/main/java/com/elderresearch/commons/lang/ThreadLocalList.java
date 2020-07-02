@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2017 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2017-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang;
 
 import java.util.Iterator;
@@ -25,7 +22,7 @@ public class ThreadLocalList<T> implements Iterable<T> {
 	/**
 	 * Creates a new thread-localized list. 
 	 * @param supplier the supplier to use to create new values for each new thread accessing the map. If this is
-	 * <tt>null</tt>, {@link #get()} will always return <tt>null</tt> unless values are explicitly {@link #set(Object)}. 
+	 * {@code null}, {@link #get()} will always return {@code null} unless values are explicitly {@link #set(Object)}. 
 	 */
 	public ThreadLocalList(Supplier<T> supplier) {
 		all = new CopyOnWriteArrayList<>();

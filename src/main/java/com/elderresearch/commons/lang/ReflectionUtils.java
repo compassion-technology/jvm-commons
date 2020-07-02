@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2016 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2011-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang;
 
 import java.lang.reflect.Constructor;
@@ -28,10 +25,10 @@ import lombok.extern.log4j.Log4j2;
 @UtilityClass
 public class ReflectionUtils {
 	/**
-	 * Gets the declared field with name <tt>name</tt> and sets it to be accessible.
+	 * Gets the declared field with name {@code name} and sets it to be accessible.
 	 * @param c the class
 	 * @param name the field name
-	 * @return the field, or <tt>null</tt> if there was a problem getting the field or accessing it
+	 * @return the field, or {@code null} if there was a problem getting the field or accessing it
 	 */
 	public Field getField(Class<?> c, String name) {
 		if (c == null || name == null) { return null; }
@@ -46,7 +43,7 @@ public class ReflectionUtils {
 	}
 
 	/**
-	 * Gets the declared fields with name <tt>name</tt> and attempts to set each one of them as being accessible.
+	 * Gets the declared fields with name {@code name} and attempts to set each one of them as being accessible.
 	 * 
 	 * @param c class to query
 	 * @return the set of fields as an array. If none are found, the an empty array is returned. If changing the 
@@ -73,10 +70,10 @@ public class ReflectionUtils {
 	
 	/**
 	 * Gets the value of the field for the specified object.  This method silently returns
-	 * <tt>null</tt> in the event of a problem getting the field value.
+	 * {@code null} in the event of a problem getting the field value.
 	 * @param f the field
 	 * @param o the object instance
-	 * @return the value of the field, or <tt>null</tt> if there was a problem accessing the value
+	 * @return the value of the field, or {@code null} if there was a problem accessing the value
 	 */
 	public Object get(Field f, Object o) {
 		if (f == null) { return null; }
@@ -90,7 +87,7 @@ public class ReflectionUtils {
 	}
 	
 	/**
-	 * Sets the value of the field for the specified object. This method returns <tt>false</tt> in
+	 * Sets the value of the field for the specified object. This method returns {@code false} in
 	 * the event of a problem setting the field.
 	 * @param f the field
 	 * @param o the object instance
@@ -114,7 +111,7 @@ public class ReflectionUtils {
 	 * @param <T> the type of object to instantiate
 	 * @param c the object's class
 	 * @param args the arguments to pass to the constructor, or nothing to use the default constructor
-	 * @return the new instance, or <tt>null</tt> if there was a problem instantiating the object
+	 * @return the new instance, or {@code null} if there was a problem instantiating the object
 	 * @see #arg(Object)
 	 */
 	public <T> T newInstance(Class<T> c, ConstructorArg... args) {
@@ -144,7 +141,7 @@ public class ReflectionUtils {
 	
 	/**
 	 * Wraps a constructor argument, using the type provided by {@link Object#getClass()}. 
-	 * @param o any parameter (<b>cannot</b> be <tt>null</tt>)
+	 * @param o any parameter (<b>cannot</b> be {@code null})
 	 * @return a constructor argument
 	 * @see #newInstance(Class, ConstructorArg...)
 	 */
@@ -153,9 +150,9 @@ public class ReflectionUtils {
 	}
 	/**
 	 * Wraps a constructor argument with an explicitly specified type.
-	 * @param o any parameter (<b>can</b> be <tt>null</tt>)
+	 * @param o any parameter (<b>can</b> be {@code null})
 	 * @param c the type of the parameter (useful for primitives that might be
-	 * boxed as an <tt>Object</tt>
+	 * boxed as an {@code Object}
 	 * @return a constructor argument
 	 * @see #newInstance(Class, ConstructorArg...)
 	 */
@@ -181,7 +178,7 @@ public class ReflectionUtils {
 	 * method will be arbitrary. The method is also set to be {@linkplain Method#setAccessible(boolean) accessible}.
 	 * @param c the class
 	 * @param methodName the name of the method
-	 * @return the method, or <tt>null</tt> if no method with that name was found
+	 * @return the method, or {@code null} if no method with that name was found
 	 */
 	public Method getMethodAnyParams(Class<?> c, String methodName) {
 		val match = Arrays.stream(c.getMethods()).filter($ -> StringUtils.equals($.getName(), methodName)).findAny();
@@ -190,24 +187,24 @@ public class ReflectionUtils {
 	}
 	
 	/**
-	 * Invokes the method with name <tt>methodName</tt> on object <tt>o</tt>.
+	 * Invokes the method with name {@code methodName} on object {@code o}.
 	 * @param o the object instance
 	 * @param methodName the name of the method
 	 * @param args the parameters to pass to the method
-	 * @return the result of the method, or <tt>null</tt> if there was a problem invoking the method
+	 * @return the result of the method, or {@code null} if there was a problem invoking the method
 	 */
 	public Object invoke(Object o, String methodName, Object... args) {
 		return invoke(o, methodName, false, args);
 	}
 	
 	/**
-	 * Invokes the method with name <tt>methodName</tt> on object <tt>o</tt>. If
-	 * no method named <tt>methodName</tt> is found, this will silently
-	 * return <tt>null</tt> without logging a warning message
+	 * Invokes the method with name {@code methodName} on object {@code o}. If
+	 * no method named {@code methodName} is found, this will silently
+	 * return {@code null} without logging a warning message
 	 * @param o the object instance
 	 * @param methodName the name of the method
 	 * @param args the parameters to pass to the method
-	 * @return the result of the method, or <tt>null</tt> if there was a problem invoking the method
+	 * @return the result of the method, or {@code null} if there was a problem invoking the method
 	 */
 	public Object invokeIfExists(Object o, String methodName, Object... args) {
 		return invoke(o, methodName, true, args);
@@ -237,7 +234,7 @@ public class ReflectionUtils {
 
 	/**
 	 * Factory implementation that uses reflection to create new instances of
-	 * type <tt>T</tt>.
+	 * type {@code T}.
 	 * @param <T> the type of objects to create
 	 */
 	public static class ReflectionFactory<T> implements Supplier<T> {

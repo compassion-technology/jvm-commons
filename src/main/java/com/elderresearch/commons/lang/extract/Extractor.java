@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2016 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2016-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang.extract;
 
 import java.text.Format;
@@ -134,7 +131,7 @@ public abstract class Extractor<F extends Format, T> {
 	 * Attempts to parse the given string, using all available formats. The
 	 * value parsed by the first format that doesn't throw an exception is returned.
 	 * @param text the value as a string
-	 * @return the parsed value, or <tt>null</tt> if none of the available
+	 * @return the parsed value, or {@code null} if none of the available
 	 * formats were able to parse the input parameter
 	 */
 	public T parse(String text) {

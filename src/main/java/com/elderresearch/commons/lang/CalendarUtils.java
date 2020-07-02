@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2016 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2016-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang;
 
 import java.lang.reflect.Field;
@@ -76,7 +73,7 @@ public class CalendarUtils {
 	
 	/**
 	 * Convert a {@link Calendar} ordinal field to its string representation.
-	 * For example, passing {@link Calendar#AM_PM} returns <tt>"AM/PM"</tt>.
+	 * For example, passing {@link Calendar#AM_PM} returns {@code "AM/PM"}.
 	 * @param calendarField the calendar field
 	 * @return the string representation
 	 */
@@ -141,11 +138,11 @@ public class CalendarUtils {
 	
 	/**
 	 * Returns the field in {@link Calendar} with the given name. If no field
-	 * is found with the specified name, <tt>-1</tt> is returned. Some basic
-	 * cleaning is performed on <tt>field</tt> so that values returned by
+	 * is found with the specified name, {@code -1} is returned. Some basic
+	 * cleaning is performed on {@code field} so that values returned by
 	 * {@link #toString(int)} can be found via this method and vice versa.
 	 * @param field the field to lookup 
-	 * @return the corresponding calendar field constant, or <tt>-1</tt> if a
+	 * @return the corresponding calendar field constant, or {@code -1} if a
 	 * matching field could not be found
 	 * @implNote this method is not thread safe, but is effectively thread-safe (because it only reads a data
 	 * structure) after the first invocation

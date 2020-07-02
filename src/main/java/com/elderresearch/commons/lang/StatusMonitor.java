@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2016 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2012-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang;
 
 import java.util.LinkedList;
@@ -50,9 +47,9 @@ public class StatusMonitor {
 
 	/** The current task state. */
 	@Getter private volatile TaskState state;
-	/** A string describing the current operation or status of the task, for example <tt>"Reading file..."</tt>. */
+	/** A string describing the current operation or status of the task, for example {@code "Reading file..."}. */
 	@Getter private volatile String status;
-	/** The current progress of the task. A <tt>-1</tt> is used to indicate this task has made indeterminate progress. */
+	/** The current progress of the task. A {@code -1} is used to indicate this task has made indeterminate progress. */
 	@Getter private volatile long progress;
 	/** The number of operations that must be performed before the task will be finished or {@link #INDETERMINATE} if
 	 *  this task can run indefinitely or its size is not known. */
@@ -65,9 +62,9 @@ public class StatusMonitor {
 	
 	/**
 	 * Creates a new status monitor that monitors the progress of some task and
-	 * notifies each listener in <tt>listeners</tt> of any change in state,
+	 * notifies each listener in {@code listeners} of any change in state,
 	 * status, or progress.
-	 * @param name the name of the task to monitor (can be <tt>null</tt>)
+	 * @param name the name of the task to monitor (can be {@code null})
 	 */
 	public StatusMonitor(Object name) {
 		this.name  = name;
@@ -147,8 +144,8 @@ public class StatusMonitor {
 	
 	/**
 	 * Sets a string describing the current operation or
-	 * status of this task, for example <tt>"Reading file..."</tt>.
-	 * Usually this string ends in an ellipsis (<tt>"..."</tt>). The
+	 * status of this task, for example {@code "Reading file..."}.
+	 * Usually this string ends in an ellipsis ({@code "..."}). The
 	 * task's controller is notified that this task's status
 	 * has changed.
 	 * @param status the current status of the task
@@ -161,8 +158,8 @@ public class StatusMonitor {
 	
 	/**
 	 * Sets a string describing the current operation or
-	 * status of this task, for example <tt>"Reading file..."</tt>.
-	 * Usually this string ends in an ellipsis (<tt>"..."</tt>). The
+	 * status of this task, for example {@code "Reading file..."}.
+	 * Usually this string ends in an ellipsis ({@code "..."}). The
 	 * task's controller is notified that this task's status
 	 * has changed.
 	 * @param status the current status of the task
@@ -177,9 +174,9 @@ public class StatusMonitor {
 	/**
 	 * Sets or increments the current progress of the task.
 	 * @param progress the amount of progress that has been made
-	 * @param relative if <tt>relative</tt> is <tt>true</tt>,
-	 * <tt>progress</tt> will be added to the current task's progress;
-	 * otherwise, the task's progress will be set to <tt>progress</tt>
+	 * @param relative if {@code relative} is {@code true},
+	 * {@code progress} will be added to the current task's progress;
+	 * otherwise, the task's progress will be set to {@code progress}
 	 * @return this for method chaining
 	 */
 	public StatusMonitor setProgress(long progress, boolean relative) {
@@ -201,7 +198,7 @@ public class StatusMonitor {
 	
 	/**
 	 * Convenience method that sets the size to an indeterminate size, sets the
-	 * status to <tt>status</tt>, and changes the state to {@link TaskState#RUNNING}
+	 * status to {@code status}, and changes the state to {@link TaskState#RUNNING}
 	 * in an atomic operation.
 	 * @param status the new task status
 	 * @param args the format arguments passed to
@@ -214,7 +211,7 @@ public class StatusMonitor {
 	
 	/**
 	 * Convenience method that sets the size of the new task, resets the progress
-	 * to <tt>0L</tt>, sets the status to <tt>status</tt>, and changes the state
+	 * to {@code 0L}, sets the status to {@code status}, and changes the state
 	 * to {@link TaskState#RUNNING} in an atomic operation.
 	 * @param status the new task status
 	 * @param size the new task's size
@@ -231,7 +228,7 @@ public class StatusMonitor {
 	
 	/**
 	 * Updates the task state to {@link TaskState#FINISHED} and the status to
-	 * <tt>"Done."</tt>. It is recommended you always invoke this method when a
+	 * {@code "Done."}. It is recommended you always invoke this method when a
 	 * task completes normally for a consistent user experience.
 	 * @return this for method chaining
 	 */
@@ -244,7 +241,7 @@ public class StatusMonitor {
 	
 	/**
 	 * Convenience method that updates the task state to {@link TaskState#CANCELED}
-	 * and the status to <tt>reason</tt> in an atomic operation.
+	 * and the status to {@code reason} in an atomic operation.
 	 * @param reason the reason the task was canceled
 	 * @return this for method chaining
 	 */
@@ -254,7 +251,7 @@ public class StatusMonitor {
 	
 	/**
 	 * Convenience method that updates the task state to {@link TaskState#ERROR}
-	 * and the status to <tt>error</tt> in an atomic operation.
+	 * and the status to {@code error} in an atomic operation.
 	 * @param error the error message
 	 * @return this for method chaining
 	 */
@@ -272,7 +269,7 @@ public class StatusMonitor {
 	
 	/**
 	 * Convenience method to see if the task is still running.
-	 * This is equivalent to <tt>{@link #getState()} == {@link TaskState#RUNNING}</tt>.
+	 * This is equivalent to {@code {@link #getState()} == {@link TaskState#RUNNING}}.
 	 * @return if the task is running
 	 */
 	public boolean isRunning() {

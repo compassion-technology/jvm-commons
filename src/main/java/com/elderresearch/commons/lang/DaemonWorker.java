@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2016 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2016-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang;
 
 import java.util.ArrayList;
@@ -38,7 +35,7 @@ public class DaemonWorker<T> implements Runnable {
 	@Setter private Consumer<List<T>> callback;
 	/** The maximum size of each batch of items to process. */
 	@Setter private int maxBatchSize;
-	/** The worker thread, or <tt>null</tt> if this worker has not yet been started. */
+	/** The worker thread, or {@code null} if this worker has not yet been started. */
 	@Getter private Thread thread;
 	
 	private BlockingQueue<T> queue;

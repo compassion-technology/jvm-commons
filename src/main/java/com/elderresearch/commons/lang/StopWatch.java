@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2016 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2013-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang;
 
 import java.util.concurrent.TimeUnit;
@@ -27,7 +24,7 @@ public class StopWatch {
 	 * A "dummy" stop watch that immediately returns for all calls to {@link #start()},
 	 * {@link #stop()}, and {@link #reset()}. This is useful for "release" code
 	 * where you don't want to pay the overhead of using a real stop watch to
-	 * measure elapsed time but also don't want to <tt>null</tt> check.
+	 * measure elapsed time but also don't want to {@code null} check.
 	 */
 	public static final StopWatch DUMMY = new StopWatch() {
 		@Override public StopWatch reset() { return this; }
@@ -43,7 +40,7 @@ public class StopWatch {
 	/**
 	 * Sets this stop watch's parent stop watch. Any calls to {@link #start()}
 	 * and {@link #stop()} will be propagated to the parent stop watch.
-	 * @param parent the parent stop watch, or <tt>null</tt> for no parent
+	 * @param parent the parent stop watch, or {@code null} for no parent
 	 * @return this instance for method chaining
 	 */
 	public StopWatch setParent(StopWatch parent) {

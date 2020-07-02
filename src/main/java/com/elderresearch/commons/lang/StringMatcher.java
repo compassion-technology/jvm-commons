@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2016 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2013-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang;
 
 import java.util.Arrays;
@@ -21,7 +18,7 @@ import org.apache.commons.lang3.StringUtils;
  * assert !sm.test("Ji");</pre>
  * or by setting the test string and repeatedly setting the basis:<pre>
  * val sm = new StringMatcher(StringMatchStrat.STARTS_WITH);
- * sm.test("Jo");
+7 * sm.test("Jo");
  * assert sm.matchAny("John", "Jill");
  * assert !sm.matchAll("John", "Jill");</pre>
  * This class is <b>not</b> thread-safe and any changes to the settings (like {@link #ignoreCase()} or
@@ -117,7 +114,7 @@ public class StringMatcher {
 	/**
 	 * Sets the basis for the match and returns the result if a test string has been set (via {@link #does(String)}).
 	 * For example, for the {@link StringMatchStrat#STARTS_WITH} strategy, the basis is the set of prefixes to match.
-	 * Only one base string must match the test string to return <tt>true</tt>.
+	 * Only one base string must match the test string to return {@code true}.
 	 * @param basis the basis for the match
 	 * @return whether or not the test string passed to {@link #does(String)} matched the parameters
 	 */
@@ -128,7 +125,7 @@ public class StringMatcher {
 	/**
 	 * Sets the basis for the match and returns the result if a test string has been set (via {@link #does(String)}).
 	 * For example, for the {@link StringMatchStrat#STARTS_WITH} strategy, the basis is the set of prefixes to match.
-	 * All of the base strings must match the test string to return <tt>true</tt>.
+	 * All of the base strings must match the test string to return {@code true}.
 	 * @param basis the basis for the match
 	 * @return whether or not the test string passed to {@link #does(String)} matched the parameters
 	 */

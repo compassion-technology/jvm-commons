@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2016 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2016-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang.service;
 
 import java.util.ArrayList;
@@ -56,8 +53,8 @@ public class ServiceManager<S> implements Iterable<S> {
 	 * Apply the function to the highest priority service that returns a value.
 	 * @param fn the function to apply
 	 * @param <T> the output type
-	 * @return the output of the highest priority service, or <tt>null</tt> if all available implementations returned
-	 * <tt>null</tt>
+	 * @return the output of the highest priority service, or {@code null} if all available implementations returned
+	 * {@code null}
 	 */
 	public <T> T apply(Function<S, T> fn) {
 		for (S impl : this) {

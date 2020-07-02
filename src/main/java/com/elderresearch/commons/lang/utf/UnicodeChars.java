@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2019 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2019-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang.utf;
 
 // CHECKSTYLE:OFF
@@ -7130,9 +7127,11 @@ public interface UnicodeChars {
     char HORIZONTAL_ELLIPSIS = '\u2026';
     /** ‧ of type OTHER_PUNCTUATION */
     char HYPHENATION_POINT = '\u2027';
-    /**   of type LINE_SEPARATOR */
+    /** 
+ of type LINE_SEPARATOR */
     char LINE_SEPARATOR = '\u2028';
-    /**   of type PARAGRAPH_SEPARATOR */
+    /** 
+ of type PARAGRAPH_SEPARATOR */
     char PARAGRAPH_SEPARATOR = '\u2029';
     /** ‪ of type FORMAT */
     char LEFT_TO_RIGHT_EMBEDDING = '\u202A';

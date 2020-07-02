@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2019 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2019-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang.utf;
 
 // CHECKSTYLE:OFF

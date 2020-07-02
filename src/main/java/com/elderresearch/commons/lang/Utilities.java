@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2016 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2012-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang;
 
 import java.io.BufferedReader;
@@ -68,7 +65,7 @@ public final class Utilities {
 	/**
 	 * Removes leading and trailing whitespace and matching single and
 	 * double quotes.  For example, <br>
-	 * <tt>stripQuotes("  'hello world '") = "hello world"</tt>
+	 * {@code stripQuotes("  'hello world '") = "hello world"}
 	 * @param s the string to clean
 	 * @return the cleaned string
 	 */
@@ -166,8 +163,8 @@ public final class Utilities {
 	/**
 	 * Applies the same format string to each element of an array,
 	 * concatenating each formatted string together with a space.
-	 * @param format the format to use for each element (e.g. <tt>"%5d"</tt>)
-	 * @param delim the delimiter between each element (e.g. <tt>" "</tt>)
+	 * @param format the format to use for each element (e.g. {@code "%5d"})
+	 * @param delim the delimiter between each element (e.g. {@code " "})
 	 * @param array the array to format
 	 * @return a formatted string
 	 * @see String#format(String, Object...)
@@ -188,7 +185,7 @@ public final class Utilities {
 	
 	/**
 	 * Converts a long into its string representation of no more than 4 significant digits,
-	 * using SI prefixes like <tt>k</tt> for "kilo" (1,000) and <tt>m</tt> for "mega" (1,000,000).
+	 * using SI prefixes like {@code k} for "kilo" (1,000) and {@code m} for "mega" (1,000,000).
 	 * This method does not round mathematically- it only does string manipulation.
 	 * For example: <code>compactLargetNumber(1234567L) = "1,234k"</code>
 	 * @param l the number to format
@@ -209,11 +206,11 @@ public final class Utilities {
 	}
 	
 	/**
-	 * Gets the charset name inside a <tt>Content-Type</tt> header.  If the
-	 * charset name cannot be parsed, <tt>"us-ascii"</tt> is returned. 
-	 * For example, <tt>getEncoding("text/plain; charset=utf-8")</tt> returns
-	 * <tt>"utf-8"</tt>.
-	 * @param s the <tt>Content-Type</tt> string to parse
+	 * Gets the charset name inside a {@code Content-Type} header.  If the
+	 * charset name cannot be parsed, {@code "us-ascii"} is returned. 
+	 * For example, {@code getEncoding("text/plain; charset=utf-8")} returns
+	 * {@code "utf-8"}.
+	 * @param s the {@code Content-Type} string to parse
 	 * @return the encoding
 	 */
 	public String getEncoding(String s) {
@@ -227,11 +224,11 @@ public final class Utilities {
 	
 	/**
 	 * Returns the extension of the filename. This is the
-	 * substring starting at the last index of <tt>'.'</tt>.
-	 * If the filename does not contain a <tt>'.'</tt>, an
+	 * substring starting at the last index of {@code '.'}.
+	 * If the filename does not contain a {@code '.'}, an
 	 * empty string is returned.
 	 * @param filename a file name 
-	 * @return the file's extension, including the <tt>'.'</tt>
+	 * @return the file's extension, including the {@code '.'}
 	 */
 	public String getExtension(String filename) {
 		int i = filename.lastIndexOf('.');
@@ -249,14 +246,14 @@ public final class Utilities {
 	/**
 	 * Returns if the character is a vowel.
 	 * @param c the character to test
-	 * @return if <tt>c</tt> is an <tt>a</tt>, <tt>e</tt>, <tt>i</tt>, <tt>o</tt> or <tt>u</tt> (case-insensitive)  
+	 * @return if {@code c} is an {@code a}, {@code e}, {@code i}, {@code o} or {@code u} (case-insensitive)  
 	 */
 	public boolean isVowel(char c) {
 		return Arrays.binarySearch(vowels, c) >= 0;
 	}
 	
 	/**
-	 * Encloses the string in single quotes (<tt>'</tt>) if the string can
+	 * Encloses the string in single quotes ({@code '}) if the string can
 	 * <b>not</b> be parsed as a number and it is not already enclosed in single
 	 * or double quotes.
 	 * @param s the string
@@ -283,7 +280,7 @@ public final class Utilities {
 	 * Creates the plural form of the passed string.  This method is not
 	 * exhaustive but covers most English singular nouns.
 	 * @param s a singular string
-	 * @return the pluralized form of <tt>s</tt>
+	 * @return the pluralized form of {@code s}
 	 */
 	public String pluralize(String s) {
 		if (s == null) { return null; }
@@ -312,7 +309,7 @@ public final class Utilities {
 	
 	/**
 	 * Return the pluralized form of the string if the number is not equal to
-	 * <tt>1</tt>.
+	 * {@code 1}.
 	 * @param s a singular string
 	 * @param n the amount
 	 * @return the pluralized form if applicable
@@ -327,9 +324,9 @@ public final class Utilities {
 	 * precision via {@link #stringValue(double, int)}. Otherwise, the default
 	 * {@link Object#toString()} is returned.
 	 * @param o the object to format
-	 * @param precision the number of decimal places to show if <tt>d</tt> is not a whole number. If
-	 * this is less than <tt>0</tt> or <tt>Integer.MAX_VALUE</tt>, the default string is returned
-	 * @return the formatted object, or <tt>null</tt> if <tt>o</tt> is <tt>null</tt>
+	 * @param precision the number of decimal places to show if {@code d} is not a whole number. If
+	 * this is less than {@code 0} or {@code Integer.MAX_VALUE}, the default string is returned
+	 * @return the formatted object, or {@code null} if {@code o} is {@code null}
 	 */
 	public String stringValue(Object o, int precision) {
 		if (o == null) { return null; }
@@ -343,12 +340,12 @@ public final class Utilities {
 	
 	/**
 	 * Formats the number as a string, handling decimal places in a more advanced way than the
-	 * default logic.  If the rounded value of <tt>d</tt> is equal to <tt>d</tt>, the returned
-	 * string is a whole number (no decimal point shown).  If not, <tt>precision</tt> determines
+	 * default logic.  If the rounded value of {@code d} is equal to {@code d}, the returned
+	 * string is a whole number (no decimal point shown).  If not, {@code precision} determines
 	 * how many decimal places are shown.
 	 * @param d the number to format
-	 * @param precision the number of decimal places to show if <tt>d</tt> is not a whole number. If
-	 * this is less than <tt>0</tt> or <tt>Integer.MAX_VALUE</tt>, the default string is returned
+	 * @param precision the number of decimal places to show if {@code d} is not a whole number. If
+	 * this is less than {@code 0} or {@code Integer.MAX_VALUE}, the default string is returned
 	 * @return the formatted number
 	 */
 	public String stringValue(double d, int precision) {
@@ -364,8 +361,8 @@ public final class Utilities {
 	/**
 	 * Tests if the provided string has one or more digit characters.
 	 * @param s the string to test
-	 * @return if one or more characters are digits or <tt>false</tt> if <tt>s</tt>
-	 * is <tt>null</tt>
+	 * @return if one or more characters are digits or {@code false} if {@code s}
+	 * is {@code null}
 	 * @see Character#isDigit(char)
 	 * @see #containsLetters(String)
 	 */
@@ -381,8 +378,8 @@ public final class Utilities {
 	/**
 	 * Tests if the provided string has one or more letter characters.
 	 * @param s the string to test
-	 * @return if one or more characters are letters or <tt>false</tt> if
-	 * <tt>s</tt> is <tt>null</tt>
+	 * @return if one or more characters are letters or {@code false} if
+	 * {@code s} is {@code null}
 	 * @see Character#isLetter(char)
 	 * @see #containsDigits(String)
 	 */
@@ -397,9 +394,9 @@ public final class Utilities {
 	
 	/**
 	 * Derives a more user-friendly name of a string following the
-	 * <tt>enum</tt> naming convention.  For example, the friendly
-	 * version of <tt>"ENUM_NAME"</tt> is <tt>"Enum name"</tt>. 
-	 * @param e a string following the <tt>enum</tt> naming
+	 * {@code enum} naming convention.  For example, the friendly
+	 * version of {@code "ENUM_NAME"} is {@code "Enum name"}. 
+	 * @param e a string following the {@code enum} naming
 	 * convention
 	 * @return a more user-friendly version of the string
 	 */
@@ -409,7 +406,7 @@ public final class Utilities {
 	
 	/**
 	 * Derives a more user-friendly name of a string following the constant naming convention.
-	 * For example, the friendly version of <tt>"ENUM_NAME"</tt> is <tt>"Enum name"</tt>. 
+	 * For example, the friendly version of {@code "ENUM_NAME"} is {@code "Enum name"}. 
 	 * @param s a string following the constant naming convention
 	 * @return a more user-friendly version of the string
 	 */
@@ -421,13 +418,13 @@ public final class Utilities {
 
 	/**
 	 * Finds the enum instance corresponding to the provided string. If no
-	 * enums are declared that match <tt>name</tt>, <tt>defaultValue</tt> is returned.
+	 * enums are declared that match {@code name}, {@code defaultValue} is returned.
 	 * @param <T> the type of enum
 	 * @param c the class of enums to search
-	 * @param name the name of the enum (can be <tt>null</tt>)
-	 * @param defaultValue the enum to return if no enum with name <tt>name</tt> is found
-	 * (can be <tt>null</tt>)
-	 * @return the matching enum, or <tt>defaultValue</tt>
+	 * @param name the name of the enum (can be {@code null})
+	 * @param defaultValue the enum to return if no enum with name {@code name} is found
+	 * (can be {@code null})
+	 * @return the matching enum, or {@code defaultValue}
 	 */
 	public <T extends Enum<T>> T valueOf(Class<T> c, String name, T defaultValue) {
 		if (name == null) {  return defaultValue; }
@@ -489,7 +486,7 @@ public final class Utilities {
 	 * 26 = Z<br> 27 = AA<br> 28 = AB<br> </code>etc...<br>
 	 * (Microsoft Excel uses this lettering for column headers)
 	 * @param i the number to convert
-	 * @return a string corresponding to number <tt>i</tt>
+	 * @return a string corresponding to number {@code i}
 	 */
 	public String getLetters(int i) {
 		//Taken from AbstractTableModel.getColumnName(int column)
@@ -529,7 +526,7 @@ public final class Utilities {
 	
 	/**
 	 * Starts a thread marked as a daemon thread that executes the provided runnable.
-	 * @param g the thread group (can be <tt>null</tt>)
+	 * @param g the thread group (can be {@code null})
 	 * @param r the runnable to execute
 	 * @param name the name of the thread
 	 * @return the created thread
@@ -545,7 +542,7 @@ public final class Utilities {
 	 * Invokes the object's {@link Object#wait()} method, handling the
 	 * interrupted exception.
 	 * @param obj the object on which to synchronize and wait
-	 * @param timeout the amount of time to wait before returning, or <tt>0</tt>
+	 * @param timeout the amount of time to wait before returning, or {@code 0}
 	 * if the thread should wait indefinitely
 	 * @param unit the unit of the timeout amount
 	 */
@@ -559,7 +556,7 @@ public final class Utilities {
 	 * Wait for the count down latch as long as the status monitor is still running
 	 * and the wait is not interrupted.
 	 * @param latch the latch on which to wait
-	 * @param sm the status monitor that allows the caller to cancel the wait (can be <tt>null</tt>)
+	 * @param sm the status monitor that allows the caller to cancel the wait (can be {@code null})
 	 */
 	public void await(CountDownLatch latch, StatusMonitor sm) {
 		while (sm == null || sm.isRunning()) {
@@ -596,8 +593,8 @@ public final class Utilities {
 	 * @param <T> the type of objects in the queue
 	 * @param queue the queue
 	 * @param time how long to wait for an object to become available
-	 * @param unit the unit in which <tt>time</tt> is measured
-	 * @return the next available object from the queue, or <tt>null</tt> if the specified time
+	 * @param unit the unit in which {@code time} is measured
+	 * @return the next available object from the queue, or {@code null} if the specified time
 	 * elapsed or an {@link InterruptedException} was thrown
 	 * @see BlockingQueue#poll(long, TimeUnit)
 	 */
@@ -611,9 +608,9 @@ public final class Utilities {
 	 * for the next available object to become available as long as the status monitor is running.
 	 * @param <T> the type of objects in the queue
 	 * @param queue the queue
-	 * @param sm the task's status monitor, which can be <tt>null</tt>. If so,
+	 * @param sm the task's status monitor, which can be {@code null}. If so,
 	 * this method has the same effect as {@link BlockingQueue#poll()}
-	 * @return the next available object from the queue, or <tt>null</tt> if the specified time
+	 * @return the next available object from the queue, or {@code null} if the specified time
 	 * elapsed or an {@link InterruptedException} was thrown
 	 * @see BlockingQueue#poll(long, TimeUnit)
 	 * @see StatusMonitor#isRunning()
@@ -633,7 +630,7 @@ public final class Utilities {
 	 * @param <T> the type of objects in the queue
 	 * @param queue the queue
 	 * @param time how long to wait for objects to become available
-	 * @param unit the unit in which <tt>time</tt> is measured
+	 * @param unit the unit in which {@code time} is measured
 	 * @param batch the output batch list. This is a parameter so the same list instance can be reused, and is not
 	 * required to be empty when passed in
 	 * @param maxBatchSize the maximum number of objects to include
@@ -664,7 +661,7 @@ public final class Utilities {
 	 * @param queue the queue
 	 * @param obj the object to add
 	 * @param time how long to wait for space to become available
-	 * @param unit the unit in which <tt>time</tt> is measured
+	 * @param unit the unit in which {@code time} is measured
 	 * @return if the object was successfully added to the queue
 	 * @see BlockingQueue#offer(Object, long, TimeUnit)
 	 */
@@ -679,7 +676,7 @@ public final class Utilities {
 	 * @param <T> the type of objects in the queue
 	 * @param queue the queue
 	 * @param obj the object to add
-	 * @param sm the task's status monitor, which can be <tt>null</tt>. If so,
+	 * @param sm the task's status monitor, which can be {@code null}. If so,
 	 * this method has the same effect as {@link BlockingQueue#offer(Object)}
 	 * @return if the object was successfully added to the queue
 	 * @see BlockingQueue#offer(Object, long, TimeUnit)
@@ -694,11 +691,11 @@ public final class Utilities {
 	
 	/**
 	 * Tests if an option is turned on in a group of options/flags created with 
-	 * the binary OR operator (<tt>|</tt>).  Each option must be a unique
+	 * the binary OR operator ({@code |}).  Each option must be a unique
 	 * bit for this to work correctly.
 	 * @param group a set of options OR'ed together
 	 * @param option the option to test
-	 * @return whether or not <tt>option</tt> is turned on
+	 * @return whether or not {@code option} is turned on
 	 */
 	public boolean isOn(int group, int option) {
 		return (group & option) > 0;
@@ -706,8 +703,8 @@ public final class Utilities {
 	
 	/**
 	 * Tests if an option is turned on in a group of options/flags created with
-	 * the binary OR operator (<tt>|</tt>). The enum's ordinal is the bit index which bit
-	 * it corresponds to.  It must therefore be less than or equal to <tt>63</tt>.
+	 * the binary OR operator ({@code |}). The enum's ordinal is the bit index which bit
+	 * it corresponds to.  It must therefore be less than or equal to {@code 63}.
 	 * @param group a set of options OR'ed together
 	 * @param e an enum value to test
 	 * @return whether or not the enum is turned on
@@ -718,7 +715,7 @@ public final class Utilities {
 	
 	/**
 	 * Linearly interpolate between two boundary values.
-	 * @param amount the partial amount (between <tt>0.0</tt> and <tt>1.0</tt>) 
+	 * @param amount the partial amount (between {@code 0.0} and {@code 1.0}) 
 	 * @param min the minimum value
 	 * @param max the maximum value
 	 * @return the interpolated value
@@ -728,7 +725,7 @@ public final class Utilities {
 	}
 	/**
 	 * Linearly interpolate between two boundary values.
-	 * @param amount the partial amount (between <tt>0.0</tt> and <tt>1.0</tt>) 
+	 * @param amount the partial amount (between {@code 0.0} and {@code 1.0}) 
 	 * @param min the minimum value
 	 * @param max the maximum value
 	 * @return the interpolated value
@@ -738,9 +735,9 @@ public final class Utilities {
 	}
 	
 	/**
-	 * Normalizes the amount between <tt>0.0</tt> and <tt>1.0</tt>.
-	 * This method may return a value less than <tt>0.0</tt> or greater than <tt>1.0</tt>
-	 * if <tt>amount</tt> falls outside the range of <tt>min</tt> and <tt>max</tt>.
+	 * Normalizes the amount between {@code 0.0} and {@code 1.0}.
+	 * This method may return a value less than {@code 0.0} or greater than {@code 1.0}
+	 * if {@code amount} falls outside the range of {@code min} and {@code max}.
 	 * @param amount the original amount
 	 * @param min the minimum amount
 	 * @param max the maximum amount
@@ -751,9 +748,9 @@ public final class Utilities {
 	}
 	
 	/**
-	 * Normalizes the amount between <tt>0.0</tt> and <tt>1.0</tt>.
-	 * This method may return a value less than <tt>0.0</tt> or greater than <tt>1.0</tt>
-	 * if <tt>amount</tt> falls outside the range of <tt>min</tt> and <tt>max</tt>.
+	 * Normalizes the amount between {@code 0.0} and {@code 1.0}.
+	 * This method may return a value less than {@code 0.0} or greater than {@code 1.0}
+	 * if {@code amount} falls outside the range of {@code min} and {@code max}.
 	 * @param amount the original amount
 	 * @param min the minimum amount
 	 * @param max the maximum amount
@@ -788,13 +785,13 @@ public final class Utilities {
 	}
 	
 	/**
-	 * For each property in <tt>target</tt>, check to see if there's a corresponding key in 
-	 * <tt>overrides</tt>, and if so, overwrite the value in <tt>target</tt> with the
-	 * one in <tt>overrides</tt>.
+	 * For each property in {@code target}, check to see if there's a corresponding key in 
+	 * {@code overrides}, and if so, overwrite the value in {@code target} with the
+	 * one in {@code overrides}.
 	 * 
 	 * @param target Property set to update/overwrite.
 	 * @param overrides Property set to source overrides.
-	 * @return <tt>true</tt> if any properties were overridden, <tt>false</tt> otherwise.
+	 * @return {@code true} if any properties were overridden, {@code false} otherwise.
 	 */
 	public boolean applyPropertyOverrides(Properties target, Properties overrides) {
 	    boolean retval = false;
@@ -809,9 +806,9 @@ public final class Utilities {
 	}
 	
 	/**
-	 * Converts a URL to a URI, swallowing and logging any exceptions and returning <tt>null</tt> if it is not valid.
+	 * Converts a URL to a URI, swallowing and logging any exceptions and returning {@code null} if it is not valid.
 	 * @param u the URL to convert
-	 * @return the corresponding URI, or <tt>null</tT> if there was a problem converting it
+	 * @return the corresponding URI, or {@code null</tT> if there was a problem converting it
 	 */
 	public URI toURI(URL u) {
 		try {
@@ -825,7 +822,7 @@ public final class Utilities {
 	/**
 	 * Loads a resource file relative to the current class loader's root directory.
 	 * @param relativeFileName the file to load
-	 * @return the resource as a file, or <tt>null</tt> if the resource couldn't be found
+	 * @return the resource as a file, or <tt>null} if the resource couldn't be found
 	 */
 	public Path getResourceFile(String relativeFileName) {
 		return Optional.ofNullable(Utilities.class.getClassLoader().getResource(relativeFileName))
@@ -839,7 +836,7 @@ public final class Utilities {
 	 * path instead (relative or absolute).
 	 * @param c the class that specifies where to look
 	 * @param name the path of the resource or file
-	 * @return a stream to the resource, or <tt>null</tt> if it was not found as either a resource or a file
+	 * @return a stream to the resource, or {@code null} if it was not found as either a resource or a file
 	 */
 	public InputStream getResourceOrFile(Class<?> c, String name) {
 		return Optional.ofNullable(c.getResourceAsStream(name)).orElseGet(() -> {
@@ -853,7 +850,7 @@ public final class Utilities {
 	
 	/**
 	 * Recurses through the object, invoking the callback for each one. If the object is not iterable, the callback
-	 * is invoked with the parameter object <tt>o</tt>. If it is iterable, this method is recursively invoked
+	 * is invoked with the parameter object {@code o}. If it is iterable, this method is recursively invoked
 	 * for each element in the collection.
 	 * @param o the object to recurse
 	 * @param callback the callback to invoke for each object
@@ -889,7 +886,7 @@ public final class Utilities {
 	 * @param fmt the format to use to parse
 	 * @param s the string to parse
 	 * @param defVal the default date value in the case of an error
-	 * @return the parsed date, or <tt>defVal</tt>
+	 * @return the parsed date, or {@code defVal}
 	 */
 	public Date parseDate(DateFormat fmt, String s, Date defVal) {
 		try {
@@ -901,7 +898,7 @@ public final class Utilities {
 	
 	/**
 	 * Finds the best message to use for the exception. This recurses nested 
-	 * exceptions so long as the messsage is <tt>null</tt>. If the exception or
+	 * exceptions so long as the messsage is {@code null}. If the exception or
 	 * none of its nested exceptions have a message, the simple name of the 
 	 * exception's class is returned.
 	 * @param t the thrown exception
@@ -918,8 +915,8 @@ public final class Utilities {
 	/**
 	 * Returns the first element of the collection.
 	 * @param col the collection
-	 * @param <T> the type of objects in <tt>col</tt>
-	 * @return the first element, or <tt>null</tt> if <tt>col</tt> is <tt>null</tt>
+	 * @param <T> the type of objects in {@code col}
+	 * @return the first element, or {@code null} if {@code col} is {@code null}
 	 * or empty
 	 */
 	public <T> T first(Collection<T> col) {
@@ -929,9 +926,9 @@ public final class Utilities {
 	/**
 	 * Returns the first element of the array.
 	 * @param arr the array
-	 * @param <T> the type of objects in <tt>arr</tt>
-	 * @return the first element, or <tt>null</tt> if <tt>arr</tt> is <tt>null</tt>
-	 * or has a length of <tt>0</tt>
+	 * @param <T> the type of objects in {@code arr}
+	 * @return the first element, or {@code null} if {@code arr} is {@code null}
+	 * or has a length of {@code 0}
 	 */
 	@SafeVarargs
 	public <T> T first(T... arr) {
@@ -939,12 +936,12 @@ public final class Utilities {
 	}
 	
 	/**
-	 * Returns the <tt>i</tt><sup>th</sup> element of the array, if it is not <tt>null</tt> and has at least
-	 * <tt>i + 1</tt> elements.
+	 * Returns the {@code i}<sup>th</sup> element of the array, if it is not {@code null} and has at least
+	 * {@code i + 1} elements.
 	 * @param arr the array
 	 * @param i the index
 	 * @param <T> the type of objects in the array
-	 * @return the element at the index, or <tt>null</tt> if the array is null or the index is out of bounds
+	 * @return the element at the index, or {@code null} if the array is null or the index is out of bounds
 	 */
 	public <T> T get(T[] arr, int i) {
 		if (arr == null || i < 0 || i >= arr.length) { return null; }
@@ -952,12 +949,12 @@ public final class Utilities {
 	}
 	
 	/**
-	 * Returns the <tt>i</tt><sup>th</sup> element of the list, if it is not <tt>null</tt> and has at least
-	 * <tt>i + 1</tt> elements.
+	 * Returns the {@code i}<sup>th</sup> element of the list, if it is not {@code null} and has at least
+	 * {@code i + 1} elements.
 	 * @param list the list
 	 * @param i the index
 	 * @param <T> the type of objects in the array
-	 * @return the element at the index, or <tt>null</tt> if the list is null or the index is out of bounds
+	 * @return the element at the index, or {@code null} if the list is null or the index is out of bounds
 	 */
 	public <T> T get(List<T> list, int i) {
 		if (list == null || i < 0 || i >= list.size()) { return null; }

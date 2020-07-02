@@ -1,17 +1,16 @@
-/*******************************************************************************
- * Copyright (c) 2016 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2016-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang;
+
+import static org.junit.Assert.assertEquals;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class UtilitiesTest extends TestCase {
+public class UtilitiesTest {
+	@Test
 	public void testSoundex() {
 		assertEquals("R163", Utilities.getSoundex("Robert"));
 		assertEquals("R163", Utilities.getSoundex("Rupert"));
@@ -20,12 +19,14 @@ public class UtilitiesTest extends TestCase {
 		assertEquals("A261", Utilities.getSoundex("Ashcroft"));
 	}
 	
+	@Test
 	public void testAppendString() {
 		assertEquals("the | cat |  | chased | the | mouse", StringUtils.join(
 			new String[] {"the", "cat", null, "chased", "the", "mouse"}, " | "
 		));
 	}
 	
+	@Test
 	public void testAppendCollection() {
 		List<String> l = new LinkedList<>();
 		l.add("the");
@@ -38,6 +39,7 @@ public class UtilitiesTest extends TestCase {
 		assertEquals("the | cat |  | chased | the | mouse", StringUtils.join(l, " | "));
 	}
 	
+	@Test
 	public void testStripQuotes() {
 		assertEquals("Hello", Utilities.stripQuotes(" 'Hello'"));
 		assertEquals("Hello", Utilities.stripQuotes("\"Hello \""));
@@ -48,6 +50,7 @@ public class UtilitiesTest extends TestCase {
 		assertEquals("' hello world", Utilities.stripQuotes("' hello world  "));
 	}
 	
+	@Test
 	public void testPluralize() {
 		assertEquals("plants", Utilities.pluralize("plant"));
 		assertEquals("indexes", Utilities.pluralize("index"));
@@ -62,6 +65,7 @@ public class UtilitiesTest extends TestCase {
 		assertEquals("pizza", Utilities.pluralizeIf("pizza", 1));
 	}
 	
+	@Test
 	public void testLetterFreq() {
 		assertEquals(0.4233f, Utilities.getLetterFrequencyScore("Hello, this is a test".toCharArray()), 0.001f);
 		assertEquals(0.2108f, Utilities.getLetterFrequencyScore("ABA12341255asf2sfgerq".toCharArray()), 0.001f);

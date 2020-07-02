@@ -1,3 +1,4 @@
+/* ©2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang.jackson;
 
 import java.io.IOException;
