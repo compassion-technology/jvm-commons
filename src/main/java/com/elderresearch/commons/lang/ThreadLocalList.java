@@ -69,4 +69,12 @@ public class ThreadLocalList<T> implements Iterable<T> {
 		delegate.remove();
 		all.remove(existing);
 	}
+	
+	/**
+	 * Return the number of thread-local variables that have been created so far.
+	 * @return the size of the thread-local
+	 */
+	public int size() {
+		return all.size();
+	}
 }
