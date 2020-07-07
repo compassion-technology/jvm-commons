@@ -865,18 +865,28 @@ public final class Utilities {
 	}
 	
 	/**
-	 * Reads each line of the resource stream or file and invokes a callback for each non-blank line.
+	 * Reads each line of the resource stream or file and invokes a callback for each trimmed, non-blank line.
 	 * @param c the class for resource loading
 	 * @param resourceOrFile the reasource path or file path
 	 * @param callback the callback to invoke for each line
 	 */
 	public void forEachLine(Class<?> c, String resourceOrFile, Consumer<String> callback) {
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(getResourceOrFile(c, resourceOrFile)))) {
+		forEachLine(new InputStreamReader(getResourceOrFile(c, resourceOrFile)), resourceOrFile, callback);
+	}
+	
+	/**
+	 * Reads each line of the stream and invokes a callback for each trimmed, non-blank line.
+	 * @param input the input stream of characters
+	 * @param identifier an optional identifier for the input (like a file path)
+	 * @param callback the callback to invoke for each line
+	 */
+	public void forEachLine(InputStreamReader input, String identifier, Consumer<String> callback) {
+		try (BufferedReader br = new BufferedReader(input)) {
 			for (String line = br.readLine(); line != null; line = br.readLine()) {
 				LambdaUtils.accept(StringUtils.stripToNull(line), callback::accept);
 			}
 		} catch (IOException e) {
-			log.warn("Error reading lines of {}", resourceOrFile, e);
+			log.warn("Error reading lines of input {}", identifier, e);
 		}
 	}
 	
