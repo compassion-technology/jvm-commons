@@ -1,12 +1,13 @@
 /* ©2016-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang.extract;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.collect.Lists;
 
 /**
  * Provides a simplified way of specifying the locale "scope" of extract
@@ -20,7 +21,7 @@ public enum LocalityLevel {
 	ALL {
 		@Override
 		public List<Locale> getLocales(Locale[] all) {
-			return Arrays.asList(all);
+			return Lists.newArrayList(all);
 		}
 	},
 	/** All locales with the same language as the default locale's language. */
@@ -43,7 +44,7 @@ public enum LocalityLevel {
 	LOCAL {
 		@Override
 		public List<Locale> getLocales(Locale[] all) {
-			return Arrays.asList(Locale.getDefault());
+			return Lists.newArrayList(Locale.getDefault());
 		}
 	};
 	

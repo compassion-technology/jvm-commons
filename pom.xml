@@ -96,9 +96,18 @@
 	<build>
 		<plugins>
 			<plugin>
-    		<artifactId>maven-compiler-plugin</artifactId>
-		    <version>3.8.1</version>
+    			<artifactId>maven-compiler-plugin</artifactId>
+		    	<version>3.8.1</version>
 		    </plugin>
+		   	<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemProperties>
+						<!-- See https://javachannel.org/posts/help-my-java-locale-is-wrong-in-jdk11/ -->
+						<java.locale.providers>COMPAT,CLDR</java.locale.providers>
+					</systemProperties>
+				</configuration>
+			</plugin>
     	</plugins>
 	</build>
 </project>

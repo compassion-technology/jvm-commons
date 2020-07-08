@@ -75,11 +75,6 @@ public class DateExtractor extends Extractor<DateFormat, Date> {
 	}
 	
 	@Override
-	protected Locale[] getAvailableLocales() {
-		return DateFormat.getAvailableLocales();
-	}
-	
-	@Override
 	protected void addFormatsFor(Locale l, Consumer<DateFormat> adder) {
 		for (int i = DateFormat.FULL; i <= DateFormat.SHORT; i++) {
 			for (int j = DateFormat.FULL; j <= DateFormat.SHORT; j++) {
