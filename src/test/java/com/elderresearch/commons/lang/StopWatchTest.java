@@ -1,12 +1,12 @@
-/*******************************************************************************
- * Copyright (c) 2016 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2013-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * Test case for stop watch utility.
@@ -14,7 +14,8 @@ import junit.framework.TestCase;
  * @author <a href="dimeo@datamininglab.com">John Dimeo</a>
  * @since Jan 15, 2013
  */
-public class StopWatchTest extends TestCase {
+public class StopWatchTest {
+	@Test
 	public void testSingleStop() {
 		StopWatch sw = new StopWatch();
 		assertEquals(0L, sw.getTime());
@@ -26,6 +27,7 @@ public class StopWatchTest extends TestCase {
 		assertTrue(sw.getTime() > 0L);
 	}
 	
+	@Test
 	public void testMultipleStops() {
 		StopWatch sw = new StopWatch();
 		sw.start();
@@ -46,6 +48,7 @@ public class StopWatchTest extends TestCase {
 		assertTrue(elapsed3 > elapsed2);
 	}
 	
+	@Test
 	public void testTwoStarts() {
 		try {
 			StopWatch sw = new StopWatch();
@@ -57,6 +60,7 @@ public class StopWatchTest extends TestCase {
 		assertTrue(false);
 	}
 	
+	@Test
 	public void testNoStarts() {
 		try {
 			StopWatch sw = new StopWatch();
@@ -67,6 +71,7 @@ public class StopWatchTest extends TestCase {
 		assertTrue(false);
 	}
 	
+	@Test
 	public void testTwoStops() {
 		try {
 			StopWatch sw = new StopWatch();
@@ -79,6 +84,7 @@ public class StopWatchTest extends TestCase {
 		assertTrue(false);
 	}
 	
+	@Test
 	public void testReset() {
 		StopWatch sw = new StopWatch();
 		sw.start();

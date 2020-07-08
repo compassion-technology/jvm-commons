@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2016 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2016-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang.extract;
 
 import java.util.ArrayList;
@@ -13,6 +10,13 @@ import java.util.List;
 
 import org.apache.commons.lang3.Range;
 
+/**
+ * Represents a match from an {@link Extractor}.
+ * 
+ * @author <a href="dimeo@elderresearch.com">John Dimeo</a>
+ * @since Jul 1, 2020
+ * @param <T> the type of value returned by the extractor
+ */
 public final class Match<T> {
 	private static final int  CONTEXT_CHARS = 32;
 	
@@ -72,8 +76,8 @@ public final class Match<T> {
 	 * Takes a set of extraction results and removes any overlapping
 	 * results, keeping the longest matches. For example, if the text is
 	 * (with 4 extracted matches indicated with brackets):<br/>
-	 * <tt>"Example text from [2000] to [1 [March, [2001]]]"</tt><br/>
-	 * only matches <tt>"2000"</tt> and <tt>"1 March 2001"</tt> will be preserved
+	 * {@code "Example text from [2000] to [1 [March, [2001]]]"}<br/>
+	 * only matches {@code "2000"} and {@code "1 March 2001"} will be preserved
 	 * in the returned list.
 	 * @param matches the set of matches
 	 * @return the matches, but with overlapping matches removed

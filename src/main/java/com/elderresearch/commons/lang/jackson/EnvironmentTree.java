@@ -1,3 +1,4 @@
+/* ©2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang.jackson;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ import com.google.common.base.CaseFormat;
 import lombok.val;
 
 /**
- * This class reads values starting with a a prefix from the current environment (including environment variables
+ * This class reads values starting with a prefix from the current environment (including environment variables
  * via {@link System#getenv()} and system properties via {@link System#getProperties()}) and applies them to an
  * object via a {@link JsonNode} tree.
  * 

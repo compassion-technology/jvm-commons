@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2016 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2012-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang.utf;
 
 import java.io.IOException;
@@ -9,6 +6,7 @@ import java.io.PrintStream;
 import java.lang.Character.UnicodeBlock;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,15 +77,13 @@ final class UnicodeCodeGen {
 			grouped.getOrDefault(group, other).add((char) i);
     	}
     	
+    	val year = String.valueOf(LocalDate.now().getYear());
     	for (Entry<String, List<Character>> e : grouped.entrySet()) {
     		if (e.getValue().size() < 2) { continue; }
     		
     		String clsName = "Unicode" + WordUtils.capitalizeFully(e.getKey());
     		try (PrintStream ps = new PrintStream(clsName + ".java", "UTF-8")) {
-    			ps.println("/*******************************************************************************");
-    			ps.println(" * Copyright (c) 2019 Elder Research, Inc.");
-    			ps.println(" * All rights reserved.");
-    			ps.println(" *******************************************************************************/");
+    			ps.println("/* ©2012-" + year + " Elder Research, Inc. All rights reserved. */");
     			ps.println(UnicodeCodeGen.class.getPackage() + ";");
     			ps.println();
     			ps.println("// CHECKSTYLE:OFF");

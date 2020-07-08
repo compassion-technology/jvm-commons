@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2017 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2017-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang.iter;
 
 import java.io.IOException;
@@ -30,7 +27,7 @@ public class IteratorCloseable<T> implements IteratorWithSize<T>, AutoCloseable 
 	/**
 	 * Creates a new closeable iterator. 
 	 * @param iter the wrapped iterator
-	 * @param closer the close callback. If this is <tt>null</tt>, you must subclass this class and override {@link #close()}.
+	 * @param closer the close callback. If this is {@code null}, you must subclass this class and override {@link #close()}.
 	 */
 	public IteratorCloseable(Iterator<T> iter, IORunnable closer) {
 		this.iter = iter;

@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2016 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2016-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang;
 
 import java.util.Arrays;
@@ -42,7 +39,7 @@ public class CLIUtils {
      * @param shared optionally a shared parameter object common to all commands
      * @param commands one or more commands annotated with JCommander
      * @param <T> the common type among all commands
-     * @return the parsed command (one of the objects passed as the parameter) or <tt>null</tt> if there was a problem
+     * @return the parsed command (one of the objects passed as the parameter) or {@code null} if there was a problem
      * parsing the arguments
      * @see JCommander#addCommand(Object)
      */

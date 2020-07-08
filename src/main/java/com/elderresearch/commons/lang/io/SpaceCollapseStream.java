@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2017 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2017-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang.io;
 
 import java.io.IOException;

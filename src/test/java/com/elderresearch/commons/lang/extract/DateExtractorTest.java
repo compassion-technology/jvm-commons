@@ -1,8 +1,8 @@
-/*******************************************************************************
- * Copyright (c) 2016 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2016-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang.extract;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,9 +17,7 @@ import org.junit.Test;
 
 import com.elderresearch.commons.lang.Utilities;
 
-import junit.framework.TestCase;
-
-public class DateExtractorTest extends TestCase {
+public class DateExtractorTest {
 	private static final DateExtractor ALL = DateExtractor.getInstance(LocalityLevel.ALL);
 	private static final DateExtractor LANG = DateExtractor.getInstance(LocalityLevel.LANGUAGE);
 	private static final DateExtractor LOCAL = DateExtractor.getInstance(LocalityLevel.LOCAL);

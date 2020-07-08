@@ -1,7 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2016 Elder Research, Inc.
- * All rights reserved.
- *******************************************************************************/
+/* ©2012-2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang.extract;
 
 import java.text.DateFormat;
@@ -75,11 +72,6 @@ public class DateExtractor extends Extractor<DateFormat, Date> {
 	@Override
 	protected void initFormat(DateFormat format) {
 		format.setLenient(false);
-	}
-	
-	@Override
-	protected Locale[] getAvailableLocales() {
-		return DateFormat.getAvailableLocales();
 	}
 	
 	@Override
