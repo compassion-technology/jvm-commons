@@ -72,7 +72,6 @@ public abstract class Extractor<F extends Format, T> {
 		formats.remove();
 	}
 	
-	protected abstract Locale[] getAvailableLocales();
 	protected abstract void addFormatsFor(Locale l, Consumer<F> adder);
 	
 	/** Optional callback to initialize formats for use by the extractor. */
@@ -85,7 +84,7 @@ public abstract class Extractor<F extends Format, T> {
 	 * @param locality the new locality level
 	 */
 	public void setLocalityLevel(LocalityLevel locality) {
-		this.locales = locality.getLocales(getAvailableLocales());
+		this.locales = locality.getLocales(Locale.getAvailableLocales());
 		unload();
 	}
 	

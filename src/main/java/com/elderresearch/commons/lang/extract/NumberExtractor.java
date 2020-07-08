@@ -58,11 +58,6 @@ public class NumberExtractor extends Extractor<NumberFormat, Number> {
 	}
 	
 	@Override
-	protected Locale[] getAvailableLocales() {
-		return NumberFormat.getAvailableLocales();
-	}
-	
-	@Override
 	protected void addFormatsFor(Locale l, Consumer<NumberFormat> adder) {
 		if (isEnabled(NumberFormatType.DECIMAL)) {
 			adder.accept(NumberFormat.getInstance(l));
