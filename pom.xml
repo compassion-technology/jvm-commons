@@ -103,10 +103,8 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.22.2</version>
 				<configuration>
-					<systemProperties>
-						<!-- See https://javachannel.org/posts/help-my-java-locale-is-wrong-in-jdk11/ -->
-						<java.locale.providers>COMPAT,CLDR</java.locale.providers>
-					</systemProperties>
+					<!-- See https://javachannel.org/posts/help-my-java-locale-is-wrong-in-jdk11/ -->
+					<argLine>-Djava.locale.providers=COMPAT,CLDR</argLine>
 				</configuration>
 			</plugin>
     	</plugins>
