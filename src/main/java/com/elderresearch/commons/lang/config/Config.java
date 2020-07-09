@@ -117,25 +117,27 @@ public interface Config {
 			log.warn("Error applying environment overrides", e);
 		}
 		
-		postProcess(log, om);
+		postProcess(log, om, true);
 	}
 	
 	/**
 	 * Subclasses can do post-processing here after a configuration is initialized, like decrypting sensitive data.
-	 * The default implementation of this method is to log the current configuration.
 	 * @param log the logger to use to log any errors/warnings
 	 * @param m the object mapper to use (usually a YAML mapper via {@link YAMLUtils#newMapper()})
+	 * @param logConfig whether or not to log the configuration tree
 	 */
-	default void postProcess(Logger log, ObjectMapper om) {
-		try {
-			log.info("Configuration:{}{}", System.lineSeparator(),
-				om.writerWithDefaultPrettyPrinter().writeValueAsString(this));
-		} catch (IOException e) {
-			log.warn("Couldn't print configuration", e);
+	default void postProcess(Logger log, ObjectMapper om, boolean logConfig) {
+		if (logConfig) {
+			try {
+				log.info("Configuration:{}{}", System.lineSeparator(),
+					om.writerWithDefaultPrettyPrinter().writeValueAsString(this));
+			} catch (IOException e) {
+				log.warn("Couldn't print configuration", e);
+			}
 		}
 		
 		// Now post process any children
-		forEachChild($ -> $.postProcess(log, om));
+		forEachChild($ -> $.postProcess(log, om, false));
 	}
 	
 	/**
