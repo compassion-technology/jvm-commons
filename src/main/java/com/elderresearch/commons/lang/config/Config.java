@@ -1,11 +1,11 @@
 /* ©2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang.config;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
@@ -40,22 +40,13 @@ public interface Config {
 	default InputStream resolveCurrentDir(Logger log, String path) {
 		try {
 			return Files.newInputStream(Paths.get(path));
-		} catch (FileNotFoundException e) {
+		} catch (NoSuchFileException e) {
 			// This is an expected situation when the user wants to use only defaults
 			return null;
 		} catch (IOException e) {
 			log.warn("Error resolving path {}", path, e);
 			return null;
 		}
-	}
-	
-	/**
-	 * Recurse through configurations that have other {@link Config} instances as child beans,
-	 * invoking the callback for each. The default implementation is a no-op.
-	 * @param callback the callback to invoke for each child configuration bean in this bean
-	 */
-	default void forEachChild(Consumer<Config> callback) {
-		// No-op by default
 	}
 	
 	/**
@@ -71,7 +62,10 @@ public interface Config {
 		try {
 			// Try to load relative to the running .jar, not the current directory
 			val jar = getClass().getProtectionDomain().getCodeSource().getLocation();
-			return Files.newInputStream(Paths.get(jar.toURI()));
+			return Files.newInputStream(Paths.get(jar.toURI()).resolve(path));
+		} catch (NoSuchFileException e) {
+			// This is an expected situation when the user wants to use only defaults
+			return null;
 		} catch (URISyntaxException | SecurityException | IOException e) {
 			log.warn("Error locating executable; using current directory to look for config file", e);
 			return resolveCurrentDir(log, path);
@@ -98,26 +92,12 @@ public interface Config {
 	}
 	
 	/**
-	 * Loads a configuration file into this object, merging/overriding values that have already been defined
-	 * (or overriding the defaults declared in the bean itself), as well as applying any overrides from the
-	 * environment. Finally, this method will call {@link #postProcess()} before returning.
-	 * @param log the logger to use to log any errors/warnings
-	 * @param om the object mapper to use (usually a YAML mapper via {@link YAMLUtils#newMapper()})
-	 * @param stream the stream to load (can be {@code null})
-	 * @param env the environment to override specifying the prefix (can be {@code null})
-	 * @see #resolveCodeDir(Logger, String)
-	 * @see #resolveCurrentDir(Logger, String)
+	 * Recurse through configurations that have other {@link Config} instances as child beans,
+	 * invoking the callback for each. The default implementation is a no-op.
+	 * @param callback the callback to invoke for each child configuration bean in this bean
 	 */
-	default void load(Logger log, ObjectMapper om, InputStream stream, EnvironmentTree env) {
-		merge(log, om, stream);
-		
-		try {
-			if (env != null) { env.applyOverrides(om, this); }
-		} catch (IOException e) {
-			log.warn("Error applying environment overrides", e);
-		}
-		
-		postProcess(log, om, true);
+	default void forEachChild(Consumer<Config> callback) {
+		// No-op by default
 	}
 	
 	/**
@@ -149,12 +129,14 @@ public interface Config {
 	 * @param envPrefix the prefix for environment variables and system properties that should override
 	 * configuration values (if this is {@code null}, the environment will not be checked). System properties
 	 * take precedent over environment variables.
+     * @param logConfig whether or not to log the configuration tree after all loading/merging has occurred and
+     * environment overrides have been applied
 	 * @param paths zero or more paths (<em>relative to the executing code</em>, not the current directory)
 	 * specifying files to load
 	 * @return the configuration object {@code defConfig} after it has been loaded
 	 * @see #resolveCodeDir(Logger, String)
 	 */
-	static <C extends Config> C load(Logger log, ObjectMapper om, C conf, String envPrefix, String... paths) {
+	static <C extends Config> C load(Logger log, ObjectMapper om, C conf, String envPrefix, boolean logConfig, String... paths) {
 		for (val path : paths) {
 			conf.merge(log, om, conf.resolveCodeDir(log, path));
 		}
@@ -162,7 +144,13 @@ public interface Config {
 		val env = LambdaUtils.apply(envPrefix, $ -> EnvironmentTree.forPrefix($)
 			.addEnvironmentVariables().addSystemProperties());
 		
-		conf.load(log, om, null, env);
+		try {
+			if (env != null) { env.applyOverrides(om, conf); }
+		} catch (IOException e) {
+			log.warn("Error applying environment overrides", e);
+		}
+		
+		conf.postProcess(log, om, logConfig);
 		return conf;
 	}
 }
