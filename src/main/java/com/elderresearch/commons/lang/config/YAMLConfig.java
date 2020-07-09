@@ -1,8 +1,7 @@
 /* ©2020 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.lang.config;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.nio.file.Files;
 
 import com.elderresearch.commons.lang.jackson.YAMLUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,20 +14,6 @@ import lombok.extern.log4j.Log4j2;
 public class YAMLConfig implements Config {
 	@Getter
 	private static final ObjectMapper mapper = YAMLUtils.newMapper();
-	
-	/**
-	 * Saves this configuration to the specified output stream.
-	 * @param os the stream to write the configuration
-	 */
-	public void save(OutputStream os) {
-		try {
-			mapper.writer()
-				.with(YAMLGenerator.Feature.MINIMIZE_QUOTES)
-				.writeValue(os, this);
-		} catch (IOException e) {
-			log.warn("Error writing configuration", e);
-		}
-	}
 	
 	/**
 	 * Load configuration from the environment and optionally YAML files.
@@ -44,4 +29,14 @@ public class YAMLConfig implements Config {
 	public void load(String envPrefix, boolean logConfig, String... paths) {
 		Config.load(log, mapper, this, envPrefix, logConfig, paths);
 	}
+	
+    /**
+     * Saves this configuration to the YAML file.
+     * @param path the path (<em>relative to the executing code</em>, not the current directory) to which
+     * to save the configuration 
+     */
+    public void save(String path) {
+    	save(log, mapper.writer().with(YAMLGenerator.Feature.MINIMIZE_QUOTES),
+    		resolveCodeDir(log, path, Files::newOutputStream));
+    }
 }

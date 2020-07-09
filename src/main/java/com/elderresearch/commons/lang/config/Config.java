@@ -3,6 +3,7 @@ package com.elderresearch.commons.lang.config;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -13,8 +14,10 @@ import java.util.function.Consumer;
 import org.apache.logging.log4j.Logger;
 
 import com.elderresearch.commons.lang.LambdaUtils;
+import com.elderresearch.commons.lang.LambdaUtils.IOFunction;
 import com.elderresearch.commons.lang.jackson.YAMLUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 import lombok.val;
 
@@ -31,15 +34,18 @@ public interface Config {
 	/**
 	 * Resolve the path against the current working directory. This will silently return {@code null} if
 	 * the file is not found but will log the error if it is any other kind of {@link IOException}.
+	 * @param <S> the stream type
 	 * @param log the logger to use to log any errors/warnings
 	 * @param path the path to resolve
-	 * @return the input stream with the contents of the path
-	 * @see Files#newInputStream(Path, java.nio.file.OpenOption...)
+	 * @param toStream the function that converts a path to either an input or output stream
+	 * @return the stream with the contents of the path
 	 * @see #resolveCodeDir(Logger, String)
+	 * @see Files#newInputStream(Path, java.nio.file.OpenOption...)
+	 * @see Files#newOutputStream(Path, java.nio.file.OpenOption...)
 	 */
-	default InputStream resolveCurrentDir(Logger log, String path) {
+	default <S> S resolveCurrentDir(Logger log, String path, IOFunction<Path, S> toStream) {
 		try {
-			return Files.newInputStream(Paths.get(path));
+			return toStream.apply(Paths.get(path));
 		} catch (NoSuchFileException e) {
 			// This is an expected situation when the user wants to use only defaults
 			return null;
@@ -54,21 +60,25 @@ public interface Config {
 	 * This allows users to place configuration files next to the executable and not have to worry about
 	 * specifying a relative or absolute path from their current working directory. If resolution fails,
 	 * this will fall back to {@link #resolveCurrentDir(Logger, String)}.
+	 * @param <S> the stream type
 	 * @param log the logger to use to log any errors/warnings
 	 * @param path the path to resolve
-	 * @return the input stream with the contents of the path
+	 * @param toStream the function that converts a path to either an input or output stream
+	 * @return the stream with the contents of the path
+	 * @see Files#newInputStream(Path, java.nio.file.OpenOption...)
+	 * @see Files#newOutputStream(Path, java.nio.file.OpenOption...)
 	 */
-	default InputStream resolveCodeDir(Logger log, String path) {
+	default <S> S resolveCodeDir(Logger log, String path, IOFunction<Path, S> toStream) {
 		try {
 			// Try to load relative to the running .jar, not the current directory
 			val jar = getClass().getProtectionDomain().getCodeSource().getLocation();
-			return Files.newInputStream(Paths.get(jar.toURI()).resolve(path));
+			return toStream.apply(Paths.get(jar.toURI()).resolve(path));
 		} catch (NoSuchFileException e) {
 			// This is an expected situation when the user wants to use only defaults
 			return null;
 		} catch (URISyntaxException | SecurityException | IOException e) {
-			log.warn("Error locating executable; using current directory to look for config file", e);
-			return resolveCurrentDir(log, path);
+			log.warn("Error locating executable; using current directory instead", e);
+			return resolveCurrentDir(log, path, toStream);
 		}
 	}
 	
@@ -103,7 +113,7 @@ public interface Config {
 	/**
 	 * Subclasses can do post-processing here after a configuration is initialized, like decrypting sensitive data.
 	 * @param log the logger to use to log any errors/warnings
-	 * @param m the object mapper to use (usually a YAML mapper via {@link YAMLUtils#newMapper()})
+	 * @param om the object mapper to use (usually a YAML mapper via {@link YAMLUtils#newMapper()})
 	 * @param logConfig whether or not to log the configuration tree
 	 */
 	default void postProcess(Logger log, ObjectMapper om, boolean logConfig) {
@@ -118,6 +128,20 @@ public interface Config {
 		
 		// Now post process any children
 		forEachChild($ -> $.postProcess(log, om, false));
+	}
+	
+	/**
+	 * Saves this configuration to the specified output stream.
+	 * @param log the logger to use to log any errors/warnings
+	 * @param om the object writer to use
+	 * @param os the stream to write the configuration
+	 */
+	default void save(Logger log, ObjectWriter ow, OutputStream os) {
+		try {
+			ow.writeValue(os, this);
+		} catch (IOException e) {
+			log.warn("Error writing configuration", e);
+		}
 	}
 	
 	/**
@@ -138,7 +162,7 @@ public interface Config {
 	 */
 	static <C extends Config> C load(Logger log, ObjectMapper om, C conf, String envPrefix, boolean logConfig, String... paths) {
 		for (val path : paths) {
-			conf.merge(log, om, conf.resolveCodeDir(log, path));
+			conf.merge(log, om, conf.resolveCodeDir(log, path, Files::newInputStream));
 		}
 		
 		val env = LambdaUtils.apply(envPrefix, $ -> EnvironmentTree.forPrefix($)
