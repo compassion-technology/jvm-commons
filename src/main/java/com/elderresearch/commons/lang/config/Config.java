@@ -13,7 +13,6 @@ import java.util.function.Consumer;
 
 import org.apache.logging.log4j.Logger;
 
-import com.elderresearch.commons.lang.LambdaUtils;
 import com.elderresearch.commons.lang.LambdaUtils.IOFunction;
 import com.elderresearch.commons.lang.jackson.YAMLUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -165,15 +164,15 @@ public interface Config {
 			conf.merge(log, om, conf.resolveCodeDir(log, path, Files::newInputStream));
 		}
 		
-		val env = LambdaUtils.apply(envPrefix, $ -> EnvironmentTree.forPrefix($)
-			.addEnvironmentVariables().addSystemProperties());
-		
-		try {
-			if (env != null) { env.applyOverrides(om, conf); }
-		} catch (IOException e) {
-			log.warn("Error applying environment overrides", e);
+		if (envPrefix != null) {
+			val env = EnvironmentTree.forPrefix(envPrefix).addEnvironmentVariables().addSystemProperties();
+			try {
+				env.applyOverrides(om, conf);
+			} catch (IOException e) {
+				log.warn("Error applying environment overrides", e);
+			}
 		}
-		
+
 		conf.postProcess(log, om, logConfig);
 		return conf;
 	}
