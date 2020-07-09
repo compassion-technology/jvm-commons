@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.Consumer;
 
 import org.apache.logging.log4j.Logger;
 
@@ -46,6 +47,15 @@ public interface Config {
 			log.warn("Error resolving path {}", path, e);
 			return null;
 		}
+	}
+	
+	/**
+	 * Recurse through configurations that have other {@link Config} instances as child beans,
+	 * invoking the callback for each. The default implementation is a no-op.
+	 * @param callback the callback to invoke for each child configuration bean in this bean
+	 */
+	default void forEachChild(Consumer<Config> callback) {
+		// No-op by default
 	}
 	
 	/**
@@ -123,6 +133,9 @@ public interface Config {
 		} catch (IOException e) {
 			log.warn("Couldn't print configuration", e);
 		}
+		
+		// Now post process any children
+		forEachChild($ -> $.postProcess(log, om));
 	}
 	
 	/**
@@ -130,7 +143,7 @@ public interface Config {
 	 * @param <C> the configuration type
 	 * @param log the logger to use to log any errors/warnings
 	 * @param om the object mapper to use (usually a YAML mapper via {@link YAMLUtils#newMapper()})
-	 * @param defConfig the blank/initial configuration object
+	 * @param conf the blank/initial configuration object
 	 * @param envPrefix the prefix for environment variables and system properties that should override
 	 * configuration values (if this is {@code null}, the environment will not be checked). System properties
 	 * take precedent over environment variables.
@@ -139,15 +152,15 @@ public interface Config {
 	 * @return the configuration object {@code defConfig} after it has been loaded
 	 * @see #resolveCodeDir(Logger, String)
 	 */
-	static <C extends Config> C load(Logger log, ObjectMapper om, C defConfig, String envPrefix, String... paths) {
+	static <C extends Config> C load(Logger log, ObjectMapper om, C conf, String envPrefix, String... paths) {
 		for (val path : paths) {
-			defConfig.merge(log, om, defConfig.resolveCodeDir(log, path));
+			conf.merge(log, om, conf.resolveCodeDir(log, path));
 		}
 		
 		val env = LambdaUtils.apply(envPrefix, $ -> EnvironmentTree.forPrefix($)
 			.addEnvironmentVariables().addSystemProperties());
 		
-		defConfig.load(log, om, null, env);
-		return defConfig;
+		conf.load(log, om, null, env);
+		return conf;
 	}
 }
