@@ -1,5 +1,5 @@
 /* ©2020 Elder Research, Inc. All rights reserved. */
-package com.elderresearch.commons.lang.jackson;
+package com.elderresearch.commons.lang.config;
 
 import java.io.IOException;
 import java.util.HashMap;
