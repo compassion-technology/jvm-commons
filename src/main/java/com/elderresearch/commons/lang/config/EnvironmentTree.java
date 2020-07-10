@@ -1,5 +1,5 @@
 /* ©2020 Elder Research, Inc. All rights reserved. */
-package com.elderresearch.commons.lang.jackson;
+package com.elderresearch.commons.lang.config;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -56,7 +56,7 @@ public class EnvironmentTree {
 		}
 	}
 	
-	public <T> T applyOverrides(ObjectMapper om, T obj) throws IOException {
+	public <T> void applyOverrides(ObjectMapper om, T obj) throws IOException {
 		val tree = om.valueToTree(obj);
 		val trav = tree.traverse();
 		while (!trav.isClosed()) {
@@ -72,7 +72,7 @@ public class EnvironmentTree {
 			}
 		}
 		
-		return om.readerFor(obj.getClass()).readValue(tree);
+		om.readerForUpdating(obj).readValue(tree);
 	}
 	
 	private static String last(JsonPointer p) {
