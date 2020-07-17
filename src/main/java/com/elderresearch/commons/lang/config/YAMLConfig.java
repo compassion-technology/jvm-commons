@@ -13,7 +13,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class YAMLConfig implements Config {
 	@Getter
-	private static final ObjectMapper mapper = YAMLUtils.newMapper();
+	private static final ObjectMapper mapper = YAMLUtils.newMapper().setDefaultMergeable(true);
 	
 	/**
 	 * Load configuration from the environment and optionally YAML files.
