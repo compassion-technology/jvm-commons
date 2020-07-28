@@ -24,7 +24,7 @@ public class YAMLConfig implements Config {
      * environment overrides have been applied
 	 * @param paths zero or more paths (<em>relative to the executing code</em>, not the current directory)
 	 * specifying files to load
-	 * @see Config#load(org.apache.logging.log4j.Logger, ObjectMapper, Config, String, String...)
+	 * @see Config#load(org.apache.logging.log4j.Logger, ObjectMapper, Config, String, boolean, String...)
 	 */
 	public void load(String envPrefix, boolean logConfig, String... paths) {
 		Config.load(log, mapper, this, envPrefix, logConfig, paths);

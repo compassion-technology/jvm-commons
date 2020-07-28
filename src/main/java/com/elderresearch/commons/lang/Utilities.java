@@ -808,7 +808,7 @@ public final class Utilities {
 	/**
 	 * Converts a URL to a URI, swallowing and logging any exceptions and returning {@code null} if it is not valid.
 	 * @param u the URL to convert
-	 * @return the corresponding URI, or {@code null</tT> if there was a problem converting it
+	 * @return the corresponding URI, or {@code null} if there was a problem converting it
 	 */
 	public URI toURI(URL u) {
 		try {

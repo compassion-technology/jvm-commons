@@ -67,7 +67,7 @@ public interface UnicodeChars {
     char GREATER_THAN_SIGN = '\u003E';
     /** ? of type OTHER_PUNCTUATION */
     char QUESTION_MARK = '\u003F';
-    /** @ of type OTHER_PUNCTUATION */
+    /** &commat; of type OTHER_PUNCTUATION */
     char COMMERCIAL_AT = '\u0040';
     /** [ of type START_PUNCTUATION */
     char LEFT_SQUARE_BRACKET = '\u005B';

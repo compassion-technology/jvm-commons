@@ -38,7 +38,7 @@ public interface Config {
 	 * @param path the path to resolve
 	 * @param toStream the function that converts a path to either an input or output stream
 	 * @return the stream with the contents of the path
-	 * @see #resolveCodeDir(Logger, String)
+	 * @see #resolveCodeDir(Logger, String, IOFunction)
 	 * @see Files#newInputStream(Path, java.nio.file.OpenOption...)
 	 * @see Files#newOutputStream(Path, java.nio.file.OpenOption...)
 	 */
@@ -58,7 +58,7 @@ public interface Config {
 	 * Resolve the path against the location where the code is installed/running and stream the contents.
 	 * This allows users to place configuration files next to the executable and not have to worry about
 	 * specifying a relative or absolute path from their current working directory. If resolution fails,
-	 * this will fall back to {@link #resolveCurrentDir(Logger, String)}.
+	 * this will fall back to {@link #resolveCurrentDir(Logger, String, IOFunction)}.
 	 * @param <S> the stream type
 	 * @param log the logger to use to log any errors/warnings
 	 * @param path the path to resolve
@@ -88,9 +88,9 @@ public interface Config {
 	 * @param log the logger to use to log any errors/warnings
 	 * @param om the object mapper to use (usually a YAML mapper via {@link YAMLUtils#newMapper()})
 	 * @param stream the stream to load (can be {@code null})
-	 * @see #load(Logger, ObjectMapper, InputStream, EnvironmentTree)
-	 * @see #resolveCodeDir(Logger, String)
-	 * @see #resolveCurrentDir(Logger, String)
+	 * @see #load(Logger, ObjectMapper, Config, String, boolean, String...)
+	 * @see #resolveCodeDir(Logger, String, IOFunction)
+	 * @see #resolveCurrentDir(Logger, String, IOFunction)
 	 */
 	default void merge(Logger log, ObjectMapper om, InputStream stream) {
 		try {
@@ -157,7 +157,7 @@ public interface Config {
 	 * @param paths zero or more paths (<em>relative to the executing code</em>, not the current directory)
 	 * specifying files to load
 	 * @return the configuration object {@code defConfig} after it has been loaded
-	 * @see #resolveCodeDir(Logger, String)
+	 * @see #resolveCodeDir(Logger, String, IOFunction)
 	 */
 	static <C extends Config> C load(Logger log, ObjectMapper om, C conf, String envPrefix, boolean logConfig, String... paths) {
 		for (val path : paths) {

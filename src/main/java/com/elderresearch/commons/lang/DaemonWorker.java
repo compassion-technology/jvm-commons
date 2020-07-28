@@ -147,7 +147,7 @@ public class DaemonWorker<T> implements Runnable {
 	
 	/**
 	 * Enqueue an item for this worker to process. This method will block until space is available on the queue or
-	 * {@link #cancel()} is called.
+	 * until {@link #shutdown()} or {@link #shutdownAndWait()} are called.
 	 * @param obj the object to enqueue
 	 */
 	public void enqueue(T obj) {
