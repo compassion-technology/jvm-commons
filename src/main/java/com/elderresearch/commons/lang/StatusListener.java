@@ -42,7 +42,16 @@ public interface StatusListener {
 		@Override
 		public void statusChanged(StatusMonitor sm) {
 			if (sm.getSize() < 0L) {
-				printer.accept(String.format("[%-9s] %s", sm.getState(), sm.getStatus()));
+				if (sm.getProgress() > 0L) {
+					printer.accept(String.format("[%-9s] %6s %s",
+						sm.getState(),
+						Utilities.compactLargeNumber(sm.getProgress()),
+						sm.getStatus()));
+				} else {
+					printer.accept(String.format("[%-9s] %s",
+						sm.getState(),
+						sm.getStatus()));	
+				}
 			} else {
 				printer.accept(String.format("[%-9s] %6s/%6s (%6.2f%%) %s",
 					sm.getState(),
