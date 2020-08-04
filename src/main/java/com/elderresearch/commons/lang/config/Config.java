@@ -71,7 +71,9 @@ public interface Config {
 		try {
 			// Try to load relative to the running .jar, not the current directory
 			val jar = getClass().getProtectionDomain().getCodeSource().getLocation();
-			return toStream.apply(Paths.get(jar.toURI()).resolve(path));
+			Path p = Paths.get(jar.toURI());
+			p = Files.isDirectory(p) ? p : p.getParent();
+			return toStream.apply(p.resolve(path));
 		} catch (NoSuchFileException e) {
 			// This is an expected situation when the user wants to use only defaults
 			return null;
@@ -132,7 +134,7 @@ public interface Config {
 	/**
 	 * Saves this configuration to the specified output stream.
 	 * @param log the logger to use to log any errors/warnings
-	 * @param om the object writer to use
+	 * @param ow the object writer to use
 	 * @param os the stream to write the configuration
 	 */
 	default void save(Logger log, ObjectWriter ow, OutputStream os) {
