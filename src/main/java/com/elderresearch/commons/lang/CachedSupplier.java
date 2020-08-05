@@ -33,7 +33,7 @@ public class CachedSupplier<T> implements Supplier<T> {
     }
     
     /**
-     * @param delegate
+     * @param delegate - the delegate consumer to cache
      * @param beforeReset - consumer to run just before resetting the cache (helpful for native
      * 		objects that require smarter memory management than the JVM garbage collector can provide)
      */

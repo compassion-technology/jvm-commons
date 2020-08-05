@@ -13,7 +13,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class YAMLConfig implements Config {
 	@Getter
-	private static final ObjectMapper mapper = YAMLUtils.newMapper();
+	private static final ObjectMapper mapper = YAMLUtils.newMapper().setDefaultMergeable(true);
 	
 	/**
 	 * Load configuration from the environment and optionally YAML files.
@@ -24,7 +24,7 @@ public class YAMLConfig implements Config {
      * environment overrides have been applied
 	 * @param paths zero or more paths (<em>relative to the executing code</em>, not the current directory)
 	 * specifying files to load
-	 * @see Config#load(org.apache.logging.log4j.Logger, ObjectMapper, Config, String, String...)
+	 * @see Config#load(org.apache.logging.log4j.Logger, ObjectMapper, Config, String, boolean, String...)
 	 */
 	public void load(String envPrefix, boolean logConfig, String... paths) {
 		Config.load(log, mapper, this, envPrefix, logConfig, paths);

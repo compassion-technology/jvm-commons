@@ -3,6 +3,8 @@ package com.elderresearch.commons.lang;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
