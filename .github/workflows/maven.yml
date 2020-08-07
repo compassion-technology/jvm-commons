@@ -19,5 +19,9 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    - name: maven-settings-xml-action
+      uses: whelk-io/maven-settings-xml-action@v10
+      with:
+        repositories: '[{ "id": "jitpack.io", "url": "https://jitpack.io" }]'
     - name: Build with Maven
       run: mvn -B clean package
