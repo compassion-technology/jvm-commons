@@ -12,6 +12,8 @@
 	<name>ERI Commons - JVM Extensions (Java 8)</name>
 	
 	<properties>
+		<project.directory></project.directory>
+	
 		<source.copy.phase>generate-sources</source.copy.phase>
 		<source.copy.exclude></source.copy.exclude>
 		<relative.source.path>../core/src/main/java</relative.source.path>

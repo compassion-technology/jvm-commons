@@ -10,6 +10,10 @@
 
 	<artifactId>commons-jvm-core</artifactId>
 	<name>ERI Commons - JVM Extensions</name>
+
+	<properties>
+		<project.directory></project.directory>
+	</properties>
 	
 	<dependencies>
 		<dependency>
