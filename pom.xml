@@ -8,7 +8,7 @@
 	</parent>
 
 	<groupId>com.elderresearch</groupId>
-	<artifactId>commons-jvm</artifactId>
+	<artifactId>commons-jvm-parent</artifactId>
 	<name>ERI Commons - JVM Extensions (Parent)</name>
 	<description>Shared JVM language extensions</description>
 	<version>2.4.3-SNAPSHOT</version>
