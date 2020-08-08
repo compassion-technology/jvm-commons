@@ -3,12 +3,12 @@
 	
 	<parent>
 		<groupId>com.elderresearch</groupId>
-		<artifactId>commons-jvm</artifactId>
-		<version>2.4.2</version>
+		<artifactId>commons-jvm-parent</artifactId>
+		<version>2.4.3</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>commons-jvm-core</artifactId>
+	<artifactId>commons-jvm</artifactId>
 	<name>ERI Commons - JVM Extensions</name>
 
 	<properties>
