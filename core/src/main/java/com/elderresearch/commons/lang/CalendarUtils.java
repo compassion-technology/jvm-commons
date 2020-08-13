@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 
 import lombok.val;
 import lombok.experimental.UtilityClass;
@@ -150,7 +151,7 @@ public class CalendarUtils {
 	public int valueOf(String field) {
 		if (fieldMap == null) {
 			fieldMap = new HashMap<>();
-			for (Field f : ReflectionUtils.getFields(Calendar.class)) {
+			for (Field f : FieldUtils.getAllFields(Calendar.class)) {
 				if (int.class.equals(f.getType()) && Modifier.isStatic(f.getModifiers())) {
 					try {
 						fieldMap.put(f.getName(), f.getInt(null));
