@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.text.WordUtils;
 
 import com.elderresearch.commons.lang.ReflectionUtils;
@@ -38,7 +39,7 @@ final class UnicodeCodeGen {
 	
 	public static void main(String[] args) throws IOException {
 		Map<Integer, String> types = new HashMap<>();
-		for (Field f : ReflectionUtils.getFields(Character.class)) {
+		for (Field f : FieldUtils.getAllFieldsList(Character.class)) {
 			if (Modifier.isStatic(f.getModifiers())
 			&& !StringUtils.startsWithAny(f.getName(), "$", "MIN_", "MAX_", "DIRECTIONALITY_", "TYPE", "BYTES", "SIZE")) {
 				val b = (Number) ReflectionUtils.get(f, null);
@@ -47,7 +48,7 @@ final class UnicodeCodeGen {
 		}
 		
 		Map<String, Integer> counts = new HashMap<>();
-		for (Field f : ReflectionUtils.getFields(UnicodeBlock.class)) {
+		for (Field f : FieldUtils.getAllFieldsList(UnicodeBlock.class)) {
 			if (f.getType() == UnicodeBlock.class) {
 				UnicodeBlock b = Utilities.cast(ReflectionUtils.get(f, null));
 				String firstPart = StringUtils.substringBefore(b.toString(), "_");
