@@ -18,6 +18,7 @@ import java.util.function.Supplier;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jooq.lambda.Seq;
 
 import lombok.Builder;
@@ -130,7 +131,7 @@ public class Documentation {
 			// class (e.g. f.o.o.Enum$1) but yet it doesn't, so we have to go through the field instead.
 			if (this instanceof Enum<?>) {
 				Enum<?> e = Utilities.cast(this);
-				return Documentation.get(ReflectionUtils.getField(e.getDeclaringClass(), e.name()));
+				return Documentation.get(FieldUtils.getField(e.getDeclaringClass(), e.name(), true));
 			}
 			return Documentation.get(getClass());
 		}

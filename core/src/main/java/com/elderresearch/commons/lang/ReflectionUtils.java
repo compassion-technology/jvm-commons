@@ -8,8 +8,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.function.Supplier;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 
 import lombok.val;
 import lombok.experimental.UtilityClass;
@@ -25,50 +25,6 @@ import lombok.extern.log4j.Log4j2;
 @UtilityClass
 public class ReflectionUtils {
 	/**
-	 * Gets the declared field with name {@code name} and sets it to be accessible.
-	 * @param c the class
-	 * @param name the field name
-	 * @return the field, or {@code null} if there was a problem getting the field or accessing it
-	 */
-	public Field getField(Class<?> c, String name) {
-		if (c == null || name == null) { return null; }
-		
-		try {
-			Field f = c.getDeclaredField(name);
-			f.setAccessible(true);
-			return f;
-		} catch (NoSuchFieldException e) {
-			return null;
-		}
-	}
-
-	/**
-	 * Gets the declared fields with name {@code name} and attempts to set each one of them as being accessible.
-	 * 
-	 * @param c class to query
-	 * @return the set of fields as an array. If none are found, the an empty array is returned. If changing the 
-	 * accessibility flag encounters a problem, only debug logging is performed.
-	 */
-	public Field[] getFields(Class<?> c) {
-        if (c == null) { return null; }
-        Field[] retval = null;
-        retval = c.getDeclaredFields();
-		for (Field f : retval) {
-		    try {
-		        f.setAccessible(true);
-		    } catch (SecurityException ex) {
-		    	log.debug("Couldn't modify accessibility of field {}", f);                    
-		    }
-		}
-		return retval;
-	}
-	
-	public Field[] getAllFields(Class<?> c) {
-		Class<?> superClass = c.getSuperclass();
-		return superClass == null? getFields(c) : ArrayUtils.addAll(getAllFields(superClass), getFields(c));
-	}
-	
-	/**
 	 * Gets the value of the field for the specified object.  This method silently returns
 	 * {@code null} in the event of a problem getting the field value.
 	 * @param f the field
@@ -79,11 +35,11 @@ public class ReflectionUtils {
 		if (f == null) { return null; }
 		
 		try {
-			return f.get(o);
+			return FieldUtils.readField(f, o);
 		} catch (IllegalArgumentException | IllegalAccessException e) {
             log.warn("Couldn't access field {}", f, e);
+            return null;
 		}
-		return null;
 	}
 	
 	/**
@@ -98,12 +54,12 @@ public class ReflectionUtils {
 		if (f == null) { return false; }
 		
 		try {
-			f.set(o, val);
+			FieldUtils.writeField(f, o, val);
 			return true;
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			log.warn("Couldn't access field {}", f, e);
+			return false;
 		}
-		return false;
 	}
 	
 	/**

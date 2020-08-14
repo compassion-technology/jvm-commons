@@ -4,10 +4,11 @@
 	<parent>
 		<groupId>com.elderresearch</groupId>
 		<artifactId>commons-jvm-parent</artifactId>
-		<version>2.4.3</version>
+		<version>2.4.4</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
+	<groupId>com.elderresearch.commons-jvm</groupId>
 	<artifactId>commons-jvm-java8</artifactId>
 	<name>ERI Commons - JVM Extensions (Java 8)</name>
 	
