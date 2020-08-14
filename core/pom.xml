@@ -7,7 +7,8 @@
 		<version>2.4.4-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-
+	
+	<groupId>com.elderresearch.commons-jvm</groupId>
 	<artifactId>commons-jvm</artifactId>
 	<name>ERI Commons - JVM Extensions</name>
 

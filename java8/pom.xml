@@ -8,6 +8,7 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
+	<groupId>com.elderresearch.commons-jvm</groupId>
 	<artifactId>commons-jvm-java8</artifactId>
 	<name>ERI Commons - JVM Extensions (Java 8)</name>
 	
