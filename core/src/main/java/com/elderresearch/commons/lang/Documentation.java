@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -214,7 +214,7 @@ public class Documentation {
 			db.implementationNotes(d.implNotes());
 		}
 		if (ArrayUtils.getLength(d.tags()) > 0) {
-			val set = new HashSet<CharSequence>();
+			val set = new LinkedHashSet<CharSequence>();
         	Collections.addAll(set, d.tags());
         	db.tags(set);
 		}
