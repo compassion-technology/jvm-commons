@@ -3,7 +3,7 @@ ERI Commons - Language Extensions
 
 ![Build](https://github.com/ElderResearch/commons-jvm/workflows/Java%20CI%20with%20Maven/badge.svg)
 
-A "toolbox" of langauge extensions and utilities for JVM-based languages, like Java.
+A "toolbox" of language extensions and utilities for JVM-based languages, like Java.
 
 This sends the following transitive dependencies:
 * Apache [Commons Lang](http://commons.apache.org/proper/commons-lang/) and [Commons Text](http://commons.apache.org/proper/commons-text/)
@@ -12,8 +12,8 @@ This sends the following transitive dependencies:
 * [JCommander](https://github.com/cbeust/jcommander)
 * [Jackson](https://github.com/FasterXML/jackson) with [YAML support](https://github.com/FasterXML/jackson-dataformats-text/tree/master/yaml)
 
-Some of the utilties in this project include:
-- `@Documentation`: Annotation to faciliate code generation and documentation of system components that can be reflected at runtime
+Some of the utilities in this project include:
+- `@Documentation`: Annotation to facilitate code generation and documentation of system components that can be reflected at runtime
 - `PropertiesKey` and `PreferencesKey`: Support enum-based simple key/value config via a file, the registry, system properties or environment variables
 - `NumberExtractor` and `DateExtractor`: General-purpose/robust number and date parser/extractor that uses all localized formats available to the JVM to extract values from text.
 - `LambdaUtils`: Utilities for using Java 8 lambdas
