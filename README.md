@@ -3,7 +3,7 @@ ERI Commons - Language Extensions
 
 ![Build](https://github.com/ElderResearch/commons-jvm/workflows/Java%20CI%20with%20Maven/badge.svg)
 
-A "toolbox" of langauge extensions and utilities for JVM-based languages, like Java. Supports Java 8 and Java 11.
+A "toolbox" of language extensions and utilities for JVM-based languages, like Java. Supports Java 8 and Java 11.
 
 ## Maven
 
@@ -51,10 +51,10 @@ This sends the following transitive dependencies:
 
 ## Overview
 
-Some of the utilties in this project include:
+Some of the utilities in this project include:
 - `Config`, `YAMLConfig`, and `EnvironmentTree`: Powerful configuration that supports a configuration bean via YAML (or any other supported Jackson format) with environment (environment variable and/or system property) overrides.
 - `DaemonWorker`: An easy to use wrapper around a daemon thread and a blocking queue for multithreaded, queueable tasks.
-- `@Documentation`: Annotation to faciliate code generation and documentation of system components that can be reflected at runtime
+- `@Documentation`: Annotation to facilitate code generation and documentation of system components that can be reflected at runtime
 - `NumberExtractor` and `DateExtractor`: General-purpose/robust number and date parser/extractor that uses all localized formats available to the JVM to extract values from text.
 - `IteratorCloseable`, `IteratorMultithreaded`, and `IteratorWithSize`: Variants on the standard `Iterator` pattern offering deterministic progress, closeability, and parallelism.
 - `LambdaUtils`: Utilities for using Java 8 lambdas
