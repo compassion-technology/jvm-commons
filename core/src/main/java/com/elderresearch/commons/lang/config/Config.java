@@ -74,11 +74,10 @@ public interface Config {
 			Path p = Paths.get(jar.toURI());
 			p = Files.isDirectory(p) ? p : p.getParent();
 			return toStream.apply(p.resolve(path));
-		} catch (NoSuchFileException e) {
-			// This is an expected situation when the user wants to use only defaults
-			return null;
 		} catch (URISyntaxException | SecurityException | IOException e) {
-			log.warn("Error locating executable; using current directory instead", e);
+			if(!(e instanceof NoSuchFileException)) {
+				log.warn("Error locating executable; using current directory instead", e);
+			}
 			return resolveCurrentDir(log, path, toStream);
 		}
 	}
