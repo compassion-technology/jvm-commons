@@ -122,7 +122,7 @@ public class DaemonWorker<T> implements Runnable {
 	public void run() {
 		if (beforeWork != null) { beforeWork.run(); }
 		
-		val batch = new ArrayList<T>(maxBatchSize);
+		List<T> batch = new ArrayList<>(maxBatchSize);
 		while (running || !queue.isEmpty() || anyRunningUpstreamWorkers()) {
 			if (Utilities.pollBatch(queue, 1L, TimeUnit.SECONDS, batch, maxBatchSize)) {
 				process(batch);
@@ -150,10 +150,11 @@ public class DaemonWorker<T> implements Runnable {
 	 * until {@link #shutdown()} or {@link #shutdownAndWait()} are called.
 	 * @param obj the object to enqueue
 	 */
-	public void enqueue(T obj) {
+	public boolean enqueue(T obj) {
 		while (running) {
-			if (Utilities.offer(queue, obj, WAIT_TIME_MS, TimeUnit.MILLISECONDS)) { return; }
+			if (Utilities.offer(queue, obj, WAIT_TIME_MS, TimeUnit.MILLISECONDS)) { return true; }
 		}
+		return false;
 	}
 	
 	/**
