@@ -152,7 +152,7 @@ public class CalendarUtils {
 		if (fieldMap == null) {
 			fieldMap = new HashMap<>();
 			for (Field f : FieldUtils.getAllFields(Calendar.class)) {
-				if (int.class.equals(f.getType()) && Modifier.isStatic(f.getModifiers())) {
+				if (int.class.equals(f.getType()) && Modifier.isPublic(f.getModifiers()) && Modifier.isStatic(f.getModifiers())) {
 					try {
 						fieldMap.put(f.getName(), f.getInt(null));
 					} catch (IllegalArgumentException | IllegalAccessException e) {
