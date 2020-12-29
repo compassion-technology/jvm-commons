@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -536,6 +538,47 @@ public final class Utilities {
 		t.setDaemon(true);
 		t.start();
 		return t;
+	}
+	
+	/**
+	 * Shutdown an executor service and wait for it to terminate, first gracefully (waiting 10 seconds for normal
+	 * termination) and then forcefully (waiting 1 second before returning). 
+	 * @param exec the executor to shutdown
+	 * @return any pending tasks on the executor that never started because of a forceful shutdown. This
+	 * is an empty list if shutdown was normal and the executor terminated. It may be {@code null} if the caller
+	 * was interrupted while waiting for termination.
+	 * @see #shutdown(ExecutorService, long, long)
+	 */
+	public List<Runnable> shutdown(ExecutorService exec) {
+		return shutdown(exec, 10L, 1L);
+	}
+	
+	/**
+	 * Shutdown an executor service and wait for it to terminate, first gracefully and then forcefully. 
+	 * @param exec the executor to shutdown
+	 * @param gracefulWaitSec how many seconds to wait after a graceful shutdown to wait for termination
+	 * before attempting a forceful shutdown
+	 * @param forcedWaitSec how many seconds to wait after a forceful shutdown to wait for termination
+	 * before returning and logging a warning
+	 * @return any pending tasks on the executor that never started because of a forceful shutdown. This
+	 * is an empty list if shutdown was normal and the executor terminated. It may be {@code null} if the caller
+	 * was interrupted while waiting for termination.
+	 */
+	public List<Runnable> shutdown(ExecutorService exec, long gracefulWaitSec, long forcedWaitSec) {
+		exec.shutdown();
+		try {
+			if (!exec.awaitTermination(gracefulWaitSec, TimeUnit.SECONDS)) {
+				val ret = exec.shutdownNow();
+				if (!exec.awaitTermination(forcedWaitSec, TimeUnit.SECONDS)) {
+					log.warn("Executor did not shut down correctly");
+				}
+				return ret;
+			}
+			return Collections.emptyList();
+		} catch (InterruptedException e) {
+			log.warn("Executor was interrupted while waiting to shut down", e);
+			return null;
+		}
 	}
 	
 	/**
