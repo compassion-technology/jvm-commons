@@ -63,7 +63,6 @@ public abstract class IteratorMultithreaded<T> {
 		return this;
 	}
 	
-	
 	/**
 	 * Sets the priority for the worker threads. Priorities are specified by the
 	 * constants in the {@link Thread} class.
@@ -98,7 +97,6 @@ public abstract class IteratorMultithreaded<T> {
 		Interruptable.run(liveThreads::await, "waiting for iterator worker threads");
 	}
 	
-
 	/**
 	 * Called before each object is enqueued.
 	 * @param object the next object from the iterator

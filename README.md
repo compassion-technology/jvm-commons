@@ -24,7 +24,7 @@ And then the following dependency:
 <dependency>
 	<groupId>com.elderresearch.commons-jvm</groupId>
 	<artifactId>commons-jvm</artifactId>
-	<version>2.4.6</version>
+	<version>2.5.0</version>
 </dependency>
 ```
 
@@ -34,7 +34,7 @@ for Java 11+ or
 <dependency>
 	<groupId>com.elderresearch.commons-jvm</groupId>
 	<artifactId>commons-jvm-java8</artifactId>
-	<version>2.4.6</version>
+	<version>2.5.0</version>
 </dependency>
 ```
 
