@@ -200,25 +200,25 @@ public class StatusMonitor {
 	 * Convenience method that sets the size to an indeterminate size, sets the
 	 * status to {@code status}, and changes the state to {@link TaskState#RUNNING}
 	 * in an atomic operation.
-	 * @param status the new task status
+	 * @param task the new task status
 	 * @param args the format arguments passed to
 	 * {@link String#format(String, Object...)}
 	 * @return this for method chaining
 	 */
-	public StatusMonitor newTask(String status, Object... args) {
-		return begin().newTask().setSize(INDETERMINATE).setStatus(status, args).end();
+	public StatusMonitor newTask(String task, Object... args) {
+		return begin().newTask().setSize(INDETERMINATE).setStatus(task, args).end();
 	}
 	
 	/**
 	 * Convenience method that sets the size of the new task, resets the progress
 	 * to {@code 0L}, sets the status to {@code status}, and changes the state
 	 * to {@link TaskState#RUNNING} in an atomic operation.
-	 * @param status the new task status
-	 * @param size the new task's size
+	 * @param task the new task status
+	 * @param taskSize the new task's size
 	 * @return this for method chaining
 	 */
-	public StatusMonitor newTask(String status, long size) {
-		return begin().newTask().setSize(size).setProgress(0L, false).setStatus(status).end();
+	public StatusMonitor newTask(String task, long taskSize) {
+		return begin().newTask().setSize(taskSize).setProgress(0L, false).setStatus(task).end();
 	}
 	
 	private StatusMonitor newTask() {

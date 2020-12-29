@@ -18,7 +18,7 @@ import org.apache.commons.lang3.StringUtils;
  * assert !sm.test("Ji");</pre>
  * or by setting the test string and repeatedly setting the basis:<pre>
  * val sm = new StringMatcher(StringMatchStrat.STARTS_WITH);
-7 * sm.test("Jo");
+ * sm.test("Jo");
  * assert sm.matchAny("John", "Jill");
  * assert !sm.matchAll("John", "Jill");</pre>
  * This class is <b>not</b> thread-safe and any changes to the settings (like {@link #ignoreCase()} or
@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author <a href="dimeo@datamininglab.com">John Dimeo</a>
  * @since Sep 13, 2013
  */
+@SuppressWarnings("hiding")
 public class StringMatcher {
 	/** Enumerated wrapper to the String comparison methods in {@link StringUtils}. */
 	public enum StringMatchStrat {
