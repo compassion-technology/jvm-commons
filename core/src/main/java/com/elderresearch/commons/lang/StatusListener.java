@@ -41,7 +41,7 @@ public interface StatusListener {
 		
 		@Override
 		public void statusChanged(StatusMonitor sm) {
-			if (sm.getSize() < 0L) {
+			if (sm.getSize() < 1L) {
 				if (sm.getProgress() > 0L) {
 					printer.accept(String.format("[%-9s] %6s %s",
 						sm.getState(),
