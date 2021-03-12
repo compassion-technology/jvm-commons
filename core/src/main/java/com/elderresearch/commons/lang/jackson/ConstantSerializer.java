@@ -1,5 +1,6 @@
 package com.elderresearch.commons.lang.jackson;
 
+import com.elderresearch.commons.lang.jackson.ConstantSerializer.PasswordSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializerBase;
 
@@ -26,5 +27,10 @@ public class ConstantSerializer extends ToStringSerializerBase {
 	
 	public static class PasswordSerializer extends ConstantSerializer {
 		public PasswordSerializer() { super(Object.class, "******"); }
+	}
+	
+	interface PasswordMixin {
+		@JsonSerialize(using = PasswordSerializer.class)
+		public String getPassword();
 	}
 }
