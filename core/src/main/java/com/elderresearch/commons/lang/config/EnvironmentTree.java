@@ -31,6 +31,14 @@ public class EnvironmentTree {
 		boolean has(String path);
 		String get(String path);
 		
+		default CaseFormat pathFormat() {
+			return CaseFormat.LOWER_UNDERSCORE;
+		}
+		
+		default char pathSeparator() {
+			return JsonPointer.SEPARATOR;
+		}
+		
 		@Override
 		default void close() throws IOException {
 			// Nothing to close by default
@@ -49,6 +57,9 @@ public class EnvironmentTree {
 	        }
 	        return this;
 		}
+		
+		@Override
+		public char pathSeparator() { return '_'; }
 	}
 
 	private final String prefix;
@@ -92,10 +103,9 @@ public class EnvironmentTree {
 			if (fn == null) { continue; }
 			
 			val path = trav.getParsingContext().pathAsPointer();
-			val key = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE,
-					path.toString().replace(JsonPointer.SEPARATOR, '_'));
-			
 			for (val env : environments) {
+				val key = CaseFormat.LOWER_CAMEL.to(env.pathFormat(),
+						path.toString().replace(JsonPointer.SEPARATOR, env.pathSeparator()));
 				if (env.has(key)) {
 					ObjectNode n = Utilities.cast(tree.at(path));
 					n.put(last(path), env.get(key));
