@@ -3,6 +3,8 @@ package com.elderresearch.commons.lang.config;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,59 +28,57 @@ import lombok.val;
  */
 public class EnvironmentTree {
 	public interface Environment {
-		boolean isEmpty();
-		void put(String path, String value);
 		boolean has(String path);
 		String get(String path);
 	}
-	
-	public static class EnvironmentMap implements Environment {
+
+	public class EnvironmentMap implements Environment {
 		private Map<String, String> map = new HashMap<>();
 		
-		@Override public boolean isEmpty() { return map.isEmpty(); }
 		@Override public boolean has(String path) { return map.containsKey(path); }
 		@Override public String get(String path) { return map.get(path); }
-		@Override public void put(String path, String value) { map.put(path, value); }
+		
+		public EnvironmentMap put(String path, String value) {
+	        if (StringUtils.startsWithIgnoreCase(path, prefix)) {
+	        	map.put(normalizePath(path), value);
+	        }
+	        return this;
+		}
 	}
 
 	private final String prefix;
-	private Environment environment;
+	private List<Environment> environments;
 	
 	protected EnvironmentTree(String prefix) {
 		this.prefix = StringUtils.lowerCase(prefix);
-		this.environment = new EnvironmentMap();
+		this.environments = new LinkedList<>();
 	}
 	
 	public static EnvironmentTree forPrefix(String prefix) {
 		return new EnvironmentTree(prefix);
 	}
 	
-	public EnvironmentTree withImpl(Environment e) {
-		this.environment = e;
+	public EnvironmentTree with(Environment e) {
+		this.environments.add(e);
 		return this;
 	}
 
-	public EnvironmentTree addEnvironmentVariables() {
-		System.getenv().forEach(this::add);
-		return this;
+	public EnvironmentTree withEnvironmentVariables() {
+		val e = new EnvironmentMap();
+		System.getenv().forEach(e::put);
+		return with(e);
 	}
 	
-	public EnvironmentTree addSystemProperties() {
-		System.getProperties().forEach((k, v) -> add(k.toString(), v.toString()));
-		return this;
-	}
-	
-	public void add(String path, String value) {
-		if (StringUtils.startsWithIgnoreCase(path, prefix)) {
-			val srcFmt = StringUtils.isAllUpperCase(StringUtils.replaceChars(path, "_- .", null))
-				? CaseFormat.UPPER_UNDERSCORE : CaseFormat.LOWER_CAMEL;
-			path = StringUtils.replaceChars(srcFmt.to(CaseFormat.LOWER_UNDERSCORE, path), "-.", "__");
-			environment.put(StringUtils.removeStart(path, prefix), value);
-		}
+	public EnvironmentTree withSystemProperties() {
+		val e = new EnvironmentMap();
+		System.getProperties().forEach((k, v) -> e.put(k.toString(), v.toString()));
+		return with(e);
 	}
 	
 	public <T> void applyOverrides(ObjectMapper om, T obj) throws IOException {
-		if (environment.isEmpty()) { addEnvironmentVariables().addSystemProperties(); }
+		if (environments.isEmpty()) {
+			withEnvironmentVariables().withSystemProperties();
+		}
 		
 		val tree = om.valueToTree(obj);
 		val trav = tree.traverse();
@@ -89,9 +89,12 @@ public class EnvironmentTree {
 			val path = trav.getParsingContext().pathAsPointer();
 			val key = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE,
 					path.toString().replace(JsonPointer.SEPARATOR, '_'));
-			if (environment.has(key)) {
-				ObjectNode n = Utilities.cast(tree.at(path));
-				n.put(last(path), environment.get(key));
+			
+			for (val env : environments) {
+				if (env.has(key)) {
+					ObjectNode n = Utilities.cast(tree.at(path));
+					n.put(last(path), env.get(key));
+				}	
 			}
 		}
 		
@@ -102,5 +105,12 @@ public class EnvironmentTree {
 		// p.last() is throwing an NPE :-/
 		int i = p.toString().lastIndexOf(JsonPointer.SEPARATOR);
 		return p.toString().substring(i + 1);
+	}
+	
+	public String normalizePath(String path) {
+		val srcFmt = StringUtils.isAllUpperCase(StringUtils.replaceChars(path, "_- .", null))
+			? CaseFormat.UPPER_UNDERSCORE : CaseFormat.LOWER_CAMEL;
+		path = StringUtils.replaceChars(srcFmt.to(CaseFormat.LOWER_UNDERSCORE, path), "-.", "__");
+		return StringUtils.removeStart(path, prefix);
 	}
 }
