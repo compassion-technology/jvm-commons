@@ -27,9 +27,14 @@ import lombok.val;
  * @since Jun 13, 2020
  */
 public class EnvironmentTree {
-	public interface Environment {
+	public interface Environment extends AutoCloseable {
 		boolean has(String path);
 		String get(String path);
+		
+		@Override
+		default void close() throws IOException {
+			// Nothing to close by default
+		}
 	}
 
 	public class EnvironmentMap implements Environment {
@@ -99,6 +104,8 @@ public class EnvironmentTree {
 		}
 		
 		om.readerForUpdating(obj).readValue(tree);
+		
+		for (val env : environments) { env.close(); }
 	}
 	
 	private static String last(JsonPointer p) {
