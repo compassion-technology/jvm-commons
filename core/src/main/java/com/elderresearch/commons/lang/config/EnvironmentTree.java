@@ -25,16 +25,37 @@ import lombok.val;
  * @since Jun 13, 2020
  */
 public class EnvironmentTree {
+	public interface Environment {
+		boolean isEmpty();
+		void put(String path, String value);
+		boolean has(String path);
+		String get(String path);
+	}
+	
+	public static class EnvironmentMap implements Environment {
+		private Map<String, String> map = new HashMap<>();
+		
+		@Override public boolean isEmpty() { return map.isEmpty(); }
+		@Override public boolean has(String path) { return map.containsKey(path); }
+		@Override public String get(String path) { return map.get(path); }
+		@Override public void put(String path, String value) { map.put(path, value); }
+	}
+
 	private final String prefix;
-	private Map<String, String> environment;
+	private Environment environment;
 	
 	protected EnvironmentTree(String prefix) {
 		this.prefix = StringUtils.lowerCase(prefix);
-		this.environment = new HashMap<>();
+		this.environment = new EnvironmentMap();
 	}
 	
 	public static EnvironmentTree forPrefix(String prefix) {
 		return new EnvironmentTree(prefix);
+	}
+	
+	public EnvironmentTree withImpl(Environment e) {
+		this.environment = e;
+		return this;
 	}
 
 	public EnvironmentTree addEnvironmentVariables() {
@@ -47,7 +68,7 @@ public class EnvironmentTree {
 		return this;
 	}
 	
-	private void add(String path, String value) {
+	public void add(String path, String value) {
 		if (StringUtils.startsWithIgnoreCase(path, prefix)) {
 			val srcFmt = StringUtils.isAllUpperCase(StringUtils.replaceChars(path, "_- .", null))
 				? CaseFormat.UPPER_UNDERSCORE : CaseFormat.LOWER_CAMEL;
@@ -57,6 +78,8 @@ public class EnvironmentTree {
 	}
 	
 	public <T> void applyOverrides(ObjectMapper om, T obj) throws IOException {
+		if (environment.isEmpty()) { addEnvironmentVariables().addSystemProperties(); }
+		
 		val tree = om.valueToTree(obj);
 		val trav = tree.traverse();
 		while (!trav.isClosed()) {
@@ -66,7 +89,7 @@ public class EnvironmentTree {
 			val path = trav.getParsingContext().pathAsPointer();
 			val key = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE,
 					path.toString().replace(JsonPointer.SEPARATOR, '_'));
-			if (environment.containsKey(key)) {
+			if (environment.has(key)) {
 				ObjectNode n = Utilities.cast(tree.at(path));
 				n.put(last(path), environment.get(key));
 			}
