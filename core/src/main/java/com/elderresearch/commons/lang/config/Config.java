@@ -89,7 +89,7 @@ public interface Config {
 	 * @param log the logger to use to log any errors/warnings
 	 * @param om the object mapper to use (usually a YAML mapper via {@link YAMLUtils#newMapper()})
 	 * @param stream the stream to load (can be {@code null})
-	 * @see #load(Logger, ObjectMapper, Config, String, boolean, String...)
+	 * @see #load(Logger, ObjectMapper, Config, EnvironmentTree, boolean, String...)
 	 * @see #resolveCodeDir(Logger, String, IOFunction)
 	 * @see #resolveCurrentDir(Logger, String, IOFunction)
 	 */
@@ -150,9 +150,10 @@ public interface Config {
 	 * @param log the logger to use to log any errors/warnings
 	 * @param om the object mapper to use (usually a YAML mapper via {@link YAMLUtils#newMapper()})
 	 * @param conf the blank/initial configuration object
-	 * @param envPrefix the prefix for environment variables and system properties that should override
-	 * configuration values (if this is {@code null}, the environment will not be checked). System properties
-	 * take precedent over environment variables.
+	 * @param env the environment values that should override the config, including environment variables and system
+	 * properties that should override the defaults and configuration loaded from the file (can be {@code null}). If
+	 * no environment values have been added to the specified tree, environment variables and system properties matching
+	 * the prefix will be automatically loaded (with system properties taking precedence).
      * @param logConfig whether or not to log the configuration tree after all loading/merging has occurred and
      * environment overrides have been applied
 	 * @param paths zero or more paths (<em>relative to the executing code</em>, not the current directory)
@@ -160,13 +161,12 @@ public interface Config {
 	 * @return the configuration object {@code defConfig} after it has been loaded
 	 * @see #resolveCodeDir(Logger, String, IOFunction)
 	 */
-	static <C extends Config> C load(Logger log, ObjectMapper om, C conf, String envPrefix, boolean logConfig, String... paths) {
+	static <C extends Config> C load(Logger log, ObjectMapper om, C conf, EnvironmentTree env, boolean logConfig, String... paths) {
 		for (val path : paths) {
 			conf.merge(log, om, conf.resolveCodeDir(log, path, Files::newInputStream));
 		}
 		
-		if (envPrefix != null) {
-			val env = EnvironmentTree.forPrefix(envPrefix).addEnvironmentVariables().addSystemProperties();
+		if (env != null) {
 			try {
 				env.applyOverrides(om, conf);
 			} catch (IOException e) {

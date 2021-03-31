@@ -17,17 +17,18 @@ public class YAMLConfig implements Config {
 	
 	/**
 	 * Load configuration from the environment and optionally YAML files.
-	 * @param envPrefix the prefix for environment variables and system properties that should override
-	 * configuration values (if this is {@code null}, the environment will not be checked). System properties
-	 * take precedent over environment variables.
+	 * @param env the environment values that should override the config, including environment variables and system
+	 * properties that should override the defaults and configuration loaded from the file (can be {@code null}). If
+	 * no environment values have been added to the specified tree, environment variables and system properties matching
+	 * the prefix will be automatically loaded (with system properties taking precedence).
      * @param logConfig whether or not to log the configuration tree after all loading/merging has occurred and
      * environment overrides have been applied
 	 * @param paths zero or more paths (<em>relative to the executing code</em>, not the current directory)
 	 * specifying files to load
-	 * @see Config#load(org.apache.logging.log4j.Logger, ObjectMapper, Config, String, boolean, String...)
+	 * @see Config#load(org.apache.logging.log4j.Logger, ObjectMapper, Config, EnvironmentTree, boolean, String...)
 	 */
-	public void load(String envPrefix, boolean logConfig, String... paths) {
-		Config.load(log, mapper, this, envPrefix, logConfig, paths);
+	public void load(EnvironmentTree env, boolean logConfig, String... paths) {
+		Config.load(log, mapper, this, env, logConfig, paths);
 	}
 	
     /**
