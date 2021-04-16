@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.elderresearch.commons.lang.LambdaUtils.IOFunction;
@@ -112,24 +113,22 @@ public interface Config {
 	
 	/**
 	 * Subclasses can do post-processing here after a configuration is initialized, like decrypting sensitive data.
-	 * @param log the logger to use to log any errors/warnings
 	 * @param om the object mapper to use (usually a YAML mapper via {@link YAMLUtils#newMapper()})
-	 * @param logConfig whether or not to log the configuration tree
 	 */
-	default void postProcess(Logger log, ObjectMapper om, boolean logConfig) {
-		if (logConfig) {
-			try {
-				log.info("Configuration:{}{}", System.lineSeparator(),
-					om.writerWithDefaultPrettyPrinter().writeValueAsString(this));
-			} catch (IOException e) {
-				log.warn("Couldn't print configuration", e);
-			}
-		}
-		
+	default Config postProcess(ObjectMapper om) {
 		// Now post process any children
-		forEachChild($ -> $.postProcess(log, om, false));
+		forEachChild($ -> $.postProcess(om));
+		return this;
 	}
-	
+	default void logConfig(ObjectMapper om) {
+        val log = LogManager.getLogger(getClass());
+        try {
+            log.info("Configuration:{}{}", System.lineSeparator(),
+                    om.writerWithDefaultPrettyPrinter().writeValueAsString(this));
+        } catch (IOException e) {
+            log.warn("Couldn't print configuration", e);
+        }
+    }
 	/**
 	 * Saves this configuration to the specified output stream.
 	 * @param log the logger to use to log any errors/warnings
@@ -173,8 +172,7 @@ public interface Config {
 				log.warn("Error applying environment overrides", e);
 			}
 		}
-
-		conf.postProcess(log, om, logConfig);
+		conf.postProcess(om);
 		return conf;
 	}
 }

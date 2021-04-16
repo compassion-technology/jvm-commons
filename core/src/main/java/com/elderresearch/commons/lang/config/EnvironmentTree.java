@@ -95,26 +95,28 @@ public class EnvironmentTree {
 		if (environments.isEmpty()) {
 			withEnvironmentVariables().withSystemProperties();
 		}
+
+		for (val env : environments) {
+            val tree = om.valueToTree(obj);
+            val trav = tree.traverse();
+            while (!trav.isClosed()) {
+                val fn = trav.nextFieldName();
+                if (fn == null) {
+                    continue;
+                }
+
+                val path = trav.getParsingContext().pathAsPointer();
+                val key = CaseFormat.LOWER_CAMEL.to(env.pathFormat(),
+                        path.toString().replace(JsonPointer.SEPARATOR, env.pathSeparator()));
+                if (env.has(key)) {
+                    ObjectNode n = Utilities.cast(tree.at(path));
+                    n.put(last(path), env.get(key));
+                }
+            }
+            om.readerForUpdating(obj).readValue(tree);
+        }
 		
-		val tree = om.valueToTree(obj);
-		val trav = tree.traverse();
-		while (!trav.isClosed()) {
-			val fn = trav.nextFieldName();
-			if (fn == null) { continue; }
-			
-			val path = trav.getParsingContext().pathAsPointer();
-			for (val env : environments) {
-				val key = CaseFormat.LOWER_CAMEL.to(env.pathFormat(),
-						path.toString().replace(JsonPointer.SEPARATOR, env.pathSeparator()));
-				if (env.has(key)) {
-					ObjectNode n = Utilities.cast(tree.at(path));
-					n.put(last(path), env.get(key));
-				}	
-			}
-		}
-		
-		om.readerForUpdating(obj).readValue(tree);
-		
+
 		for (val env : environments) { env.close(); }
 	}
 	
