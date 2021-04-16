@@ -28,7 +28,7 @@ public class ConstantSerializer extends ToStringSerializerBase {
 		public PasswordSerializer() { super(Object.class, "******"); }
 	}
 	
-	interface PasswordMixin {
+	public interface PasswordMixin {
 		@JsonSerialize(using = PasswordSerializer.class)
 		public String getPassword();
 	}

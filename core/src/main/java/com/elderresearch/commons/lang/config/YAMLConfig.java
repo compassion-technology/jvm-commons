@@ -27,8 +27,8 @@ public class YAMLConfig implements Config {
 	 * specifying files to load
 	 * @see Config#load(org.apache.logging.log4j.Logger, ObjectMapper, Config, EnvironmentTree, boolean, String...)
 	 */
-	public void load(EnvironmentTree env, boolean logConfig, String... paths) {
-		Config.load(log, mapper, this, env, logConfig, paths);
+	public Config load(EnvironmentTree env, boolean logConfig, String... paths) {
+		return Config.load(log, mapper, this, env, logConfig, paths);
 	}
 	
     /**
