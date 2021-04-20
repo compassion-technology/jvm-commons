@@ -90,7 +90,7 @@ public interface Config {
 	 * @param log the logger to use to log any errors/warnings
 	 * @param om the object mapper to use (usually a YAML mapper via {@link YAMLUtils#newMapper()})
 	 * @param stream the stream to load (can be {@code null})
-	 * @see #load(Logger, ObjectMapper, Config, EnvironmentTree, boolean, String...)
+	 * @see #load(Logger, ObjectMapper, Config, EnvironmentTree, String...)
 	 * @see #resolveCodeDir(Logger, String, IOFunction)
 	 * @see #resolveCurrentDir(Logger, String, IOFunction)
 	 */
@@ -120,6 +120,10 @@ public interface Config {
 		forEachChild($ -> $.postProcess(om));
 		return this;
 	}
+
+    /**
+     * @param om the object mapper with custom mixins to affect only the log
+     */
 	default void logConfig(ObjectMapper om) {
         val log = LogManager.getLogger(getClass());
         try {
@@ -129,6 +133,7 @@ public interface Config {
             log.warn("Couldn't print configuration", e);
         }
     }
+
 	/**
 	 * Saves this configuration to the specified output stream.
 	 * @param log the logger to use to log any errors/warnings
@@ -153,14 +158,12 @@ public interface Config {
 	 * properties that should override the defaults and configuration loaded from the file (can be {@code null}). If
 	 * no environment values have been added to the specified tree, environment variables and system properties matching
 	 * the prefix will be automatically loaded (with system properties taking precedence).
-     * @param logConfig whether or not to log the configuration tree after all loading/merging has occurred and
-     * environment overrides have been applied
-	 * @param paths zero or more paths (<em>relative to the executing code</em>, not the current directory)
+     * @param paths zero or more paths (<em>relative to the executing code</em>, not the current directory)
 	 * specifying files to load
 	 * @return the configuration object {@code defConfig} after it has been loaded
 	 * @see #resolveCodeDir(Logger, String, IOFunction)
 	 */
-	static <C extends Config> C load(Logger log, ObjectMapper om, C conf, EnvironmentTree env, boolean logConfig, String... paths) {
+	static <C extends Config> C load(Logger log, ObjectMapper om, C conf, EnvironmentTree env, String... paths) {
 		for (val path : paths) {
 			conf.merge(log, om, conf.resolveCodeDir(log, path, Files::newInputStream));
 		}

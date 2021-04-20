@@ -90,7 +90,15 @@ public class EnvironmentTree {
 		System.getProperties().forEach((k, v) -> e.put(k.toString(), v.toString()));
 		return with(e);
 	}
-	
+
+    /**
+     * Override a config object (usually) in the order that they've been added using {@link #with(Environment)},
+     * {@link #withEnvironmentVariables()}, or {@link #withSystemProperties()}. this allows you to access overridden
+     * properties from previous environments specified with {@link #with(Environment)}.
+     * @param om the ObjectMapper that reads from the environments
+     * @param obj the POJO object that we will override
+     * @throws IOException
+     */
 	public <T> void applyOverrides(ObjectMapper om, T obj) throws IOException {
 		if (environments.isEmpty()) {
 			withEnvironmentVariables().withSystemProperties();
