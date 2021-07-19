@@ -135,7 +135,7 @@ public class EnvironmentTree {
 	}
 	
 	public String normalizePath(String path) {
-		val srcFmt = StringUtils.isAllUpperCase(StringUtils.replaceChars(path, "_- .", null))
+		val srcFmt = StringUtils.isAllUpperCase(StringUtils.replaceChars(path, "_- .1234567890", null))
 			? CaseFormat.UPPER_UNDERSCORE : CaseFormat.LOWER_CAMEL;
 		path = StringUtils.replaceChars(srcFmt.to(CaseFormat.LOWER_UNDERSCORE, path), "-.", "__");
 		return StringUtils.removeStart(path, prefix);
