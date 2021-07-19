@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
-public class CoolConfigTest {
+public class ConfigTest {
 
     @Test
     @SetEnvironmentVariable(key = "TESTPREFIX_X3_Y3", value = "test")
