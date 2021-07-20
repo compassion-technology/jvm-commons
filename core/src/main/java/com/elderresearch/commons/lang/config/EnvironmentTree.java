@@ -135,9 +135,17 @@ public class EnvironmentTree {
 	}
 	
 	public String normalizePath(String path) {
-		val srcFmt = StringUtils.isAllUpperCase(StringUtils.replaceChars(path, "_- .1234567890", null))
-			? CaseFormat.UPPER_UNDERSCORE : CaseFormat.LOWER_CAMEL;
+		val srcFmt = isAnyLetterLowerCase(path) ? CaseFormat.LOWER_CAMEL : CaseFormat.UPPER_UNDERSCORE;
 		path = StringUtils.replaceChars(srcFmt.to(CaseFormat.LOWER_UNDERSCORE, path), "-.", "__");
 		return StringUtils.removeStart(path, prefix);
 	}
+
+	private static boolean isAnyLetterLowerCase(String str) {
+        for (char c : str.toCharArray()) {
+            if (Character.isLetter(c) && Character.isLowerCase(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
