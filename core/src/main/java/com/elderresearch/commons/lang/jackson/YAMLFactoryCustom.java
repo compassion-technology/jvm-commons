@@ -34,7 +34,7 @@ class YAMLFactoryCustom extends YAMLFactory {
 	
 	private class YAMLGeneratorCustom extends YAMLGenerator {
 		YAMLGeneratorCustom(IOContext ctxt, int jsonFeatures, int yamlFeatures, ObjectCodec codec, Writer out, Version version) throws IOException {
-			super(ctxt, jsonFeatures, yamlFeatures, codec, out, version);
+			super(ctxt, jsonFeatures, yamlFeatures, null, codec, out, version);
 		}
 		
 		@Override

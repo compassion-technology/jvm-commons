@@ -114,7 +114,7 @@ public class EnvironmentTree {
                 }
 
                 val path = trav.getParsingContext().pathAsPointer();
-                val key = CaseFormat.LOWER_CAMEL.to(env.pathFormat(),
+                val key = prefix + CaseFormat.LOWER_CAMEL.to(env.pathFormat(),
                         path.toString().replace(JsonPointer.SEPARATOR, env.pathSeparator()));
                 if (env.has(key)) {
                     ObjectNode n = Utilities.cast(tree.at(path));
@@ -124,7 +124,6 @@ public class EnvironmentTree {
             om.readerForUpdating(obj).readValue(tree);
         }
 		
-
 		for (val env : environments) { env.close(); }
 	}
 	
@@ -135,17 +134,7 @@ public class EnvironmentTree {
 	}
 	
 	public String normalizePath(String path) {
-		val srcFmt = isAnyLetterLowerCase(path) ? CaseFormat.LOWER_CAMEL : CaseFormat.UPPER_UNDERSCORE;
-		path = StringUtils.replaceChars(srcFmt.to(CaseFormat.LOWER_UNDERSCORE, path), "-.", "__");
-		return StringUtils.removeStart(path, prefix);
+		val srcFmt = path.chars().anyMatch(Character::isLowerCase)? CaseFormat.LOWER_CAMEL : CaseFormat.UPPER_UNDERSCORE;
+		return StringUtils.replaceChars(srcFmt.to(CaseFormat.LOWER_UNDERSCORE, path), "-.", "__");
 	}
-
-	private static boolean isAnyLetterLowerCase(String str) {
-        for (char c : str.toCharArray()) {
-            if (Character.isLetter(c) && Character.isLowerCase(c)) {
-                return true;
-            }
-        }
-        return false;
-    }
 }
