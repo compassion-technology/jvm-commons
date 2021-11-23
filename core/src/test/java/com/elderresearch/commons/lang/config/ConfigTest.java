@@ -1,6 +1,5 @@
-package com.elderresearch.commons.lang;
+package com.elderresearch.commons.lang.config;
 
-import com.elderresearch.commons.lang.config.TestConfig;
 import lombok.val;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
