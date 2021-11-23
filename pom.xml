@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.elderresearch.maven-parent</groupId>
 		<artifactId>maven-parent</artifactId>
-		<version>6.1.1</version>
+		<version>6.1.3</version>
 	</parent>
 
 	<groupId>com.elderresearch</groupId>
