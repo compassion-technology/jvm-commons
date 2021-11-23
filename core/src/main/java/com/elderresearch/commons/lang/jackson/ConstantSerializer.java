@@ -23,13 +23,4 @@ public class ConstantSerializer extends ToStringSerializerBase {
 	public String valueToString(Object value) {
 		return constant;
 	}
-	
-	public static class PasswordSerializer extends ConstantSerializer {
-		public PasswordSerializer() { super(Object.class, "******"); }
-	}
-	
-	public interface PasswordMixin {
-		@JsonSerialize(using = PasswordSerializer.class)
-		public String getPassword();
-	}
 }
