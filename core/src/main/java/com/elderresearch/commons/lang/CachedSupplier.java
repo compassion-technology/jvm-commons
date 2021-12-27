@@ -76,10 +76,10 @@ public class CachedSupplier<T> implements Supplier<T> {
     }
     
     /**
-     * check to see if cache has been performed (without actually
+     * check to see if cache has been performed (without actually triggering the calculation)
      */
     public boolean isCached() {
-    	return cached;
+    	return cached && getResultType() == ResultType.COMPLETED;
     }
     
     public void ifCached(Consumer<T> consumer) {
@@ -122,9 +122,17 @@ public class CachedSupplier<T> implements Supplier<T> {
     @AllArgsConstructor(staticName = "of")
     public static class Result<T> {
         private static final Result<?> FAILED = of(ResultType.FAILED, Optional.empty(), null, Collections.emptyList());
+
+        public static <T> Result<T> completed(Optional<T> result) {
+        	return of(ResultType.COMPLETED, result, null, Collections.emptyList());
+        }
+        
+        public static <T> Result<T> completed() {
+        	return completed(Optional.empty());
+        }
         
         public static <T> Result<T> completed(T result) {
-            return of(ResultType.COMPLETED, Optional.of(result), null, Collections.emptyList());
+        	return completed(Optional.ofNullable(result));
         }
         
         public static <T> Result<T> completed(T result, Collection<String> issues) {
@@ -143,6 +151,7 @@ public class CachedSupplier<T> implements Supplier<T> {
             return inProgress(null);
         }
         
+        // NOTE: make sure if an Optional<T> version of this is added, update inProgress() above
         public static <T> Result<T> inProgress(T intermediary) {
             return of(ResultType.IN_PROGRESS, Optional.ofNullable(intermediary), null, Collections.emptyList());
         }
