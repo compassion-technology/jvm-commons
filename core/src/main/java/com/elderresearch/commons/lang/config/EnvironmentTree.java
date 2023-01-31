@@ -120,7 +120,7 @@ public class EnvironmentTree {
                 	val node = tree.at(path.head());
                 	if (node instanceof ObjectNode) {
                 		ObjectNode on = Utilities.cast(node);
-                        on.put(path.getMatchingProperty(), env.get(key));	
+                        on.put(last(path), env.get(key));	
                 	}
                 }
             }
@@ -129,6 +129,13 @@ public class EnvironmentTree {
 		
 		for (val env : environments) { env.close(); }
 	}
+	
+	private static String last(JsonPointer p) {
+		// p.last() throws NPE or ConcurrentException or is wrong
+		int i = p.toString().lastIndexOf(JsonPointer.SEPARATOR);
+		return p.toString().substring(i + 1);
+	}
+			
 	
 	public String normalizePath(String path) {
 		val srcFmt = path.chars().anyMatch(Character::isLowerCase)? CaseFormat.LOWER_CAMEL : CaseFormat.UPPER_UNDERSCORE;

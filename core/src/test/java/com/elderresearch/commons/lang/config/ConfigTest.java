@@ -11,13 +11,13 @@ public class ConfigTest {
     @SetEnvironmentVariable(key = "TESTPREFIX_X3_Y3", value = "test")
     public void testUpperCaseWithUnderscore() {
         val conf = new TestConfig().load();
-        Assertions.assertEquals(conf.getX3().getY3(), "test");
+        Assertions.assertEquals("test", conf.getX3().getY3());
     }
 
     @Test
     @SetEnvironmentVariable(key = "testprefixX3Y3", value = "test")
     public void testCamelCase() {
         val conf = new TestConfig().load();
-        Assertions.assertEquals(conf.getX3().getY3(), "test");
+        Assertions.assertEquals("test", conf.getX3().getY3());
     }
 }
