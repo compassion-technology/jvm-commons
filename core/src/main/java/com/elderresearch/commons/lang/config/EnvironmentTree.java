@@ -14,7 +14,6 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.base.CaseFormat;
 
 import lombok.val;
@@ -118,8 +117,11 @@ public class EnvironmentTree {
                 val key = prefix + CaseFormat.LOWER_CAMEL.to(env.pathFormat(),
                         path.toString().replace(JsonPointer.SEPARATOR, env.pathSeparator()));
                 if (env.has(key)) {
-                    ObjectNode n = Utilities.cast(tree.at(parent(path)));
-                    n.replace(last(path), TextNode.valueOf(env.get(key)));
+                	val node = tree.at(path.head());
+                	if (node instanceof ObjectNode) {
+                		ObjectNode on = Utilities.cast(node);
+                        on.put(last(path), env.get(key));	
+                	}
                 }
             }
             om.readerForUpdating(obj).readValue(tree);
@@ -129,17 +131,14 @@ public class EnvironmentTree {
 	}
 	
 	private static String last(JsonPointer p) {
-		// p.last() is throwing an NPE :-/
+		// p.last() throws NPE or ConcurrentException or is wrong
 		int i = p.toString().lastIndexOf(JsonPointer.SEPARATOR);
 		return p.toString().substring(i + 1);
 	}
+			
 	
 	public String normalizePath(String path) {
 		val srcFmt = path.chars().anyMatch(Character::isLowerCase)? CaseFormat.LOWER_CAMEL : CaseFormat.UPPER_UNDERSCORE;
 		return StringUtils.replaceChars(srcFmt.to(CaseFormat.LOWER_UNDERSCORE, path), "-.", "__");
 	}
-	
-	private static String parent(JsonPointer p) {
-		int i = p.toString().lastIndexOf(JsonPointer.SEPARATOR);
-		return p.toString().substring(0,Math.max(i,1));	}
 }

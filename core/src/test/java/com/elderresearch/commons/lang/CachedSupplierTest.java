@@ -82,6 +82,6 @@ public class CachedSupplierTest {
 		CachedSupplier<Integer> cache = new CachedSupplier<>(() -> Result.failed(new Throwable("test")));
 		assertNull(cache.get());
 		assertTrue(cache.getResultType() == ResultType.FAILED);
-		assertTrue(cache.isCached());
+		assertFalse(cache.isCached());
 	}
 }
