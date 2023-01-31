@@ -117,20 +117,17 @@ public class EnvironmentTree {
                 val key = prefix + CaseFormat.LOWER_CAMEL.to(env.pathFormat(),
                         path.toString().replace(JsonPointer.SEPARATOR, env.pathSeparator()));
                 if (env.has(key)) {
-                    ObjectNode n = Utilities.cast(tree.at(path));
-                    n.put(last(path), env.get(key));
+                	val node = tree.at(path.head());
+                	if (node instanceof ObjectNode) {
+                		ObjectNode on = Utilities.cast(node);
+                        on.put(path.getMatchingProperty(), env.get(key));	
+                	}
                 }
             }
             om.readerForUpdating(obj).readValue(tree);
         }
 		
 		for (val env : environments) { env.close(); }
-	}
-	
-	private static String last(JsonPointer p) {
-		// p.last() is throwing an NPE :-/
-		int i = p.toString().lastIndexOf(JsonPointer.SEPARATOR);
-		return p.toString().substring(i + 1);
 	}
 	
 	public String normalizePath(String path) {
