@@ -1,44 +1,13 @@
-ERI Commons - Language Extensions
+Compassion Commons JVM
 ------------------------------------------
 
-![Build](https://github.com/ElderResearch/commons-jvm/workflows/Java%20CI%20with%20Maven/badge.svg)
+A toolbox of language extensions and utilities for JVM-based languages, like Java. Supports Java 11 and later.
 
-A "toolbox" of language extensions and utilities for JVM-based languages, like Java. Supports Java 8 and Java 11.
+This was forked from Elder Research commons-jvm while it was Open Source/MIT licensed.
 
 ## Maven
 
-You can install this library from [Jipack.io](https://jitpack.io). Add the following repository to your POM:
-
-```xml
-<repositories>
-   <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-   </repository>
-</repositories>
- ```
-
-And then the following dependency:
-
-```xml
-<dependency>
-	<groupId>com.elderresearch.commons-jvm</groupId>
-	<artifactId>commons-jvm</artifactId>
-	<version>2.5.0</version>
-</dependency>
-```
-
-for Java 11+ or
-
-```xml
-<dependency>
-	<groupId>com.elderresearch.commons-jvm</groupId>
-	<artifactId>commons-jvm-java8</artifactId>
-	<version>2.5.0</version>
-</dependency>
-```
-
-for Java 8.
+See [Compassion Maven Parent](https://gitlab.com/ciorg/sharedteams/data-works/maven-parent) for information on how to work with Maven at Compassion.
 
 # Dependencies
 

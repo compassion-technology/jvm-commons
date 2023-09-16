@@ -1,97 +1,82 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.elderresearch.maven-parent</groupId>
+		<groupId>com.compassion</groupId>
 		<artifactId>maven-parent</artifactId>
-		<version>6.4.5</version>
+		<version>1.0.0</version>
 	</parent>
-
-	<groupId>com.elderresearch</groupId>
-	<artifactId>commons-jvm-parent</artifactId>
-	<name>ERI Commons - JVM Extensions (Parent)</name>
-	<description>Shared JVM language extensions</description>
-	<version>2.6.10</version>
-	<inceptionYear>2014</inceptionYear>
-	<packaging>pom</packaging>
 	
 	<repositories>
-       <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-       </repository>
-    </repositories>
-	
-	<modules>
-        <module>core</module>
-        <module>java8</module>
-    </modules>
-	
+		<repository>
+			<id>gitlab-maven</id>
+			<name>GitLab Maven Packages - Data Works group</name>
+			<url>https://gitlab.com/api/v4/groups/11537535/-/packages/maven</url>
+		</repository>
+	</repositories>
+
+	<artifactId>commons-jvm</artifactId>
+	<name>Compassion JVM Commons</name>
+	<version>2.6.10</version>
+	<inceptionYear>2023</inceptionYear>
+
 	<dependencies>
 		<dependency>
-		   <groupId>org.apache.commons</groupId>
-		   <artifactId>commons-text</artifactId>
-		   <version>1.10.0</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>1.10.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jooq</groupId>
+			<artifactId>jool</artifactId>
+			<version>0.9.15</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>31.1-jre</version>
+			<version>32.1.2-jre</version>
 			<exclusions>
-			    <!-- See https://groups.google.com/forum/#!topic/guava-discuss/AKBGPca9unw -->
+				<!-- See https://groups.google.com/forum/#!topic/guava-discuss/AKBGPca9unw -->
 				<exclusion>
 					<groupId>com.google.guava</groupId>
 					<artifactId>listenablefuture</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
 		<!-- Don't ship a log implementation since often this is used with Logback, JUL, etc.
 		     Change implementation scope to test for running tests and ship API only. -->
 		<dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>${log4j.version}</version>
-        </dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
 		<dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>${log4j.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!--For setting env variables-->
-        <dependency>
-            <groupId>org.junit-pioneer</groupId>
-            <artifactId>junit-pioneer</artifactId>
-            <version>1.4.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <version>5.7.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.7.1</version>
-            <scope>test</scope>
-        </dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${log4j.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<!--For setting env variables-->
+		<dependency>
+			<groupId>org.junit-pioneer</groupId>
+			<artifactId>junit-pioneer</artifactId>
+			<version>1.4.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<version>5.7.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>5.7.1</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
-	
-	<build>
-		<plugins>
-		   	<plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.0.0-M8</version>
-				<configuration>
-					<!-- See https://javachannel.org/posts/help-my-java-locale-is-wrong-in-jdk11/ -->
-					<systemPropertyVariables>
-						<java.locale.providers>COMPAT,CLDR,SPI</java.locale.providers>
-					</systemPropertyVariables>
-				</configuration>
-			</plugin>
-    	</plugins>
-	</build>
 </project>
