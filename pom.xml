@@ -91,7 +91,7 @@
 				<version>3.1.2</version>
 				<configuration>
 					<!-- Environment variable test -->
-					<argLine>--add-opens java.base/java.util=ALL-UNNAMED</argLine>
+					<argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
 					<!-- See https://javachannel.org/posts/help-my-java-locale-is-wrong-in-jdk11/ -->
 					<systemPropertyVariables>
 						<java.locale.providers>COMPAT,CLDR,SPI</java.locale.providers>
