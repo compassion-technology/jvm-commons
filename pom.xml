@@ -63,13 +63,6 @@
 			<version>${log4j.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<!--For setting env variables-->
-		<dependency>
-			<groupId>org.junit-pioneer</groupId>
-			<artifactId>junit-pioneer</artifactId>
-			<version>2.1.0</version>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.junit.vintage</groupId>
 			<artifactId>junit-vintage-engine</artifactId>
@@ -90,8 +83,6 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.1.2</version>
 				<configuration>
-					<!-- Environment variable test -->
-					<argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
 					<!-- See https://javachannel.org/posts/help-my-java-locale-is-wrong-in-jdk11/ -->
 					<systemPropertyVariables>
 						<java.locale.providers>COMPAT,CLDR,SPI</java.locale.providers>
