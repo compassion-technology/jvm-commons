@@ -90,11 +90,25 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.1.2</version>
 				<configuration>
+					<!-- Environment variable test -->
+					<argLine>--add-opens java.base/java.util=ALL-UNNAMED</argLine>
 					<!-- See https://javachannel.org/posts/help-my-java-locale-is-wrong-in-jdk11/ -->
 					<systemPropertyVariables>
 						<java.locale.providers>COMPAT,CLDR,SPI</java.locale.providers>
 					</systemPropertyVariables>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok-maven-plugin</artifactId>
+				<dependencies>
+					<!-- Sync Lombok version with the one we actually use to fix Java 17 error -->
+					<dependency>
+						<groupId>org.projectlombok</groupId>
+						<artifactId>lombok</artifactId>
+						<version>1.18.28</version>
+					</dependency>
+				</dependencies>
 			</plugin>
     	</plugins>
 	</build>

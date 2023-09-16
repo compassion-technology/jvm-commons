@@ -5,8 +5,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.compassion.commons.CalendarUtils;
-
 public class CalendarUtilsTest {
 	@Test
 	public void testAccess() {

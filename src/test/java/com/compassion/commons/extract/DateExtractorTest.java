@@ -16,9 +16,6 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Test;
 
 import com.compassion.commons.Utilities;
-import com.compassion.commons.extract.DateExtractor;
-import com.compassion.commons.extract.LocalityLevel;
-import com.compassion.commons.extract.Match;
 
 public class DateExtractorTest {
 	private static final DateExtractor ALL = DateExtractor.getInstance(LocalityLevel.ALL);

@@ -9,8 +9,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
-import com.compassion.commons.Utilities;
-
 public class UtilitiesTest {
 	@Test
 	public void testSoundex() {

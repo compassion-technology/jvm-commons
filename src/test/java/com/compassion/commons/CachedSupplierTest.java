@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 
-import com.compassion.commons.CachedSupplier;
 import com.compassion.commons.CachedSupplier.Result;
 import com.compassion.commons.CachedSupplier.ResultType;
 

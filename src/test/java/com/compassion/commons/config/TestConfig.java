@@ -1,8 +1,5 @@
 package com.compassion.commons.config;
 
-import com.compassion.commons.config.EnvironmentTree;
-import com.compassion.commons.config.YAMLConfig;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

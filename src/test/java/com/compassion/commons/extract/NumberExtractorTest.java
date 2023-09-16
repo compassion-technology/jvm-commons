@@ -5,9 +5,6 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.compassion.commons.extract.LocalityLevel;
-import com.compassion.commons.extract.NumberExtractor;
-
 import lombok.val;
 
 public class NumberExtractorTest {

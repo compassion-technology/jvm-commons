@@ -8,9 +8,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
-import com.compassion.commons.StopWatch;
-import com.compassion.commons.Utilities;
-
 /**
  * Test case for stop watch utility.
  * 

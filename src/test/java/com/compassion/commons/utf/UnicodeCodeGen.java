@@ -19,10 +19,8 @@ import org.apache.commons.text.WordUtils;
 
 import com.compassion.commons.ReflectionUtils;
 import com.compassion.commons.Utilities;
-import com.compassion.commons.utf.UnicodeChars;
 
 import lombok.val;
-import lombok.experimental.UtilityClass;
 
 /**
  * This class code generates Java interfaces with declared character constants for each unicode character, the majority
@@ -34,7 +32,6 @@ import lombok.experimental.UtilityClass;
  * @author <a href="dimeo@datamininglab.com">John Dimeo</a>
  * @since Dec 29, 2012
  */
-@UtilityClass
 final class UnicodeCodeGen {
 	private static String cleanName(String name) { return name.replace(' ', '_').replace('-', '_'); }
 	

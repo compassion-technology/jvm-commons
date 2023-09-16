@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import com.compassion.commons.StringMatcher;
 import com.compassion.commons.StringMatcher.StringMatchStrat;
 
 import lombok.val;
