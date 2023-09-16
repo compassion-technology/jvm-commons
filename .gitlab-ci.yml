@@ -1,0 +1,17 @@
+---
+include:
+  # Elder Research customizations of GitLab's Maven template:
+  # https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/ci/templates/Maven.gitlab-ci.yml
+  - project: "ElderResearch/devops/templates/gitlab-ci"
+    ref: "0.0.8"
+    file: "/Maven.test.gitlab-ci.yml"
+  - template: Security/SAST.gitlab-ci.yml
+
+test:jdk11:
+  tags: ["infradba-eks-runner"]
+
+deploy:
+  tags: ["infradba-eks-runner"]
+  stage: deploy
+  script:
+    - 'mvn $MAVEN_CLI_OPTS deploy'
