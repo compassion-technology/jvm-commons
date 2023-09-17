@@ -78,7 +78,7 @@ public class DateExtractor extends Extractor<DateFormat, Date> {
 	protected void addFormatsFor(Locale l, Consumer<DateFormat> adder) {
 		for (int i = DateFormat.FULL; i <= DateFormat.SHORT; i++) {
 			for (int j = DateFormat.FULL; j <= DateFormat.SHORT; j++) {
-				adder.accept(DateFormat.getDateTimeInstance(i, j));
+				adder.accept(DateFormat.getDateTimeInstance(i, j, l));
 			}
 			adder.accept(DateFormat.getDateInstance(i, l));
 		}
