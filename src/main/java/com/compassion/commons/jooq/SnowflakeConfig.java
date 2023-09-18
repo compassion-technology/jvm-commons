@@ -20,22 +20,19 @@ import lombok.experimental.Accessors;
 @Getter @Setter @Accessors(chain = true)
 public class SnowflakeConfig extends JOOQDatabaseConfig {
 	private static final String
-		DEF_URL    = "ci.us-east-2.aws.snowflakecomputing.com",
-		DEF_ROLE   = "GLOBAL_PROGRAM_DEVELOPER",
-		DEF_DB     = "GLOBAL_PROGRAM_DEVINT",
-		DEF_AUTH   = "https://compassion.okta.com";
+		DEF_URL  = "ci.us-east-2.aws.snowflakecomputing.com",
+		DEF_AUTH = "https://compassion.okta.com",
+		SVC_AUTH = "snowflake";
 	
 	@JsonSchemaDescription("The base Snowflake URL, including the account identifier")
 	@JsonSchemaDefault(DEF_URL)
 	private String baseURL = DEF_URL;
 	
 	@JsonSchemaDescription("The Snowflake role to read and write data (will usually be a _DEVELOPER role)")
-	@JsonSchemaDefault(DEF_ROLE)
-	private String role = DEF_ROLE;
+	private String role;
 	
 	@JsonSchemaDescription("The database to use to read/write data in Snowflake")
-	@JsonSchemaDefault(DEF_DB)
-	private String database = DEF_DB;
+	private String database;
 	
 	@JsonSchemaDescription("The authenticator to use. When running as an AWS lambda, this defaults to Snowflake authentication for service accounts. When running locally, this defaults to the Okta authenticator.")
 	@JsonSchemaDefault(DEF_AUTH)
@@ -55,7 +52,7 @@ public class SnowflakeConfig extends JOOQDatabaseConfig {
 			setAuthenticator(DEF_AUTH);
 		} else {
 			setUser(serviceAcct);
-			setAuthenticator("snowflake");
+			setAuthenticator(SVC_AUTH);
 		}
 		
 		setDriver(JDBCDriver.SNOWFLAKE);
