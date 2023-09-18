@@ -124,6 +124,19 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!-- Upgrade H2 version -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>2.2.220</version>
+		</dependency>
+		<!-- Snowflake driver -->
+		<dependency>
+			<groupId>net.snowflake</groupId>
+			<artifactId>snowflake-jdbc</artifactId>
+			<version>3.13.33-unshaded</version>
+		</dependency>
+		
 
 		<!-- Unit tests -->
 		<dependency>
