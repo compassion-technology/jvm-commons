@@ -23,6 +23,9 @@ import software.amazon.awssdk.services.ssm.model.SsmException;
 @Log4j2 @Accessors(fluent = true)
 public class ParamStoreEnvironment implements Environment {
 	private static final String SECRET_PATH = "/aws/reference/secretsmanager/";
+	
+	// Mark a parameter as existing but not looked up yet
+	private static final String SENTINEL = "$";
 
 	@Setter
     private SsmClient client;
@@ -41,18 +44,25 @@ public class ParamStoreEnvironment implements Environment {
 	public boolean has(String path) {
 	    if (!enabled.getAsBoolean()) { return false; }
 
-	    if (client == null) { client = SsmClient.create(); }
-
-        // Any SSM blocks are reserved and can't be looked up and also
-		// relate to configuring this lookup itself (e.g. region passed to ctor) and won't be overridden anyway
-		if (StringUtils.startsWithAny(path.toLowerCase(), "/ssm", "ssm")) { return false; }
+	    if (client == null) {
+	    	client = SsmClient.create();
+	    	client.describeParametersPaginator().forEach($ -> $.parameters().forEach(p -> {
+	    		map.put(p.name(), SENTINEL);
+	    	}));
+	    }
+	    
+	    return map.containsKey(StringUtils.prependIfMissing(path, "/"));
+	}
+	
+	@Override
+	public String get(String path) {
+		var pathNorm = StringUtils.prependIfMissing(path, "/");
+		var ret = map.get(pathNorm);
+		if (ret == null || ret != SENTINEL) { return ret; }
 		
 		try {
-			log.debug("Looking for parameter {}", path);
-			String v = client.getParameter(req -> req
-				.name(StringUtils.prependIfMissing(path, "/"))
-				.withDecryption(true)
-			).parameter().value();
+			log.debug("Looking for parameter {}", pathNorm);
+			var v = client.getParameter(req -> req.name(pathNorm).withDecryption(true)).parameter().value();
 			
 			if (v.startsWith(SECRET_PATH)) {
 				// If there is a slash after the secret name, that might indicate the key inside the secret to retrieve,
@@ -63,26 +73,22 @@ public class ParamStoreEnvironment implements Environment {
 
 				log.debug("Looking for secret {}...", v);
 				var secret = client.getParameter(GetParameterRequest.builder().name(v).withDecryption(true).build()).parameter().value();
-				map.put(path, secretConverter.convert(path, secret));
+				ret = secretConverter.convert(pathNorm, secret);
 			} else {
 				// Cache the parameter to avoid a second lookup in get()
-				map.put(path, v);
+				ret = v;
 			}
-			return true;
+			map.put(pathNorm, ret);
+			return ret;
 		} catch (ParameterNotFoundException e) {
 			// Not all params are required or defined- no logging needed
 		} catch (SsmException e) {
-			log.warn("SSM parameter lookup failed for path {}: {}", path, e.getMessage());
+			log.warn("SSM parameter lookup failed for path {}: {}", pathNorm, e.getMessage());
 		} catch (IOException e) {
 			// Don't actually log exception or else it would have the decrypted secret
-			log.warn("Secret for {} not in expected format", path);
+			log.warn("Secret for {} not in expected format", pathNorm);
 		}
-		return false;
-	}
-	
-	@Override
-	public String get(String path) {
-		return map.get(path);
+		return null;
 	}
 
 	@Override
