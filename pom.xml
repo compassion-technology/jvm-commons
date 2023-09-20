@@ -19,7 +19,7 @@
 
 	<artifactId>jvm-commons</artifactId>
 	<name>Compassion JVM Commons</name>
-	<version>3.0.3-SNAPSHOT</version>
+	<version>3.0.4-SNAPSHOT</version>
 	<inceptionYear>2023</inceptionYear>
 
 	<properties>
