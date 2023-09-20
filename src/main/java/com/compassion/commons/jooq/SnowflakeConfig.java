@@ -60,9 +60,11 @@ public class SnowflakeConfig extends JOOQDatabaseConfig {
 		LambdaUtils.accept(defDB, this::setDatabase);
 	}
 	
-	// Can remove once https://gitlab.com/ElderResearch/toolbox/commons/jvm/jooq/-/issues/1 is resolved
 	@JsonIgnore @Override
-	public SQLDialect getDialect() { return super.getDialect(); }
+	public SQLDialect getDialect() {
+		// Use Postgres to make sure update statements aren't qualified
+		return SQLDialect.POSTGRES;
+	}
 	
 	@Override
 	public String getHostURL() {
