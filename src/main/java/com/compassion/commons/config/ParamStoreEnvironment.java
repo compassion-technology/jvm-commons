@@ -29,7 +29,7 @@ public class ParamStoreEnvironment implements Environment {
 
 	@Setter
     private SsmClient client;
-    private Map<String, String> map = new HashMap<>();
+    private Map<String, String> map;
     
     @Setter
     private SecretConverter secretConverter = new DefaultSecretConverter();
@@ -43,21 +43,26 @@ public class ParamStoreEnvironment implements Environment {
 	@Override
 	public boolean has(String path) {
 	    if (!enabled.getAsBoolean()) { return false; }
-
-	    if (client == null) {
+	    return initClientAndMap().containsKey(StringUtils.prependIfMissing(path, "/"));
+	}
+	
+	private Map<String, String> initClientAndMap() {
+		if (client == null) {
 	    	client = SsmClient.create();
+	    }
+		if (map == null) {
+	    	map = new HashMap<>();
 	    	client.describeParametersPaginator().forEach($ -> $.parameters().forEach(p -> {
 	    		map.put(p.name(), SENTINEL);
 	    	}));
 	    }
-	    
-	    return map.containsKey(StringUtils.prependIfMissing(path, "/"));
+		return map;
 	}
 	
 	@Override
 	public String get(String path) {
 		var pathNorm = StringUtils.prependIfMissing(path, "/");
-		var ret = map.get(pathNorm);
+		var ret = initClientAndMap().get(pathNorm);
 		if (ret == null || ret != SENTINEL) { return ret; }
 		
 		try {
