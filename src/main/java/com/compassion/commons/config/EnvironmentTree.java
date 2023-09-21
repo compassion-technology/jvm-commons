@@ -120,7 +120,7 @@ public class EnvironmentTree {
                 	val node = tree.at(path.head());
                 	if (node instanceof ObjectNode) {
                 		ObjectNode on = Utilities.cast(node);
-                        on.put(last(path), env.get(key));	
+                        on.put(last(path), environmentOverride(env, key, env.get(key)));	
                 	}
                 }
             }
@@ -128,6 +128,10 @@ public class EnvironmentTree {
         }
 		
 		for (val env : environments) { env.close(); }
+	}
+	
+	protected String environmentOverride(Environment e, String path, String value) {
+		return value;
 	}
 	
 	private static String last(JsonPointer p) {
