@@ -22,7 +22,7 @@ import software.amazon.awssdk.services.ssm.model.SsmException;
 
 @Log4j2 @Accessors(fluent = true)
 public class ParamStoreEnvironment implements Environment {
-	private static final String SECRET_PATH = "/aws/reference/secretsmanager/";
+	public static final String SECRET_PATH = "/aws/reference/secretsmanager/";
 	
 	// Mark a parameter as existing but not looked up yet
 	private static final String SENTINEL = "$";
@@ -63,37 +63,41 @@ public class ParamStoreEnvironment implements Environment {
 	public String get(String path) {
 		var pathNorm = StringUtils.prependIfMissing(path, "/");
 		var ret = initClientAndMap().get(pathNorm);
-		if (ret == null || ret != SENTINEL) { return ret; }
-		
+		return ret == null || ret != SENTINEL? ret : getParamValue(pathNorm);
+	}
+	
+	public String getParamValue(String path) {
 		try {
-			log.debug("Looking for parameter {}", pathNorm);
-			var v = client.getParameter(req -> req.name(pathNorm).withDecryption(true)).parameter().value();
-			
-			if (v.startsWith(SECRET_PATH)) {
-				// If there is a slash after the secret name, that might indicate the key inside the secret to retrieve,
-				// so don't include that in lookups.
-				// CDK v2 now parses owned secret names (used to be a context toggle) and no longer includes a suffix on the name. 
-				int slash = v.indexOf('/', SECRET_PATH.length());
-				if (slash > 0) { v = v.substring(0, slash); }
-
-				log.debug("Looking for secret {}...", v);
-				var secret = client.getParameter(GetParameterRequest.builder().name(v).withDecryption(true).build()).parameter().value();
-				ret = secretConverter.convert(pathNorm, secret);
-			} else {
-				// Cache the parameter to avoid a second lookup in get()
-				ret = v;
-			}
-			map.put(pathNorm, ret);
+			log.debug("Looking for parameter {}", path);
+			var v = client.getParameter(req -> req.name(path).withDecryption(true)).parameter().value();
+			var ret = v.startsWith(SECRET_PATH)? getSecretValue(path, v) : v;
+			// Cache the parameter to avoid a second lookup in get()
+			map.put(path, ret);
 			return ret;
 		} catch (ParameterNotFoundException e) {
 			// Not all params are required or defined- no logging needed
 		} catch (SsmException e) {
-			log.warn("SSM parameter lookup failed for path {}: {}", pathNorm, e.getMessage());
+			log.warn("SSM parameter lookup failed for path {}: {}", path, e.getMessage());
 		} catch (IOException e) {
 			// Don't actually log exception or else it would have the decrypted secret
-			log.warn("Secret for {} not in expected format", pathNorm);
+			log.warn("Secret for {} not in expected format", path);
 		}
 		return null;
+	}
+	
+	public String getSecretValue(String path, String secret) throws IOException {
+		// If there is a slash after the secret name, that might indicate the key inside the secret to retrieve,
+		// so don't include that in lookups.
+		// CDK v2 now parses owned secret names (used to be a context toggle) and no longer includes a suffix on the name. 
+		int slash = secret.indexOf('/', SECRET_PATH.length());
+		if (slash > 0) { secret = secret.substring(0, slash); }
+
+		log.debug("Looking for secret {}...", secret);
+		var ret = client.getParameter(
+			GetParameterRequest.builder().name(secret).withDecryption(true).build()
+		).parameter().value();
+		
+		return secretConverter.convert(path, ret);		
 	}
 
 	@Override

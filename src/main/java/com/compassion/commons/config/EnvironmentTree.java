@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.compassion.commons.Utilities;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -62,7 +61,7 @@ public class EnvironmentTree {
 		public char pathSeparator() { return '_'; }
 	}
 
-	private final String prefix;
+	protected final String prefix;
 	private List<Environment> environments;
 	
 	protected EnvironmentTree(String prefix) {
@@ -100,39 +99,43 @@ public class EnvironmentTree {
      * @throws IOException
      */
 	public <T> void applyOverrides(ObjectMapper om, T obj) throws IOException {
-		if (environments.isEmpty()) {
-			withEnvironmentVariables().withSystemProperties();
-		}
-
-        val tree = om.valueToTree(obj);
-        val trav = tree.traverse();
+        var tree = om.valueToTree(obj);
+        var trav = tree.traverse();
         while (!trav.isClosed()) {
-            val fn = trav.nextFieldName();
-            if (fn == null) {
-                continue;
-            }
+            var fn = trav.nextFieldName();
+            if (fn == null) { continue; }
             
-            val path = trav.getParsingContext().pathAsPointer();
+            var path = trav.getParsingContext().pathAsPointer();
+            nextNode(path, tree.at(path));
+            
+            var node = tree.at(path.head());
+            if (!node.isObject()) { continue; }
+            
+            var objNode = (ObjectNode) node;
+            var prop = last(path);
+            
             for (val env : environments) {
 	            val key = prefix + CaseFormat.LOWER_CAMEL.to(env.pathFormat(),
 	                    path.toString().replace(JsonPointer.SEPARATOR, env.pathSeparator()));
 	            if (env.has(key)) {
-	            	val node = tree.at(path.head());
-	            	if (node instanceof ObjectNode) {
-	            		ObjectNode on = Utilities.cast(node);
-	                    on.put(last(path), environmentOverride(env, key, env.get(key)));	
-	            	}
+                    objNode.put(prop, env.get(key));	
 	            }
             }
+            
+            objNode.replace(prop, customOverride(path, objNode.get(prop)));
         }
         om.readerForUpdating(obj).readValue(tree);
 		
 		for (val env : environments) { env.close(); }
 	}
 	
+	protected void nextNode(JsonPointer path, JsonNode node) {
+		// Extension point
+	}
+	
 	@SuppressWarnings("unused")
-	protected String environmentOverride(Environment e, String path, String value) throws IOException {
-		return value;
+	protected JsonNode customOverride(JsonPointer path, JsonNode node) throws IOException {
+		return node;
 	}
 	
 	private static String last(JsonPointer p) {
