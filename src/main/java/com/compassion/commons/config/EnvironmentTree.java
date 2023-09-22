@@ -104,33 +104,34 @@ public class EnvironmentTree {
 			withEnvironmentVariables().withSystemProperties();
 		}
 
-		for (val env : environments) {
-            val tree = om.valueToTree(obj);
-            val trav = tree.traverse();
-            while (!trav.isClosed()) {
-                val fn = trav.nextFieldName();
-                if (fn == null) {
-                    continue;
-                }
-
-                val path = trav.getParsingContext().pathAsPointer();
-                val key = prefix + CaseFormat.LOWER_CAMEL.to(env.pathFormat(),
-                        path.toString().replace(JsonPointer.SEPARATOR, env.pathSeparator()));
-                if (env.has(key)) {
-                	val node = tree.at(path.head());
-                	if (node instanceof ObjectNode) {
-                		ObjectNode on = Utilities.cast(node);
-                        on.put(last(path), environmentOverride(env, key, env.get(key)));	
-                	}
-                }
+        val tree = om.valueToTree(obj);
+        val trav = tree.traverse();
+        while (!trav.isClosed()) {
+            val fn = trav.nextFieldName();
+            if (fn == null) {
+                continue;
             }
-            om.readerForUpdating(obj).readValue(tree);
+            
+            val path = trav.getParsingContext().pathAsPointer();
+            for (val env : environments) {
+	            val key = prefix + CaseFormat.LOWER_CAMEL.to(env.pathFormat(),
+	                    path.toString().replace(JsonPointer.SEPARATOR, env.pathSeparator()));
+	            if (env.has(key)) {
+	            	val node = tree.at(path.head());
+	            	if (node instanceof ObjectNode) {
+	            		ObjectNode on = Utilities.cast(node);
+	                    on.put(last(path), environmentOverride(env, key, env.get(key)));	
+	            	}
+	            }
+            }
         }
+        om.readerForUpdating(obj).readValue(tree);
 		
 		for (val env : environments) { env.close(); }
 	}
 	
-	protected String environmentOverride(Environment e, String path, String value) {
+	@SuppressWarnings("unused")
+	protected String environmentOverride(Environment e, String path, String value) throws IOException {
 		return value;
 	}
 	
