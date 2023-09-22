@@ -39,40 +39,39 @@ public class ParamStoreEnvironment implements ConfigEnvironment {
 	@Override
 	public boolean has(String path, JsonNode existing) {
 	    if (!enabled.getAsBoolean()) { return false; }
-	    return initClient().initMap().containsKey(StringUtils.prependIfMissing(path, "/"));
+	    return listParams().containsKey(StringUtils.prependIfMissing(path, "/"));
 	}
 	
-	private ParamStoreEnvironment initClient() {
+	private SsmClient initClient() {
 		if (client == null) { client = SsmClient.create(); }
-		return this;
+		return client;
 	}
-	
 	private Map<String, String> initMap() {
-		if (map == null) {
-	    	map = new HashMap<>();
-	    	client.describeParametersPaginator().forEach($ -> $.parameters().forEach(p -> {
-	    		map.put(p.name(), SENTINEL);
-	    	}));
-	    }
+		if (map == null) { map = new HashMap<>(); }
+		return map;
+	}
+	private Map<String, String> listParams() {
+		initClient().describeParametersPaginator().forEach($ -> $.parameters().forEach(p -> {
+    		initMap().put(p.name(), SENTINEL);
+    	}));
 		return map;
 	}
 	
 	@Override
 	public String get(String path, JsonNode existing) {
 		var pathNorm = StringUtils.prependIfMissing(path, "/");
-		var ret = initClient().initMap().get(pathNorm);
+		var ret = listParams().get(pathNorm);
 		// Simple equality on the sentinel means that an actual value of $ is NOT equal, even though equal()
 		return ret == null || ret != SENTINEL? ret : getParamValue(pathNorm);
 	}
 	
 	public String getParamValue(String path) {
-		initClient();
 		try {
 			log.debug("Looking for parameter {}", path);
-			var v = client.getParameter(req -> req.name(path).withDecryption(true)).parameter().value();
+			var v = initClient().getParameter(req -> req.name(path).withDecryption(true)).parameter().value();
 			if (v.startsWith(SECRET_PATH)) { v = getSecretValue(path, v); }
 			// Cache the parameter to avoid a second lookup in get()
-			map.put(path, v);
+			initMap().put(path, v);
 			return v;
 		} catch (ParameterNotFoundException e) {
 			// Not all params are required or defined- no logging needed
@@ -86,18 +85,18 @@ public class ParamStoreEnvironment implements ConfigEnvironment {
 	}
 	
 	public String getSecretValue(String path, String secret) throws IOException {
-		initClient();
-		
 		// If there is a slash after the secret name, that might indicate the key inside the secret to retrieve,
 		// so don't include that in lookups.
 		// CDK v2 now parses owned secret names (used to be a context toggle) and no longer includes a suffix on the name. 
 		int slash = secret.indexOf('/', SECRET_PATH.length());
 		if (slash > 0) { secret = secret.substring(0, slash); }
 
-		log.debug("Looking for secret {}...", secret);
-		var ret = client.getParameter(
-			GetParameterRequest.builder().name(secret).withDecryption(true).build()
-		).parameter().value();
+		var ret = initMap().computeIfAbsent(secret, $ -> {
+			log.debug("Looking for secret {}...", $);
+			return initClient().getParameter(
+				GetParameterRequest.builder().name($).withDecryption(true).build()
+			).parameter().value();	
+		});
 		
 		return secretConverter.convert(path, ret);		
 	}

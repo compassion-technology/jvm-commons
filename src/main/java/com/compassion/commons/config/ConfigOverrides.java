@@ -114,7 +114,7 @@ public class ConfigOverrides {
 	}
 	
 	private void applyOverrides(ConfigEnvironment env, JsonPointer path, JsonNode node, Consumer<String> updater) {
-        val key = prefix + CaseFormat.LOWER_CAMEL.to(env.pathFormat(),
+        val key = CaseFormat.LOWER_CAMEL.to(env.pathFormat(), prefix +
                 path.toString().replace(JsonPointer.SEPARATOR, env.pathSeparator()));
         if (env.has(key, node)) {
         	updater.accept(env.get(key, node));
