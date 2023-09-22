@@ -3,6 +3,7 @@ package com.compassion.commons.config;
 
 import java.nio.file.Files;
 
+import com.compassion.commons.Utilities;
 import com.compassion.commons.jackson.YAMLUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
@@ -18,15 +19,13 @@ public class YAMLConfig implements Config {
 	/**
 	 * Load configuration from the environment and optionally YAML files.
 	 * @param env the environment values that should override the config, including environment variables and system
-	 * properties that should override the defaults and configuration loaded from the file (can be {@code null}). If
-	 * no environment values have been added to the specified tree, environment variables and system properties matching
-	 * the prefix will be automatically loaded (with system properties taking precedence).
+	 * properties that should override the defaults and configuration loaded from the file (can be {@code null}).
      * @param paths zero or more paths (<em>relative to the executing code</em>, not the current directory)
 	 * specifying files to load
-	 * @see Config#load(org.apache.logging.log4j.Logger, ObjectMapper, Config, EnvironmentTree, String...)
+	 * @see Config#load(org.apache.logging.log4j.Logger, ObjectMapper, Config, ConfigOverrides, String...)
 	 */
-	public Config load(EnvironmentTree env, String... paths) {
-		return Config.load(log, mapper, this, env, paths);
+	public <C extends YAMLConfig> C load(ConfigOverrides env, String... paths) {
+		return Utilities.cast(Config.load(log, mapper, this, env, paths));
 	}
 	
     /**

@@ -8,10 +8,8 @@ import java.util.function.BooleanSupplier;
 import org.apache.commons.lang3.StringUtils;
 
 import com.compassion.commons.LambdaUtils.IO;
-import com.compassion.commons.config.EnvironmentTree.Environment;
 import com.compassion.commons.config.SecretConverter.DefaultSecretConverter;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.base.CaseFormat;
 
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -22,7 +20,7 @@ import software.amazon.awssdk.services.ssm.model.ParameterNotFoundException;
 import software.amazon.awssdk.services.ssm.model.SsmException;
 
 @Log4j2 @Accessors(fluent = true)
-public class ParamStoreEnvironment implements Environment {
+public class ParamStoreEnvironment implements ConfigEnvironment {
 	public static final String SECRET_PATH = "/aws/reference/secretsmanager/";
 	
 	// Mark a parameter as existing but not looked up yet
@@ -37,9 +35,6 @@ public class ParamStoreEnvironment implements Environment {
     
     @Setter
     private BooleanSupplier enabled = () -> true;
-    
-    @Override
-    public CaseFormat pathFormat() { return CaseFormat.LOWER_CAMEL; }
     
 	@Override
 	public boolean has(String path, JsonNode existing) {

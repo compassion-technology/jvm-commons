@@ -2,15 +2,15 @@
 package com.compassion.commons.config;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 
+import com.compassion.commons.Utilities;
+import com.compassion.commons.config.ConfigEnvironment.ConfigEnvironmentMap;
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,68 +28,41 @@ import lombok.val;
  * @author <a href="dimeo@elderresearch.com">John Dimeo</a>
  * @since Jun 13, 2020
  */
-public class EnvironmentTree {
-	public interface Environment extends AutoCloseable {
-		boolean has(String path, JsonNode existing);
-		String get(String path, JsonNode existing);
-		
-		default CaseFormat pathFormat() {
-			return CaseFormat.LOWER_UNDERSCORE;
-		}
-		
-		default char pathSeparator() {
-			return JsonPointer.SEPARATOR;
-		}
-		
-		@Override
-		default void close() throws IOException {
-			// Nothing to close by default
-		}
-	}
-
-	public class EnvironmentMap implements Environment {
-		private Map<String, String> map = new HashMap<>();
-		
-		@Override public boolean has(String path, JsonNode existing) { return map.containsKey(path); }
-		@Override public String get(String path, JsonNode existing) { return map.get(path); }
-		
-		public EnvironmentMap put(String path, String value) {
-	        if (StringUtils.startsWithIgnoreCase(path, prefix)) {
-	        	map.put(normalizePath(path), value);
-	        }
-	        return this;
-		}
-		
-		@Override
-		public char pathSeparator() { return '_'; }
-	}
-
+public class ConfigOverrides {
 	protected final String prefix;
-	private List<Environment> environments;
+	private List<ConfigEnvironment> environments;
 	
-	protected EnvironmentTree(String prefix) {
+	protected ConfigOverrides(String prefix) {
 		this.prefix = StringUtils.lowerCase(prefix);
 		this.environments = new LinkedList<>();
 	}
 	
-	public static EnvironmentTree forPrefix(String prefix) {
-		return new EnvironmentTree(prefix);
+	public static ConfigOverrides forPrefix(String prefix) {
+		return new ConfigOverrides(prefix);
 	}
 	
-	public EnvironmentTree with(Environment e) {
+	public ConfigOverrides with(ConfigEnvironment e) {
 		this.environments.add(e);
 		return this;
 	}
 
-	public EnvironmentTree withEnvironmentVariables() {
-		val e = new EnvironmentMap();
-		System.getenv().forEach(e::put);
+	public ConfigOverrides withEnvironmentVariables() {
+		val e = new ConfigEnvironmentMap('_', CaseFormat.UPPER_UNDERSCORE);
+		System.getenv().forEach((k, v) -> {
+			if (StringUtils.startsWithIgnoreCase(k, prefix)) {
+				e.put(StringUtils.upperCase(k), v);
+			}
+		});
 		return with(e);
 	}
 	
-	public EnvironmentTree withSystemProperties() {
-		val e = new EnvironmentMap();
-		System.getProperties().forEach((k, v) -> e.put(k.toString(), v.toString()));
+	public ConfigOverrides withSystemProperties() {
+		val e = new ConfigEnvironmentMap('.', CaseFormat.LOWER_CAMEL);
+		System.getProperties().forEach((k, v) -> {
+			if (StringUtils.startsWithIgnoreCase(k.toString(), prefix)) {
+				e.put(k.toString(), v.toString());	
+			}
+		});
 		return with(e);
 	}
 
@@ -99,11 +72,13 @@ public class EnvironmentTree {
      * properties from previous environments specified with {@link #with(Environment)}.
      * @param om the ObjectMapper that reads from the environments
      * @param obj the POJO object that we will override
+     * @return the new configuration after all overrides have been applied
      * @throws IOException
      */
-	public <T> void applyOverrides(ObjectMapper om, T obj) throws IOException {
+	public <T> T applyOverrides(ObjectMapper om, T obj) throws IOException {
+		T ret = obj;
 		for (var env: environments) {
-	        var tree = om.valueToTree(obj);
+	        var tree = om.valueToTree(ret);
 	        var trav = tree.traverse();
 	        while (!trav.isClosed()) {
 	            var fn = trav.nextFieldName();
@@ -111,7 +86,7 @@ public class EnvironmentTree {
 	            
 	            var path = trav.getParsingContext().pathAsPointer();
 	            var node = tree.at(path);
-	            nextNode(path, node);
+	            nextNode(env, path, node);
 	            
 	            var parent = tree.at(path.head());
 	            if (!parent.isObject()) { continue; }
@@ -132,12 +107,13 @@ public class EnvironmentTree {
 	            	applyOverrides(env, path, node, $ -> objNode.put(prop, $));
 	            }
 	        }
-	        om.readerForUpdating(obj).readValue(tree);
+	        ret = Utilities.cast(om.treeToValue(tree, obj.getClass()));
 		}
 		for (val env : environments) { env.close(); }
+		return ret;
 	}
 	
-	private void applyOverrides(Environment env, JsonPointer path, JsonNode node, Consumer<String> updater) {
+	private void applyOverrides(ConfigEnvironment env, JsonPointer path, JsonNode node, Consumer<String> updater) {
         val key = prefix + CaseFormat.LOWER_CAMEL.to(env.pathFormat(),
                 path.toString().replace(JsonPointer.SEPARATOR, env.pathSeparator()));
         if (env.has(key, node)) {
@@ -145,7 +121,7 @@ public class EnvironmentTree {
         }
 	}
 	
-	protected void nextNode(JsonPointer path, JsonNode node) {
+	protected void nextNode(ConfigEnvironment env, JsonPointer path, JsonNode node) {
 		// Extension point
 	}
 	
@@ -153,11 +129,5 @@ public class EnvironmentTree {
 		// p.last() throws NPE or ConcurrentException or is wrong
 		int i = p.toString().lastIndexOf(JsonPointer.SEPARATOR);
 		return p.toString().substring(i + 1);
-	}
-			
-	
-	public String normalizePath(String path) {
-		val srcFmt = path.chars().anyMatch(Character::isLowerCase)? CaseFormat.LOWER_CAMEL : CaseFormat.UPPER_UNDERSCORE;
-		return StringUtils.replaceChars(srcFmt.to(CaseFormat.LOWER_UNDERSCORE, path), "-.", "__");
 	}
 }

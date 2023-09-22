@@ -13,15 +13,13 @@ import com.bettercloud.vault.VaultException;
 import com.bettercloud.vault.api.Logical.logicalOperations;
 import com.bettercloud.vault.response.LogicalResponse;
 import com.bettercloud.vault.rest.RestResponse;
-import com.compassion.commons.config.EnvironmentTree.Environment;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.base.CaseFormat;
 import com.google.common.net.MediaType;
 
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-public class VaultEnvironment extends VaultConfig implements Environment {
+public class VaultEnvironment extends VaultConfig implements ConfigEnvironment {
 	private static final String DEF_URL = "https://vault.cybersecurity.ci.org/";
 	
 	// Don't check arrays of config that won't have secrets in Vault.
@@ -51,9 +49,6 @@ public class VaultEnvironment extends VaultConfig implements Environment {
 		
 		this.vault = new Vault(this);
 	}
-	
-    @Override
-    public CaseFormat pathFormat() { return CaseFormat.LOWER_CAMEL; }
 	
 	@Override
 	public boolean has(String path, JsonNode existing) {

@@ -15,9 +15,8 @@ public class TestConfig extends YAMLConfig {
     }
 
     public TestConfig load() {
-        super.load(EnvironmentTree.forPrefix("testprefix")
+        return super.load(ConfigOverrides.forPrefix("testprefix")
                 .withEnvironmentVariables()
                 .withSystemProperties());
-        return this;
     }
 }

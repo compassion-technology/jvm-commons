@@ -90,7 +90,7 @@ public interface Config {
 	 * @param log the logger to use to log any errors/warnings
 	 * @param om the object mapper to use (usually a YAML mapper via {@link YAMLUtils#newMapper()})
 	 * @param stream the stream to load (can be {@code null})
-	 * @see #load(Logger, ObjectMapper, Config, EnvironmentTree, String...)
+	 * @see #load(Logger, ObjectMapper, Config, ConfigOverrides, String...)
 	 * @see #resolveCodeDir(Logger, String, IOFunction)
 	 * @see #resolveCurrentDir(Logger, String, IOFunction)
 	 */
@@ -163,14 +163,14 @@ public interface Config {
 	 * @return the configuration object {@code defConfig} after it has been loaded
 	 * @see #resolveCodeDir(Logger, String, IOFunction)
 	 */
-	static <C extends Config> C load(Logger log, ObjectMapper om, C conf, EnvironmentTree env, String... paths) {
+	static <C extends Config> C load(Logger log, ObjectMapper om, C conf, ConfigOverrides env, String... paths) {
 		for (val path : paths) {
 			conf.merge(log, om, conf.resolveCodeDir(log, path, Files::newInputStream));
 		}
 		
 		if (env != null) {
 			try {
-				env.applyOverrides(om, conf);
+				conf = env.applyOverrides(om, conf);
 			} catch (IOException e) {
 				log.warn("Error applying environment overrides", e);
 			}
