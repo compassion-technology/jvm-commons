@@ -6,12 +6,15 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.CaseFormat;
 
@@ -99,33 +102,47 @@ public class EnvironmentTree {
      * @throws IOException
      */
 	public <T> void applyOverrides(ObjectMapper om, T obj) throws IOException {
-        var tree = om.valueToTree(obj);
-        var trav = tree.traverse();
-        while (!trav.isClosed()) {
-            var fn = trav.nextFieldName();
-            if (fn == null) { continue; }
-            
-            var path = trav.getParsingContext().pathAsPointer();
-            var node = tree.at(path);
-            nextNode(path, node);
-            
-            var parent = tree.at(path.head());
-            if (!parent.isObject()) { continue; }
-            
-            var objNode = (ObjectNode) parent;
-            var prop = last(path);
-            
-            for (val env : environments) {
-	            val key = prefix + CaseFormat.LOWER_CAMEL.to(env.pathFormat(),
-	                    path.toString().replace(JsonPointer.SEPARATOR, env.pathSeparator()));
-	            if (env.has(key, node)) {
-                    objNode.put(prop, env.get(key, node));
+		for (var env: environments) {
+	        var tree = om.valueToTree(obj);
+	        var trav = tree.traverse();
+	        while (!trav.isClosed()) {
+	            var fn = trav.nextFieldName();
+	            if (fn == null) { continue; }
+	            
+	            var path = trav.getParsingContext().pathAsPointer();
+	            var node = tree.at(path);
+	            nextNode(path, node);
+	            
+	            var parent = tree.at(path.head());
+	            if (!parent.isObject()) { continue; }
+	            
+	            var objNode = (ObjectNode) parent;
+	            var prop = last(path);
+	            
+	            if (node.isArray()) {
+	            	var arr = (ArrayNode) node;
+	        		applyOverrides(env, path, node, arr::add);
+	        		
+	        		var idx = new MutableInt();
+	            	for (var child : node) {
+	            		applyOverrides(env, path.appendIndex(idx.intValue()), child, $ -> arr.set(idx.intValue(), $));
+	            		idx.increment();
+	            	}
+	            } else {
+	            	applyOverrides(env, path, node, $ -> objNode.put(prop, $));
 	            }
-            }
-        }
-        om.readerForUpdating(obj).readValue(tree);
-		
+	        }
+	        om.readerForUpdating(obj).readValue(tree);
+		}
 		for (val env : environments) { env.close(); }
+	}
+	
+	private void applyOverrides(Environment env, JsonPointer path, JsonNode node, Consumer<String> updater) {
+        val key = prefix + CaseFormat.LOWER_CAMEL.to(env.pathFormat(),
+                path.toString().replace(JsonPointer.SEPARATOR, env.pathSeparator()));
+        if (env.has(key, node)) {
+        	updater.accept(env.get(key, node));
+        }
 	}
 	
 	protected void nextNode(JsonPointer path, JsonNode node) {
