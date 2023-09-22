@@ -39,13 +39,15 @@ public class ParamStoreEnvironment implements ConfigEnvironment {
 	@Override
 	public boolean has(String path, JsonNode existing) {
 	    if (!enabled.getAsBoolean()) { return false; }
-	    return initClientAndMap().containsKey(StringUtils.prependIfMissing(path, "/"));
+	    return initClient().initMap().containsKey(StringUtils.prependIfMissing(path, "/"));
 	}
 	
-	private Map<String, String> initClientAndMap() {
-		if (client == null) {
-	    	client = SsmClient.create();
-	    }
+	private ParamStoreEnvironment initClient() {
+		if (client == null) { client = SsmClient.create(); }
+		return this;
+	}
+	
+	private Map<String, String> initMap() {
 		if (map == null) {
 	    	map = new HashMap<>();
 	    	client.describeParametersPaginator().forEach($ -> $.parameters().forEach(p -> {
@@ -58,11 +60,13 @@ public class ParamStoreEnvironment implements ConfigEnvironment {
 	@Override
 	public String get(String path, JsonNode existing) {
 		var pathNorm = StringUtils.prependIfMissing(path, "/");
-		var ret = initClientAndMap().get(pathNorm);
+		var ret = initClient().initMap().get(pathNorm);
+		// Simple equality on the sentinel means that an actual value of $ is NOT equal, even though equal()
 		return ret == null || ret != SENTINEL? ret : getParamValue(pathNorm);
 	}
 	
 	public String getParamValue(String path) {
+		initClient();
 		try {
 			log.debug("Looking for parameter {}", path);
 			var v = client.getParameter(req -> req.name(path).withDecryption(true)).parameter().value();
@@ -82,6 +86,8 @@ public class ParamStoreEnvironment implements ConfigEnvironment {
 	}
 	
 	public String getSecretValue(String path, String secret) throws IOException {
+		initClient();
+		
 		// If there is a slash after the secret name, that might indicate the key inside the secret to retrieve,
 		// so don't include that in lookups.
 		// CDK v2 now parses owned secret names (used to be a context toggle) and no longer includes a suffix on the name. 
