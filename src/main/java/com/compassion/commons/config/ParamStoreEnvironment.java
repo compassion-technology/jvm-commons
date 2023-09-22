@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.compassion.commons.LambdaUtils.IO;
 import com.compassion.commons.config.EnvironmentTree.Environment;
 import com.compassion.commons.config.SecretConverter.DefaultSecretConverter;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.CaseFormat;
 
 import lombok.Setter;
@@ -41,7 +42,7 @@ public class ParamStoreEnvironment implements Environment {
     public CaseFormat pathFormat() { return CaseFormat.LOWER_CAMEL; }
     
 	@Override
-	public boolean has(String path) {
+	public boolean has(String path, JsonNode existing) {
 	    if (!enabled.getAsBoolean()) { return false; }
 	    return initClientAndMap().containsKey(StringUtils.prependIfMissing(path, "/"));
 	}
@@ -60,7 +61,7 @@ public class ParamStoreEnvironment implements Environment {
 	}
 	
 	@Override
-	public String get(String path) {
+	public String get(String path, JsonNode existing) {
 		var pathNorm = StringUtils.prependIfMissing(path, "/");
 		var ret = initClientAndMap().get(pathNorm);
 		return ret == null || ret != SENTINEL? ret : getParamValue(pathNorm);
@@ -70,10 +71,10 @@ public class ParamStoreEnvironment implements Environment {
 		try {
 			log.debug("Looking for parameter {}", path);
 			var v = client.getParameter(req -> req.name(path).withDecryption(true)).parameter().value();
-			var ret = v.startsWith(SECRET_PATH)? getSecretValue(path, v) : v;
+			if (v.startsWith(SECRET_PATH)) { v = getSecretValue(path, v); }
 			// Cache the parameter to avoid a second lookup in get()
-			map.put(path, ret);
-			return ret;
+			map.put(path, v);
+			return v;
 		} catch (ParameterNotFoundException e) {
 			// Not all params are required or defined- no logging needed
 		} catch (SsmException e) {

@@ -27,8 +27,8 @@ import lombok.val;
  */
 public class EnvironmentTree {
 	public interface Environment extends AutoCloseable {
-		boolean has(String path);
-		String get(String path);
+		boolean has(String path, JsonNode existing);
+		String get(String path, JsonNode existing);
 		
 		default CaseFormat pathFormat() {
 			return CaseFormat.LOWER_UNDERSCORE;
@@ -47,8 +47,8 @@ public class EnvironmentTree {
 	public class EnvironmentMap implements Environment {
 		private Map<String, String> map = new HashMap<>();
 		
-		@Override public boolean has(String path) { return map.containsKey(path); }
-		@Override public String get(String path) { return map.get(path); }
+		@Override public boolean has(String path, JsonNode existing) { return map.containsKey(path); }
+		@Override public String get(String path, JsonNode existing) { return map.get(path); }
 		
 		public EnvironmentMap put(String path, String value) {
 	        if (StringUtils.startsWithIgnoreCase(path, prefix)) {
@@ -106,23 +106,22 @@ public class EnvironmentTree {
             if (fn == null) { continue; }
             
             var path = trav.getParsingContext().pathAsPointer();
-            nextNode(path, tree.at(path));
+            var node = tree.at(path);
+            nextNode(path, node);
             
-            var node = tree.at(path.head());
-            if (!node.isObject()) { continue; }
+            var parent = tree.at(path.head());
+            if (!parent.isObject()) { continue; }
             
-            var objNode = (ObjectNode) node;
+            var objNode = (ObjectNode) parent;
             var prop = last(path);
             
             for (val env : environments) {
 	            val key = prefix + CaseFormat.LOWER_CAMEL.to(env.pathFormat(),
 	                    path.toString().replace(JsonPointer.SEPARATOR, env.pathSeparator()));
-	            if (env.has(key)) {
-                    objNode.put(prop, env.get(key));	
+	            if (env.has(key, node)) {
+                    objNode.put(prop, env.get(key, node));
 	            }
             }
-            
-            objNode.replace(prop, customOverride(path, objNode.get(prop)));
         }
         om.readerForUpdating(obj).readValue(tree);
 		
@@ -131,11 +130,6 @@ public class EnvironmentTree {
 	
 	protected void nextNode(JsonPointer path, JsonNode node) {
 		// Extension point
-	}
-	
-	@SuppressWarnings("unused")
-	protected JsonNode customOverride(JsonPointer path, JsonNode node) throws IOException {
-		return node;
 	}
 	
 	private static String last(JsonPointer p) {

@@ -14,6 +14,7 @@ import com.bettercloud.vault.api.Logical.logicalOperations;
 import com.bettercloud.vault.response.LogicalResponse;
 import com.bettercloud.vault.rest.RestResponse;
 import com.compassion.commons.config.EnvironmentTree.Environment;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.CaseFormat;
 import com.google.common.net.MediaType;
 
@@ -55,12 +56,12 @@ public class VaultEnvironment extends VaultConfig implements Environment {
     public CaseFormat pathFormat() { return CaseFormat.LOWER_CAMEL; }
 	
 	@Override
-	public boolean has(String path) {
-		return get(path) != null;
+	public boolean has(String path, JsonNode existing) {
+		return get(path, existing) != null;
 	}
 
 	@Override
-	public String get(String path) {
+	public String get(String path, JsonNode existing) {
 		path = StringUtils.prependIfMissing(path, "/");
 		if (vault == null || StringUtils.containsAny(path, SKIP)) { return null; }
 		
