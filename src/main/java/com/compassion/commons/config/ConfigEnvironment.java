@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.CaseFormat;
@@ -95,5 +97,30 @@ public interface ConfigEnvironment extends AutoCloseable {
 		
 		@Override public boolean has(String path, JsonNode existing) { return map.containsKey(path); }
 		@Override public String get(String path, JsonNode existing) { return map.get(path); }
+	}
+	
+	/**
+	 * A configuration environment that represents a partial configuration tree loaded from a 
+	 * JSON, YAML, or other file that should be merged into a base configuration. 
+	 */
+	@RequiredArgsConstructor
+	class PartialConfiguration implements ConfigEnvironment {
+		private final JsonNode tree;
+		
+		@Override
+		public boolean has(String path, JsonNode existing) {
+			var node = tree.at(removePrefix(path));
+			return node.isValueNode() && !node.isNull();
+		}
+		
+		@Override
+		public String get(String path, JsonNode existing) {
+			return tree.at(removePrefix(path)).asText();
+		}
+		
+		private static String removePrefix(String path) {
+			int i = path.indexOf(JsonPointer.SEPARATOR);
+			return i < 0? path : path.substring(i);
+		}
 	}
 }
