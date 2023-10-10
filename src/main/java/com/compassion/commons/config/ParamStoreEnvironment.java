@@ -51,11 +51,9 @@ public class ParamStoreEnvironment implements ConfigEnvironment {
 		return map;
 	}
 	private Map<String, String> listParams() {
-		initClient().describeParameters(req ->
-			req.maxResults(50).parameterFilters(f -> f.option("Contains").key("Name").values("cof").build()))
-		.parameters().forEach(p -> {
-			initMap().put(p.name(), SENTINEL);
-		});
+		initClient().describeParametersPaginator().forEach($ -> $.parameters().forEach(p -> {
+    		initMap().put(p.name(), SENTINEL);
+    	}));
 		return map;
 	}
 	
