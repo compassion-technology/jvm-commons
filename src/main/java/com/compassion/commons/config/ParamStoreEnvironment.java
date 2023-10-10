@@ -51,6 +51,7 @@ public class ParamStoreEnvironment implements ConfigEnvironment {
 		return map;
 	}
 	private Map<String, String> listParams() {
+		if (map != null) { return map; }
 		initClient().describeParametersPaginator().forEach($ -> $.parameters().forEach(p -> {
     		initMap().put(p.name(), SENTINEL);
     	}));
