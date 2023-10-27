@@ -46,6 +46,14 @@ public class SnowflakeConfig extends JOOQDatabaseConfig {
 	@JsonSchemaDefault("30")
 	private int maxBatchTime = 30;
 	
+	@JsonSchemaDescription("The maximum number of connections to pool when re-using connections to Snowflake")
+	@JsonSchemaDefault("4")
+	private int maxConnections = 4;
+	
+	@JsonSchemaDescription("The minimum number of connections to pool when re-using connections to Snowflake")
+	@JsonSchemaDefault("1")
+	private int minConnections = 1;
+	
 	protected SnowflakeConfig(String serviceAcct, String defRole, String defDB) {
 		if (StringUtils.isBlank(serviceAcct)) {
 			setUser(SystemUtils.USER_NAME);
@@ -68,6 +76,11 @@ public class SnowflakeConfig extends JOOQDatabaseConfig {
 	
 	@Override
 	public String getHostURL() {
+		// Set c3p0 props now before the first connection is opened
+		System.setProperty("c3p0.minPoolSize", String.valueOf(getMinConnections()));
+		System.setProperty("c3p0.initialPoolSize", String.valueOf(getMinConnections()));
+		System.setProperty("c3p0.maxPoolSize", String.valueOf(getMaxConnections()));
+		
 		return StringSubstitutor.replace("${base}?authenticator=${auth}&role=${role}&db=${db}", ImmutableMap.of(
 			"auth",   authenticator,
 			"role",   role,
