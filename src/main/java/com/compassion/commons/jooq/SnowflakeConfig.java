@@ -81,14 +81,6 @@ public class SnowflakeConfig extends JOOQDatabaseConfig {
 	
 	@Override
 	public String getHostURL() {
-		// Set c3p0 props now before the first connection is opened
-		System.setProperty("c3p0.minPoolSize", String.valueOf(getMinConnections()));
-		System.setProperty("c3p0.initialPoolSize", String.valueOf(getMinConnections()));
-		System.setProperty("c3p0.maxPoolSize", String.valueOf(getMaxConnections()));
-		// Default of 30 retries can lock users out of account.
-		// Problems are usually networking or password which aren't solved by retry.
-		System.setProperty("c3p0.acquireRetryAttempts", String.valueOf(1));
-		
 		return StringSubstitutor.replace("${base}?authenticator=${auth}&role=${role}&db=${db}", ImmutableMap.of(
 			"auth",   authenticator,
 			"role",   role,
@@ -99,6 +91,14 @@ public class SnowflakeConfig extends JOOQDatabaseConfig {
 	
 	@Override
 	public Connection acquire() throws DataAccessException {
+		// Set c3p0 props now before the first connection is opened
+		System.setProperty("c3p0.minPoolSize", String.valueOf(getMinConnections()));
+		System.setProperty("c3p0.initialPoolSize", String.valueOf(getMinConnections()));
+		System.setProperty("c3p0.maxPoolSize", String.valueOf(getMaxConnections()));
+		// Default of 30 retries can lock users out of account.
+		// Problems are usually networking or password which aren't solved by retry.
+		System.setProperty("c3p0.acquireRetryAttempts", String.valueOf(1));
+		
 		log.debug("Opening new connection to Snowflake...");
 		return super.acquire();
 	}
