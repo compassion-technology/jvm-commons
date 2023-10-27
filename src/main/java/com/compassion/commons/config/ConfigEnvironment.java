@@ -108,7 +108,7 @@ public interface ConfigEnvironment extends AutoCloseable {
 		@Override
 		public boolean has(String path, JsonNode existing) {
 			var node = tree.at(removePrefix(path));
-			return node.isValueNode() && !node.isNull();
+			return (node.isValueNode() || node.isArray()) && !node.isNull();
 		}
 		
 		@Override
