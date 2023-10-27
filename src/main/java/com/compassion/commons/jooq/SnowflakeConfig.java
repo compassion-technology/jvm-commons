@@ -85,6 +85,9 @@ public class SnowflakeConfig extends JOOQDatabaseConfig {
 		System.setProperty("c3p0.minPoolSize", String.valueOf(getMinConnections()));
 		System.setProperty("c3p0.initialPoolSize", String.valueOf(getMinConnections()));
 		System.setProperty("c3p0.maxPoolSize", String.valueOf(getMaxConnections()));
+		// Default of 30 retries can lock users out of account.
+		// Problems are usually networking or password which aren't solved by retry.
+		System.setProperty("c3p0.acquireRetryAttempts", String.valueOf(1));
 		
 		return StringSubstitutor.replace("${base}?authenticator=${auth}&role=${role}&db=${db}", ImmutableMap.of(
 			"auth",   authenticator,
