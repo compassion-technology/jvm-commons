@@ -1,9 +1,12 @@
 package com.compassion.commons.jooq;
 
+import java.sql.Connection;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.jooq.SQLDialect;
+import org.jooq.exception.DataAccessException;
 
 import com.compassion.commons.LambdaUtils;
 import com.elderresearch.commons.jdbc.JDBCDriver;
@@ -16,7 +19,9 @@ import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @Getter @Setter @Accessors(chain = true)
 public class SnowflakeConfig extends JOOQDatabaseConfig {
 	private static final String
@@ -87,5 +92,11 @@ public class SnowflakeConfig extends JOOQDatabaseConfig {
 			"base",   baseURL,
 			"db",     database
 		));
+	}
+	
+	@Override
+	public Connection acquire() throws DataAccessException {
+		log.debug("Opening new connection to Snowflake...");
+		return super.acquire();
 	}
 }
