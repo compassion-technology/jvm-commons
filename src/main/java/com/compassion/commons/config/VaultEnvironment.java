@@ -14,6 +14,7 @@ import com.bettercloud.vault.api.Logical.logicalOperations;
 import com.bettercloud.vault.response.LogicalResponse;
 import com.bettercloud.vault.rest.RestResponse;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.net.MediaType;
 
 import lombok.extern.log4j.Log4j2;
@@ -56,7 +57,7 @@ public class VaultEnvironment extends VaultConfig implements ConfigEnvironment {
 	}
 
 	@Override
-	public String get(String path, JsonNode existing) {
+	public JsonNode get(String path, JsonNode existing) {
 		path = StringUtils.prependIfMissing(path, "/");
 		if (vault == null || StringUtils.containsAny(path, SKIP)) { return null; }
 		
@@ -77,7 +78,7 @@ public class VaultEnvironment extends VaultConfig implements ConfigEnvironment {
 			case 200:
 				var ret = resp.getData().get(jsonKey);
 				if (ret != null) { log.debug("✅ Secret found at path {} with key {}", path, jsonKey); }
-				return ret;
+				return JsonNodeFactory.instance.textNode(ret);
 			default:
 				log.debug("⚠ Error reading Vault secret: {}", new String(resp.getRestResponse().getBody()));
 				return null;

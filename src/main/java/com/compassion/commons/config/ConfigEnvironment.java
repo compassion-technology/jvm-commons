@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.base.CaseFormat;
 
 import lombok.Getter;
@@ -44,7 +45,7 @@ public interface ConfigEnvironment extends AutoCloseable {
 	 * override for the value
 	 * @return the configuration value at the path in this environment
 	 */
-	String get(String path, JsonNode existing);
+	JsonNode get(String path, JsonNode existing);
 	
 	/**
 	 * When constructing paths, the case format this environment uses. For example, environment
@@ -94,7 +95,7 @@ public interface ConfigEnvironment extends AutoCloseable {
 		private final Map<String, String> map = new HashMap<>();
 		
 		@Override public boolean has(String path, JsonNode existing) { return map.containsKey(path); }
-		@Override public String get(String path, JsonNode existing) { return map.get(path); }
+		@Override public JsonNode get(String path, JsonNode existing) { return JsonNodeFactory.instance.textNode(map.get(path)); }
 	}
 	
 	/**
@@ -112,8 +113,8 @@ public interface ConfigEnvironment extends AutoCloseable {
 		}
 		
 		@Override
-		public String get(String path, JsonNode existing) {
-			return tree.at(removePrefix(path)).asText();
+		public JsonNode get(String path, JsonNode existing) {
+			return tree.at(removePrefix(path));
 		}
 		
 		private static String removePrefix(String path) {

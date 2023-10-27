@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.compassion.commons.LambdaUtils.IO;
 import com.compassion.commons.config.SecretConverter.DefaultSecretConverter;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -60,11 +61,11 @@ public class ParamStoreEnvironment implements ConfigEnvironment {
 	}
 	
 	@Override
-	public String get(String path, JsonNode existing) {
+	public JsonNode get(String path, JsonNode existing) {
 		var pathNorm = StringUtils.prependIfMissing(path, "/");
 		var ret = listParams().get(pathNorm);
 		// Simple equality on the sentinel means that an actual value of $ is NOT equal, even though equal()
-		return ret == null || ret != SENTINEL? ret : getParamValue(pathNorm);
+		return JsonNodeFactory.instance.textNode(ret == null || ret != SENTINEL? ret : getParamValue(pathNorm));
 	}
 	
 	public String getParamValue(String path) {

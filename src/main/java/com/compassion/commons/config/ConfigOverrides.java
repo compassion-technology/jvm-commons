@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 
+import com.compassion.commons.LambdaUtils;
 import com.compassion.commons.Utilities;
 import com.compassion.commons.config.ConfigEnvironment.ConfigEnvironmentMap;
 import com.fasterxml.jackson.core.JsonPointer;
@@ -104,7 +105,7 @@ public class ConfigOverrides {
 	            		idx.increment();
 	            	}
 	            } else {
-	            	applyOverrides(env, path, node, $ -> objNode.put(prop, $));
+	            	applyOverrides(env, path, node, $ -> objNode.replace(prop, $));
 	            }
 	        }
 	        ret = Utilities.cast(om.treeToValue(tree, obj.getClass()));
@@ -113,11 +114,11 @@ public class ConfigOverrides {
 		return ret;
 	}
 	
-	private void applyOverrides(ConfigEnvironment env, JsonPointer path, JsonNode node, Consumer<String> updater) {
+	private void applyOverrides(ConfigEnvironment env, JsonPointer path, JsonNode node, Consumer<JsonNode> updater) {
         val key = CaseFormat.LOWER_CAMEL.to(env.pathFormat(), prefix +
                 path.toString().replace(JsonPointer.SEPARATOR, env.pathSeparator()));
         if (env.has(key, node)) {
-        	updater.accept(env.get(key, node));
+        	LambdaUtils.accept(env.get(key, node), updater);
         }
 	}
 	
