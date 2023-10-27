@@ -137,6 +137,12 @@
 			<version>3.13.33-unshaded</version>
 		</dependency>
 		
+		<!-- ANSI for colorful log output -->
+		<dependency>
+			<groupId>org.fusesource.jansi</groupId>
+			<artifactId>jansi</artifactId>
+			<version>2.4.1</version>
+		</dependency>
 
 		<!-- Unit tests -->
 		<dependency>
