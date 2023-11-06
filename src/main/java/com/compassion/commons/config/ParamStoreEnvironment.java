@@ -94,7 +94,7 @@ public class ParamStoreEnvironment implements ConfigEnvironment {
 		int slash = secret.indexOf('/', SECRET_PATH.length());
 		if (slash > 0) { secret = secret.substring(0, slash); }
 
-		var ret = initMap().computeIfAbsent(secret, $ -> {
+		var ret = listParams().computeIfAbsent(secret, $ -> {
 			log.debug("Looking for secret {}...", $);
 			return initClient().getParameter(
 				GetParameterRequest.builder().name($).withDecryption(true).build()
