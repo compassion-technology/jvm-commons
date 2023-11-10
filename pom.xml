@@ -17,12 +17,14 @@
 		</repository>
 	</repositories>
 
-	<artifactId>jvm-commons</artifactId>
+	<artifactId>jvm-commons-jdk11</artifactId>
 	<name>Compassion JVM Commons</name>
 	<version>4.0.2-SNAPSHOT</version>
 	<inceptionYear>2023</inceptionYear>
 
 	<properties>
+		<!-- StreamNative is still on Java 11 -->
+		<maven.compiler.release>11</maven.compiler.release>
 		<git.projectId>50439669</git.projectId>
 	</properties>
 
