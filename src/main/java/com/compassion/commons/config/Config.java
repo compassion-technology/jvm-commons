@@ -90,16 +90,13 @@ public interface Config {
 	 * @param log the logger to use to log any errors/warnings
 	 * @param om the object mapper to use (usually a YAML mapper via {@link YAMLUtils#newMapper()})
 	 * @param stream the stream to load (can be {@code null})
+	 * @throws IOException if there was an error reading the configuration from the stream
 	 * @see #load(Logger, ObjectMapper, Config, ConfigOverrides, String...)
 	 * @see #resolveCodeDir(Logger, String, IOFunction)
 	 * @see #resolveCurrentDir(Logger, String, IOFunction)
 	 */
-	default void merge(Logger log, ObjectMapper om, InputStream stream) {
-		try {
-			if (stream != null) { om.readerForUpdating(this).readValue(stream); }
-		} catch (IOException e) {
-			log.warn("Error loading configuration", e);
-		}
+	default void merge(Logger log, ObjectMapper om, InputStream stream) throws IOException {
+		if (stream != null) { om.readerForUpdating(this).readValue(stream); }
 	}
 	
 	/**
@@ -161,19 +158,16 @@ public interface Config {
      * @param paths zero or more paths (<em>relative to the executing code</em>, not the current directory)
 	 * specifying files to load
 	 * @return the configuration object {@code defConfig} after it has been loaded
+	 * @throws IOException if there was an error reading the configuration from the stream or applying environment overrides
 	 * @see #resolveCodeDir(Logger, String, IOFunction)
 	 */
-	static <C extends Config> C load(Logger log, ObjectMapper om, C conf, ConfigOverrides env, String... paths) {
+	static <C extends Config> C load(Logger log, ObjectMapper om, C conf, ConfigOverrides env, String... paths) throws IOException {
 		for (val path : paths) {
 			conf.merge(log, om, conf.resolveCodeDir(log, path, Files::newInputStream));
 		}
 		
 		if (env != null) {
-			try {
-				conf = env.applyOverrides(om, conf);
-			} catch (IOException e) {
-				log.warn("Error applying environment overrides", e);
-			}
+			conf = env.applyOverrides(om, conf);
 		}
 		conf.postProcess(om);
 		return conf;

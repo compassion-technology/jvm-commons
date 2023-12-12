@@ -1,5 +1,7 @@
 package com.compassion.commons.config;
 
+import java.io.IOException;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -14,7 +16,7 @@ public class TestConfig extends YAMLConfig {
         private String y3 = "I want to change to test";
     }
 
-    public TestConfig load() {
+    public TestConfig load() throws IOException {
         return super.load(ConfigOverrides.forPrefix("testprefix")
                 .withEnvironmentVariables()
                 .withSystemProperties());

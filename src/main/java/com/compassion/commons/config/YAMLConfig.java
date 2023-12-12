@@ -1,6 +1,7 @@
 /* ©2020 Elder Research, Inc. All rights reserved. */
 package com.compassion.commons.config;
 
+import java.io.IOException;
 import java.nio.file.Files;
 
 import com.compassion.commons.Utilities;
@@ -22,9 +23,10 @@ public class YAMLConfig implements Config {
 	 * properties that should override the defaults and configuration loaded from the file (can be {@code null}).
      * @param paths zero or more paths (<em>relative to the executing code</em>, not the current directory)
 	 * specifying files to load
+	 * @throws IOException if there was an error reading the configuration from the stream 
 	 * @see Config#load(org.apache.logging.log4j.Logger, ObjectMapper, Config, ConfigOverrides, String...)
 	 */
-	public <C extends YAMLConfig> C load(ConfigOverrides env, String... paths) {
+	public <C extends YAMLConfig> C load(ConfigOverrides env, String... paths) throws IOException {
 		return Utilities.cast(Config.load(log, mapper, this, env, paths));
 	}
 	
