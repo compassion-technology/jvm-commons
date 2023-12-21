@@ -7,13 +7,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.jooq.DAO;
+import org.jooq.lambda.Seq;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @Accessors(fluent = true)
+@RequiredArgsConstructor
 public class DaoBatcher<P, D extends DAO<?, P, ?>> {
 	@Getter
 	private final D dao;
@@ -26,15 +29,17 @@ public class DaoBatcher<P, D extends DAO<?, P, ?>> {
 	
 	private long lastTransactionTime = System.currentTimeMillis();
 	
-	public DaoBatcher(SnowflakeConfig config, D dao) {
-		this.dao = dao;
-		this.maxBatchSize = config.getMaxBatchSize();
-		this.maxBatchTime = TimeUnit.SECONDS.toMillis(config.getMaxBatchTime());
+	public DaoBatcher(D dao, SnowflakeConfig config) {
+		this(dao, config.getMaxBatchSize(), TimeUnit.SECONDS.toMillis(config.getMaxBatchTime()));
 	}
 	
 	public DaoBatcher<P, D> truncate() {
 		dao.configuration().dsl().truncate(dao.getTable()).execute();
 		return this;
+	}
+	
+	public Seq<P> pending() {
+		return Seq.concat(insert, update, delete);
 	}
 	
 	public void insert(P obj) { add(insert, obj); }
