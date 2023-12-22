@@ -11,6 +11,7 @@ import org.jooq.lambda.Seq;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
 
@@ -26,6 +27,9 @@ public class DaoBatcher<P, D extends DAO<?, P, ?>> {
 	private final List<P> insert = new LinkedList<>(),
 	                      update = new LinkedList<>(),
                           delete = new LinkedList<>();
+	
+	@Setter
+	private Runnable onFlush;
 	
 	private long lastTransactionTime = System.currentTimeMillis();
 	
@@ -66,6 +70,7 @@ public class DaoBatcher<P, D extends DAO<?, P, ?>> {
 			log.debug("{} {} values in the database...", name, batch.size());
 			action.accept(batch);
 			batch.clear();
+			if (onFlush != null) { onFlush.run(); }
 			lastTransactionTime = System.currentTimeMillis();
 		}
 	}
