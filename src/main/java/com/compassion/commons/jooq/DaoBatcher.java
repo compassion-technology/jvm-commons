@@ -63,7 +63,7 @@ public class DaoBatcher<P, D extends DAO<?, P, ?>> {
 	
 	private void flush(List<P> batch, int maxSize, long nextTime, Consumer<Collection<P>> action, String name) {
 		if (!batch.isEmpty() && (batch.size() >= maxSize || System.currentTimeMillis() > nextTime)) {
-			log.info("{} {} values in Snowflake...", name, batch.size());
+			log.debug("{} {} values in the database...", name, batch.size());
 			action.accept(batch);
 			batch.clear();
 			lastTransactionTime = System.currentTimeMillis();
