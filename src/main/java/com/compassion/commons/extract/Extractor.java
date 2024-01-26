@@ -185,6 +185,6 @@ public abstract class Extractor<F extends Format, T> {
 	}
 	
 	public Range<T> getValidRange() {
-		return Range.between(min, max, comp);
+		return Range.of(min, max, comp);
 	}
 }

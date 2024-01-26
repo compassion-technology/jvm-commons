@@ -3,12 +3,11 @@ package com.compassion.commons;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-
-import org.apache.commons.lang3.StringUtils;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -83,7 +82,7 @@ public class DaemonWorker<T> implements Runnable {
 	 * queue elements when the callback is invoked.
 	 */
 	public DaemonWorker(String name, BlockingQueue<T> queue, Consumer<List<T>> callback) {
-		this.name = StringUtils.defaultString(name, getClass().getSimpleName() + instances++);
+		this.name = Objects.toString(name, getClass().getSimpleName() + instances++);
 		this.queue = queue;
 		this.maxBatchSize = queue.remainingCapacity();
 		this.callback = callback;

@@ -42,7 +42,7 @@ public final class Match<T> {
 	public String getContextBefore() { return before;      }
 	public String getMatchText()     { return matchStr;    }
 	
-	public Range<Integer> getRange() { return Range.between(start, end); }
+	public Range<Integer> getRange() { return Range.of(start, end); }
 	
     @Override
     public boolean equals(Object obj) {
