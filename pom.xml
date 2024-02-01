@@ -133,8 +133,8 @@
 		<!-- Snowflake driver -->
 		<dependency>
 			<groupId>net.snowflake</groupId>
-			<artifactId>snowflake-jdbc</artifactId>
-			<version>3.13.33-unshaded</version>
+			<artifactId>snowflake-jdbc-thin</artifactId>
+			<version>3.14.5</version>
 		</dependency>
 		
 		<!-- ANSI for colorful log output -->
