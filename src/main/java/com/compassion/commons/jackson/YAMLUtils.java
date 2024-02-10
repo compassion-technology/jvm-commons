@@ -1,6 +1,7 @@
 /* ©2017-2020 Elder Research, Inc. All rights reserved. */
 package com.compassion.commons.jackson;
 
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
@@ -8,9 +9,11 @@ import org.yaml.snakeyaml.DumperOptions.LineBreak;
 import org.yaml.snakeyaml.DumperOptions.ScalarStyle;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.Tag;
 
+import com.compassion.commons.Utilities;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.dataformat.yaml.util.StringQuotingChecker;
@@ -64,6 +67,25 @@ public class YAMLUtils {
 			}
 		}
 		return false;
+	}
+	
+	/**
+	 * Find the tuple in the mapping node with the given key or add one if none exists.
+	 * @param n the root node
+	 * @param key the key
+	 * @param callback the callback to invoke. If a tuple is found, the value node is
+	 * provided as the input. If no tuple is found, {@code null} is the parameter. In both
+	 * cases, the returned node from the callback will be used as the value node of the tuple.
+	 */
+	public static void findOrAdd(MappingNode n, String key, Function<MappingNode, Node> callback) {
+		if (!YAMLUtils.findInMap(n, key, MappingNode.class, existing -> {
+			n.getValue().replaceAll(tuple -> tuple.getValueNode() == existing
+				? new NodeTuple(tuple.getKeyNode(), callback.apply(Utilities.cast(existing)))
+				: tuple);
+			return true;
+		})) {
+			n.getValue().add(new NodeTuple(YAMLUtils.stringNode(key), callback.apply(null)));
+		}
 	}
 	
 	/**
