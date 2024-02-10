@@ -1,17 +1,21 @@
 /* ©2017-2020 Elder Research, Inc. All rights reserved. */
 package com.compassion.commons.jackson;
 
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.LineBreak;
 import org.yaml.snakeyaml.DumperOptions.ScalarStyle;
+import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.Tag;
+import org.yaml.snakeyaml.representer.Representer;
 
 import com.compassion.commons.Utilities;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -121,5 +125,26 @@ public class YAMLUtils {
         }
         
         return ScalarStyle.PLAIN;
+	}
+	
+	public static class StdRepresenter extends Representer {
+		public StdRepresenter(DumperOptions opts) {
+			super(opts);
+			setDefaultScalarStyle(ScalarStyle.PLAIN);
+		}
+		
+		@Override
+		protected NodeTuple representJavaBeanProperty(Object javaBean, Property property, Object propertyValue, Tag customTag) {
+			if (propertyValue == null) { return null; }
+			return super.representJavaBeanProperty(javaBean, property, propertyValue, customTag);
+		}
+		
+		@Override
+		protected MappingNode representJavaBean(Set<Property> properties, Object javaBean) {
+			if (!classTags.containsKey(javaBean.getClass())) {
+				addClassTag(javaBean.getClass(), Tag.MAP);
+			}
+			return super.representJavaBean(properties, javaBean);
+		}
 	}
 }
