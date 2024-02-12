@@ -130,7 +130,7 @@ public class YAMLUtils {
 	public static class StdRepresenter extends Representer {
 		public StdRepresenter(DumperOptions opts) {
 			super(opts);
-			setDefaultScalarStyle(ScalarStyle.PLAIN);
+			setDefaultScalarStyle(opts.getDefaultScalarStyle());
 		}
 		
 		@Override
