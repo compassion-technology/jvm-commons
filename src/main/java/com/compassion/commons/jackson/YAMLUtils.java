@@ -146,5 +146,10 @@ public class YAMLUtils {
 			}
 			return super.representJavaBean(properties, javaBean);
 		}
+		
+		@Override
+		protected Node representScalar(Tag tag, String value, ScalarStyle style) {
+			return super.representScalar(tag.isCustomGlobal()? Tag.STR : tag, value, style);
+		}
 	}
 }
