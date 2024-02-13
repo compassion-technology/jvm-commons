@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import com.compassion.commons.Utilities;
-import com.compassion.commons.jackson.YAMLUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
@@ -15,7 +15,9 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class YAMLConfig implements Config {
 	@Getter
-	private static final ObjectMapper mapper = YAMLUtils.newMapper().setDefaultMergeable(true);
+	private static final ObjectMapper mapper = new YAMLMapper()
+		.enable(YAMLGenerator.Feature.USE_PLATFORM_LINE_BREAKS)
+		.setDefaultMergeable(true);
 	
 	/**
 	 * Load configuration from the environment and optionally YAML files.

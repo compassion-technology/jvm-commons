@@ -7,7 +7,6 @@ import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.DumperOptions.LineBreak;
 import org.yaml.snakeyaml.DumperOptions.ScalarStyle;
 import org.yaml.snakeyaml.introspector.Property;
 import org.yaml.snakeyaml.nodes.MappingNode;
@@ -19,7 +18,6 @@ import org.yaml.snakeyaml.representer.Representer;
 
 import com.compassion.commons.Utilities;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.dataformat.yaml.util.StringQuotingChecker;
 
 import lombok.val;
@@ -33,26 +31,6 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 public class YAMLUtils {
-	/**
-	 * Gets an {@link ObjectMapper} configured to read and write YAML. When writing YAML, the mapper will use the
-	 * default line breaks for the platform on which the code is running.
-	 * @return a YAML-enabled object mapper
-	 * @see LineBreak#getPlatformLineBreak()
-	 */
-	public YAMLMapper newMapper() {
-		return newMapper(LineBreak.getPlatformLineBreak());
-	}
-	
-	/**
-	 * Gets an {@link ObjectMapper} configured to read and write YAML. When writing YAML, the mapper will use the
-	 * specified line breaks.
-	 * @param lineBreak the line breaks to use when writing YAML
-	 * @return a YAML-enabled object mapper
-	 */
-	public YAMLMapper newMapper(LineBreak lineBreak) {
-		return new YAMLMapper(new YAMLFactoryCustom(lineBreak));
-	}
-	
 	/**
 	 * Look for a key in a YAML mapping node, returning {@code true} if the key is found and the callback returns
 	 * {@code true}.
