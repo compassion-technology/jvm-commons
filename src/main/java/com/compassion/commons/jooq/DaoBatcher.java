@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang3.function.Consumers;
 import org.jooq.DAO;
 import org.jooq.lambda.Seq;
 
@@ -30,7 +31,9 @@ public class DaoBatcher<P, D extends DAO<?, P, ?>> {
                           delete = new LinkedList<>();
 	
 	@Setter
-	private Predicate<List<P>> onFlush = $ -> true;
+	private Predicate<List<P>> flushPre = $ -> true;
+	@Setter
+	private Consumer<List<P>> flushPost = Consumers.nop();
 	
 	private long lastTransactionTime = System.currentTimeMillis();
 	
@@ -69,8 +72,9 @@ public class DaoBatcher<P, D extends DAO<?, P, ?>> {
 	private void flush(List<P> batch, int maxSize, long nextTime, Consumer<Collection<P>> action, String name) {
 		if (!batch.isEmpty() && (batch.size() >= maxSize || System.currentTimeMillis() > nextTime)) {
 			log.debug("{} {} values in the database...", name, batch.size());
-			if (onFlush.test(batch)) {
-				action.accept(batch);	
+			if (flushPre.test(batch)) {
+				action.accept(batch);
+				flushPost.accept(batch);
 			}
 			batch.clear();
 			lastTransactionTime = System.currentTimeMillis();
