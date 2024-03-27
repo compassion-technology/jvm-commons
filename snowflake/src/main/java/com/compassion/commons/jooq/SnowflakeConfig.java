@@ -8,7 +8,6 @@ import org.apache.commons.text.StringSubstitutor;
 import org.jooq.SQLDialect;
 import org.jooq.exception.DataAccessException;
 
-import com.compassion.commons.LambdaUtils;
 import com.elderresearch.commons.jdbc.JDBCDriver;
 import com.elderresearch.commons.jooq.JOOQDatabaseConfig;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -69,8 +68,9 @@ public class SnowflakeConfig extends JOOQDatabaseConfig {
 		}
 		
 		setDriver(JDBCDriver.SNOWFLAKE);
-		LambdaUtils.accept(defRole, this::setRole);
-		LambdaUtils.accept(defDB, this::setDatabase);
+		
+		if (defRole != null) { setRole(defRole); }
+		if (defDB != null) { setDatabase(defDB); }
 	}
 	
 	@JsonIgnore @Override
