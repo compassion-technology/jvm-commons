@@ -17,20 +17,29 @@
 	</properties>
 
 	<dependencies>
-		<!-- Client for custom JSON schema and testing -->
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>jvm-commons</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+		   <groupId>com.fasterxml.jackson.datatype</groupId>
+		   <artifactId>jackson-datatype-jdk8</artifactId>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.apache.pulsar</groupId>
-			<!-- Using "pulsar-client" has shaded Jackson which conflicts with real Jackson -->
 			<artifactId>pulsar-client-original</artifactId>
 			<version>${pulsar.version}</version>
 		</dependency>
 		
-		<!-- Function API (for Record class) -->
+		<!-- This ordinarily would be scope: provided but for utilities and mocking,
+		     it needs to be on the compile classpath. Functions can redeclare. -->
 		<dependency>
 		    <groupId>org.apache.pulsar</groupId>
 		    <artifactId>pulsar-functions-api</artifactId>
 		    <version>${pulsar.version}</version>
-		    <scope>provided</scope>
 		</dependency>
 		
 		<!-- Logging bridging -->
