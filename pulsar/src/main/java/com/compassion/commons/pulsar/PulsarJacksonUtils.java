@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.Module;
 
 public interface PulsarJacksonUtils {
 	interface RecordMixin<T> {
@@ -39,19 +40,20 @@ public interface PulsarJacksonUtils {
 		T getValue();
 	}
 	
-	static ObjectMapper mapper = initMapper(new ObjectMapper());
-	
-	static ObjectMapper initMapper(ObjectMapper om) {
+	static ObjectMapper initMapper(ObjectMapper om, Module...  modules) {
 		return om
 		  .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 		  .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 		  .addMixIn(Record.class, RecordMixin.class)
 		  .addMixIn(Message.class, MessageMixin.class)
-		  .registerModules(new Jdk8Module(), new JavaTimeModule());
+		  .registerModules(modules);
 	}
 	
 	class ByeToMapSerializer extends StdSerializer<byte[]> {
 		private static final long serialVersionUID = 1L;
+		
+		private static final ObjectMapper mapper = initMapper(new ObjectMapper(),
+			new Jdk8Module(), new JavaTimeModule());
 
 		public ByeToMapSerializer() { super(byte[].class); }
 		
