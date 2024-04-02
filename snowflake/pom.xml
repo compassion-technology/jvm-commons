@@ -40,10 +40,6 @@
 					<artifactId>mssql-jdbc</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>org.postgresql</groupId>
-					<artifactId>postgresql</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>com.elderresearch.commons-jvm</groupId>
 					<artifactId>commons-jvm-java8</artifactId>
 				</exclusion>
