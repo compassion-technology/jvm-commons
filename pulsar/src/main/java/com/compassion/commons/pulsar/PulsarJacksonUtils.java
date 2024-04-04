@@ -34,10 +34,8 @@ public interface PulsarJacksonUtils {
 	    Optional<Schema<?>> getReaderSchema();
 		@JsonIgnore
 		ClientCnx getCnx();
-		@JsonIgnore
-		byte[] getData();
 		@JsonSerialize(using = ByeToMapSerializer.class)
-		T getValue();
+		byte[] getData();
 	}
 	
 	static ObjectMapper initMapper(ObjectMapper om, Module...  modules) {
