@@ -1,16 +1,12 @@
 package com.compassion.commons.log;
 
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.jooq.lambda.Seq;
 
 import com.compassion.commons.LambdaUtils;
-import com.compassion.commons.Utilities;
 
-import lombok.val;
 import picocli.CommandLine;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
@@ -26,13 +22,10 @@ public class LoggingMixin {
     private boolean[] verbosity = new boolean[0];
 
     private static LoggingMixin getTopLevelCommandLoggingMixin(CommandSpec commandSpec) {
-    	val obj = commandSpec.root().userObject();
-    	try {
-			return Utilities.cast(FieldUtils.readField(obj, "loggingMixin", true));
-		} catch (IllegalAccessException e) {
-			LogManager.getLogger(LoggingMixin.class).warn("Error adjusting log level via mixin", e);
-			return null;
-		}
+    	if (commandSpec.root().userObject() instanceof HasLoggingMixin withMixin) {
+    		return withMixin.getLoggingMixin();
+    	}
+    	return null;
     }
 
     @Option(names = {"-v", "--verbose"}, description = {
