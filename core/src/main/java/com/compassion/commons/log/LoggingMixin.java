@@ -19,7 +19,7 @@ public class LoggingMixin {
 	@Spec(Target.MIXEE)
     private CommandSpec mixee; // spec of the command where the @Mixin is used
 
-    private boolean[] verbosity = new boolean[0];
+    private boolean[] verbosity = new boolean[] { true };
 
     private static LoggingMixin getTopLevelCommandLoggingMixin(CommandSpec commandSpec) {
     	if (commandSpec.root().userObject() instanceof HasLoggingMixin withMixin) {
