@@ -108,4 +108,53 @@ public class ParamStoreEnvironment implements ConfigEnvironment {
 	public void close() throws IOException {
         IO.accept(client, SsmClient::close);
 	}
+	
+	public interface ParamStoreAwareConfig {
+		/**
+		 * Whether or not AWS Systems Manager's parameter store should be checked for configuration overrides.
+		 * Usually an "offline" configuration specifies this (like a YAML file or environment variabe) and then
+		 * if this is {@code true}, the {@link ParamStoreEnvironment} is queried to further override configuration.
+		 * @return if this configuration should look for config overrides in SSM
+		 */
+		boolean isSsm();
+	}
+	
+	/**
+	 * Convenience load method that applies SSM Parameter Store overrides <b>after</b> the configuration is 
+	 * initially loaded and "offline" overrides like environment variables have been applied, which dictate
+	 * whether or not SSM overrides are enabled or not.
+	 * @param <C> a YAML configuration class that also implements {@link #ParamStoreAwareConfig}
+	 * @param config the configuration instance
+	 * @param prefix the prefix to use when applying overrides
+	 * @return the configuration instance after overrides have been applied
+	 * @throws IOException if there was a problem loading the initial configuration
+	 */
+	public static <C extends YAMLConfig & ParamStoreAwareConfig> C load(C config, String prefix) throws IOException {
+		return load(config, ConfigOverrides.forPrefix(prefix).with(new ParamStoreEnvironment()));
+	}
+	
+	/**
+	 * Convenience load method that applies SSM Parameter Store overrides <b>after</b> the configuration is 
+	 * initially loaded and "offline" overrides like environment variables have been applied, which dictate
+	 * whether or not SSM overrides are enabled or not.
+	 * @param <C> a YAML configuration class that also implements {@link #ParamStoreAwareConfig}
+	 * @param config the configuration instance
+	 * @param ssm the pre-initialized/custom {@link ConfigOverrides} presumably with a {@link ParamStoreEnvironment}
+	 * registered
+	 * @return the configuration instance after overrides have been applied
+	 * @throws IOException if there was a problem loading the initial configuration
+	 */
+	public static <C extends YAMLConfig & ParamStoreAwareConfig> C load(C config, ConfigOverrides ssm) throws IOException {
+		// Now that environment variables and simple configuration has been loaded, see if we
+		// should look for secrets in SSM.
+		if (config.isSsm()) {
+			log.info("Checking AWS SSM and Secrets for configuration overrides...");
+			try {
+				config = ssm.applyOverrides(YAMLConfig.getMapper(), config); 
+			} catch (IOException e) {
+				log.warn("Error loading SSM configuration", e);
+			}
+		}
+		return config;
+	}
 }
