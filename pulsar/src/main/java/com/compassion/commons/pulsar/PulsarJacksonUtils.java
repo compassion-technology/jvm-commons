@@ -9,6 +9,7 @@ import org.apache.pulsar.client.api.Schema;
 import org.apache.pulsar.client.impl.ClientCnx;
 import org.apache.pulsar.common.api.proto.MessageMetadata;
 
+import com.compassion.commons.jackson.PasswordSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -22,6 +23,13 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.Module;
 
 public interface PulsarJacksonUtils {
+	interface PulsarConfigMixin {
+		@JsonSerialize(using = PasswordSerializer.class)
+		String getClientToken();
+		@JsonSerialize(using = PasswordSerializer.class)
+		String getAdminToken();
+	}
+	
 	interface RecordMixin<T> {
 		@JsonIgnore
 		Optional<Message<T>> getMessage();
