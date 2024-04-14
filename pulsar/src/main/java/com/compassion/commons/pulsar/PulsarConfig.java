@@ -6,15 +6,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.pulsar.client.admin.PulsarAdmin;
-import org.apache.pulsar.client.api.PulsarClient;
-import org.apache.pulsar.client.impl.auth.AuthenticationToken;
-import org.apache.pulsar.client.impl.auth.oauth2.AuthenticationOAuth2;
 import org.apache.pulsar.client.impl.auth.oauth2.KeyFile;
 import org.apache.pulsar.common.util.ObjectMapperFactory;
-import org.apache.pulsar.functions.LocalRunner;
-import org.apache.pulsar.functions.LocalRunner.LocalRunnerBuilder;
 
 import com.compassion.commons.config.YAMLConfig;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -45,44 +38,7 @@ public class PulsarConfig extends YAMLConfig implements Serializable {
 		return "https://" + getHost();
 	}
 	
-	public PulsarAdmin newAdmin() throws IOException {
-		var builder = PulsarAdmin.builder().serviceHttpUrl(getAdminUrl())
-			.allowTlsInsecureConnection(true);
-		if (oauthFile != null && Files.isReadable(oauthFile)) {
-			builder.authentication(AuthenticationOAuth2.class.getName(), oauthParams());
-		} else if (StringUtils.isNotBlank(adminToken)) {
-			builder.authentication(AuthenticationToken.class.getName(), getAdminToken());				
-		} else {
-			builder.authentication(AuthenticationToken.class.getName(), getClientToken());
-		}
-		return builder.build();
-	}
-	
-	public PulsarClient newClient() throws IOException {
-		var builder = PulsarClient.builder().serviceUrl(getServiceUrl())
-			.allowTlsInsecureConnection(true);
-		if (oauthFile != null && Files.isReadable(oauthFile)) {
-			builder.authentication(AuthenticationOAuth2.class.getName(), oauthParams());
-		} else {
-			builder.authentication(AuthenticationToken.class.getName(), getClientToken());	
-		}
-		return builder.build();
-	}
-	
-	public LocalRunnerBuilder newLocalRunner() throws IOException {
-		var builder = LocalRunner.builder().brokerServiceUrl(getServiceUrl())
-			.tlsAllowInsecureConnection(true);
-		if (oauthFile != null && Files.isReadable(oauthFile)) {
-			builder.clientAuthPlugin(AuthenticationOAuth2.class.getName())
-			       .clientAuthParams(oauthParams());
-		} else {
-			builder.clientAuthPlugin(AuthenticationToken.class.getName())
-			       .clientAuthParams(getClientToken());	
-		}
-		return builder;
-	}
-	
-	private String oauthParams() throws IOException {
+	String oauthParams() throws IOException {
 		var params = new PulsarOAuthParams();
 		try (var reader = Files.newBufferedReader(getOauthFile())) {
 			params.setIssuerUrl(KeyFile.fromJson(reader).getIssuerUrl());
