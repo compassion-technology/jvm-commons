@@ -1,7 +1,6 @@
 package com.compassion.commons.pulsar;
 
 import java.io.IOException;
-import java.nio.file.Files;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pulsar.client.admin.PulsarAdmin;
@@ -39,12 +38,10 @@ public interface PulsarClients {
 	static LocalRunnerBuilder newLocalRunner(PulsarConfig c) throws IOException {
 		var builder = LocalRunner.builder().brokerServiceUrl(c.getServiceUrl())
 			.tlsAllowInsecureConnection(true);
-		if (c.getOauthFile() != null && Files.isReadable(c.getOauthFile())) {
-			builder.clientAuthPlugin(AuthenticationOAuth2.class.getName())
-			       .clientAuthParams(c.oauthParams());
+		if (StringUtils.isNotBlank(c.getClientToken())) {
+			builder.clientAuthPlugin(AuthenticationToken.class.getName()).clientAuthParams(c.getClientToken());
 		} else {
-			builder.clientAuthPlugin(AuthenticationToken.class.getName())
-			       .clientAuthParams(c.getClientToken());	
+			builder.clientAuthPlugin(AuthenticationOAuth2.class.getName()).clientAuthParams(c.oauthParams());
 		}
 		return builder;
 	}
