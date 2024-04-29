@@ -30,6 +30,13 @@ public interface PulsarJacksonUtils {
 		String getAdminToken();
 	}
 	
+	interface KeyFileMixin {
+		@JsonSerialize(using = PasswordSerializer.class)
+		String getClientId();
+		@JsonSerialize(using = PasswordSerializer.class)
+		String getClientSecret();
+	}
+	
 	interface RecordMixin<T> {
 		@JsonIgnore
 		Optional<Message<T>> getMessage();

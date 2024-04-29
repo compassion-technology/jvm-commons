@@ -25,9 +25,15 @@ public class PulsarConfig extends YAMLConfig implements Serializable {
 	private String clientToken;
 	private String adminToken;
 	private Path oauthFile;
+	private KeyFile oauth = new KeyFile();
 	private String oauthAudience = "urn:sn:pulsar:o-xqpg6:devint";
 	private String context;
 
+	public PulsarConfig() {
+		getOauth().setType("sn_service_account");
+		getOauth().setIssuerUrl("https://auth.streamnative.cloud/");
+	}
+	
 	@JsonIgnore
 	public String getServiceUrl() {
 		return "pulsar+ssl://" + getHost() + ":" + getPort();	
@@ -39,10 +45,17 @@ public class PulsarConfig extends YAMLConfig implements Serializable {
 	}
 	
 	String oauthParams() throws IOException {
-		var params = new PulsarOAuthParams();
-		try (var reader = Files.newBufferedReader(getOauthFile())) {
-			params.setIssuerUrl(KeyFile.fromJson(reader).getIssuerUrl());
+		if (oauthFile == null) {
+			oauthFile = Files.createTempFile("oauth", ".json");
+			Files.writeString(oauthFile, oauth.toJson());
+		} else {
+			try (var reader = Files.newBufferedReader(getOauthFile())) {
+				oauth = KeyFile.fromJson(reader);
+			}	
 		}
+		
+		var params = new PulsarOAuthParams();
+		params.setIssuerUrl(getOauth().getIssuerUrl());
 		params.setPrivateKey(getOauthFile().toUri().toURL());
 		params.setAudience(getOauthAudience());
 		return ObjectMapperFactory.getMapper().getObjectMapper().writeValueAsString(params);

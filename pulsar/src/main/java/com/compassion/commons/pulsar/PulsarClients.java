@@ -15,12 +15,12 @@ public interface PulsarClients {
 	static PulsarAdmin newAdmin(PulsarConfig c) throws IOException {
 		var builder = PulsarAdmin.builder().serviceHttpUrl(c.getAdminUrl())
 			.allowTlsInsecureConnection(true);
-		if (c.getOauthFile() != null && Files.isReadable(c.getOauthFile())) {
-			builder.authentication(AuthenticationOAuth2.class.getName(), c.oauthParams());
-		} else if (StringUtils.isNotBlank(c.getAdminToken())) {
-			builder.authentication(AuthenticationToken.class.getName(), c.getAdminToken());				
-		} else {
+		if (StringUtils.isNotBlank(c.getAdminToken())) {
+			builder.authentication(AuthenticationToken.class.getName(), c.getAdminToken());
+		} else if (StringUtils.isNotBlank(c.getClientToken())) {
 			builder.authentication(AuthenticationToken.class.getName(), c.getClientToken());
+		} else {
+			builder.authentication(AuthenticationOAuth2.class.getName(), c.oauthParams());
 		}
 		return builder.build();
 	}
@@ -28,10 +28,10 @@ public interface PulsarClients {
 	static PulsarClient newClient(PulsarConfig c) throws IOException {
 		var builder = PulsarClient.builder().serviceUrl(c.getServiceUrl())
 			.allowTlsInsecureConnection(true);
-		if (c.getOauthFile() != null && Files.isReadable(c.getOauthFile())) {
-			builder.authentication(AuthenticationOAuth2.class.getName(), c.oauthParams());
+		if (StringUtils.isNotBlank(c.getClientToken())) {
+			builder.authentication(AuthenticationToken.class.getName(), c.getClientToken());
 		} else {
-			builder.authentication(AuthenticationToken.class.getName(), c.getClientToken());	
+			builder.authentication(AuthenticationOAuth2.class.getName(), c.oauthParams());
 		}
 		return builder.build();
 	}
