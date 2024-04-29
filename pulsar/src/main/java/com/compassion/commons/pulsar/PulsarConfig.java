@@ -24,7 +24,9 @@ public class PulsarConfig extends YAMLConfig implements Serializable {
 	private int port = 6651;
 	private String clientToken;
 	private String adminToken;
-	private PulsarOAuthConfig oauth = new PulsarOAuthConfig();
+	private Path oauthFile;
+	private KeyFile oauth = new KeyFile();
+	private String oauthAudience = "urn:sn:pulsar:o-xqpg6:devint";
 	private String context;
 
 	public PulsarConfig() {
@@ -43,19 +45,19 @@ public class PulsarConfig extends YAMLConfig implements Serializable {
 	}
 	
 	String oauthParams() throws IOException {
-		if (oauth.getFile() == null) {
-			oauth.setFile(Files.createTempFile("oauth", ".json"));
-			Files.writeString(oauth.getFile(), oauth.toJson());
+		if (oauthFile == null) {
+			oauthFile = Files.createTempFile("oauth", ".json");
+			Files.writeString(oauthFile, oauth.toJson());
 		} else {
-			try (var reader = Files.newBufferedReader(getOauth().getFile())) {
-				oauth = ObjectMapperFactory.getMapper().reader().readValue(reader, PulsarOAuthConfig.class);
-			}
+			try (var reader = Files.newBufferedReader(getOauthFile())) {
+				oauth = KeyFile.fromJson(reader);
+			}	
 		}
 		
 		var params = new PulsarOAuthParams();
 		params.setIssuerUrl(getOauth().getIssuerUrl());
-		params.setPrivateKey(getOauth().getFile().toUri().toURL());
-		params.setAudience(getOauth().getAudience());
+		params.setPrivateKey(getOauthFile().toUri().toURL());
+		params.setAudience(getOauthAudience());
 		return ObjectMapperFactory.getMapper().getObjectMapper().writeValueAsString(params);
 	}
 	
@@ -67,11 +69,5 @@ public class PulsarConfig extends YAMLConfig implements Serializable {
 		private URL privateKey;
 		private String audience;
 		private String scope;
-	}
-	
-	@Getter @Setter
-	public static class PulsarOAuthConfig extends KeyFile {
-		private String audience = "urn:sn:pulsar:o-xqpg6:devint";
-		private Path file;
 	}
 }
