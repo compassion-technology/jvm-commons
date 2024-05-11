@@ -8,17 +8,17 @@
 		<artifactId>jvm-commons-parent</artifactId>
 		<version>4.3.5-SNAPSHOT</version>
 	</parent>
-	
+
 	<artifactId>jvm-commons-pulsar</artifactId>
 	<name>Compassion JVM Commons - Pulsar</name>
 
 	<properties>
 		<pulsar.version>3.1.1</pulsar.version>
-		
+
 		<!-- Need the BOM to reconcile version conflicts -->
 		<grpc.version>1.55.3</grpc.version>
 	</properties>
-	
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -37,24 +37,37 @@
 			<artifactId>jvm-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<dependency>
 		   <groupId>com.fasterxml.jackson.datatype</groupId>
 		   <artifactId>jackson-datatype-jdk8</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.pulsar</groupId>
 			<artifactId>pulsar-client-original</artifactId>
 			<version>${pulsar.version}</version>
+			<exclusions>
+				<!-- This pulls in a massive 15 MB "pkg" jar. Redeclare regular dependency below -->
+				<exclusion>
+					<groupId>org.apache.pulsar</groupId>
+					<artifactId>bouncy-castle-bc</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
+		<dependency>
+		    <groupId>org.apache.pulsar</groupId>
+		    <artifactId>bouncy-castle-bc</artifactId>
+		    <version>${pulsar.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.pulsar</groupId>
 			<artifactId>pulsar-functions-local-runner-original</artifactId>
 			<version>${pulsar.version}</version>
 			<optional>true</optional>
 		</dependency>
-		
+
 		<!-- This ordinarily would be scope: provided but for utilities and mocking,
 		     it needs to be on the compile classpath. Functions can redeclare. -->
 		<dependency>
@@ -62,7 +75,7 @@
 		    <artifactId>pulsar-functions-api</artifactId>
 		    <version>${pulsar.version}</version>
 		</dependency>
-		
+
 		<!-- Logging bridging -->
 		<dependency>
     		<groupId>org.apache.logging.log4j</groupId>
