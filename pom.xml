@@ -11,9 +11,9 @@
 
 	<repositories>
 		<repository>
-			<id>gitlab-maven</id>
-			<name>GitLab Maven Packages - Data Works group</name>
-			<url>https://gitlab.com/api/v4/groups/11537535/-/packages/maven</url>
+		   	<id>gitlab-maven</id>
+		   	<name>GitLab Maven Packages - CI</name>
+		   	<url>https://gitlab.com/api/v4/groups/7156077/-/packages/maven</url>
 		</repository>
 	</repositories>
 
