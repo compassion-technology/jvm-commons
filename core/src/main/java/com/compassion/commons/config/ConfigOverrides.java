@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.jooq.lambda.Seq;
 
 import com.compassion.commons.LambdaUtils;
 import com.compassion.commons.Utilities;
@@ -25,23 +26,24 @@ import lombok.val;
  * This class reads values starting with a prefix from the current environment (including environment variables
  * via {@link System#getenv()} and system properties via {@link System#getProperties()}) and applies them to an
  * object via a {@link JsonNode} tree.
- * 
+ *
  * @author <a href="dimeo@elderresearch.com">John Dimeo</a>
  * @since Jun 13, 2020
  */
 public class ConfigOverrides {
-	protected final String prefix;
+	protected final String[] prefixes;
 	private List<ConfigEnvironment> environments;
-	
-	protected ConfigOverrides(String prefix) {
-		this.prefix = StringUtils.lowerCase(prefix);
+
+	protected ConfigOverrides(String... prefixes) {
+		if (prefixes.length == 0) { prefixes = new String[] { StringUtils.EMPTY }; }
+		this.prefixes = Seq.of(prefixes).map(StringUtils::lowerCase).toArray(String[]::new);
 		this.environments = new LinkedList<>();
 	}
-	
-	public static ConfigOverrides forPrefix(String prefix) {
-		return new ConfigOverrides(prefix);
+
+	public static ConfigOverrides forPrefixes(String... prefixes) {
+		return new ConfigOverrides(prefixes);
 	}
-	
+
 	public ConfigOverrides with(ConfigEnvironment e) {
 		this.environments.add(e);
 		return this;
@@ -50,18 +52,18 @@ public class ConfigOverrides {
 	public ConfigOverrides withEnvironmentVariables() {
 		val e = new ConfigEnvironmentMap('_', CaseFormat.UPPER_UNDERSCORE);
 		System.getenv().forEach((k, v) -> {
-			if (StringUtils.startsWithIgnoreCase(k, prefix)) {
+			if (StringUtils.startsWithAny(StringUtils.lowerCase(k), prefixes)) {
 				e.put(StringUtils.upperCase(k), v);
 			}
 		});
 		return with(e);
 	}
-	
+
 	public ConfigOverrides withSystemProperties() {
 		val e = new ConfigEnvironmentMap('.', CaseFormat.LOWER_CAMEL);
 		System.getProperties().forEach((k, v) -> {
-			if (StringUtils.startsWithIgnoreCase(k.toString(), prefix)) {
-				e.put(k.toString(), v.toString());	
+			if (StringUtils.startsWithAny(StringUtils.lowerCase(k.toString()), prefixes)) {
+				e.put(k.toString(), v.toString());
 			}
 		});
 		return with(e);
@@ -84,21 +86,21 @@ public class ConfigOverrides {
 	        while (!trav.isClosed()) {
 	            var fn = trav.nextFieldName();
 	            if (fn == null) { continue; }
-	            
+
 	            var path = trav.getParsingContext().pathAsPointer();
 	            var node = tree.at(path);
 	            nextNode(env, path, node);
-	            
+
 	            var parent = tree.at(path.head());
 	            if (!parent.isObject()) { continue; }
-	            
+
 	            var objNode = (ObjectNode) parent;
 	            var prop = last(path);
-	            
+
 	            if (node.isArray()) {
 	            	var arr = (ArrayNode) node;
 	        		applyOverrides(env, path, node, arr::add);
-	        		
+
 	        		var idx = new MutableInt();
 	            	for (var child : node) {
 	            		applyOverrides(env, path.appendIndex(idx.intValue()), child, $ -> arr.set(idx.intValue(), $));
@@ -113,19 +115,21 @@ public class ConfigOverrides {
 		for (val env : environments) { env.close(); }
 		return ret;
 	}
-	
+
 	private void applyOverrides(ConfigEnvironment env, JsonPointer path, JsonNode node, Consumer<JsonNode> updater) {
-        val key = CaseFormat.LOWER_CAMEL.to(env.pathFormat(), prefix +
-                path.toString().replace(JsonPointer.SEPARATOR, env.pathSeparator()));
-        if (env.has(key, node)) {
-        	LambdaUtils.accept(env.get(key, node), updater);
-        }
+		for (var prefix : prefixes) {
+			val key = CaseFormat.LOWER_CAMEL.to(env.pathFormat(), prefix +
+	                path.toString().replace(JsonPointer.SEPARATOR, env.pathSeparator()));
+	        if (env.has(key, node)) {
+	        	LambdaUtils.accept(env.get(key, node), updater);
+	        }
+		}
 	}
-	
+
 	protected void nextNode(ConfigEnvironment env, JsonPointer path, JsonNode node) {
 		// Extension point
 	}
-	
+
 	private static String last(JsonPointer p) {
 		// p.last() throws NPE or ConcurrentException or is wrong
 		int i = p.toString().lastIndexOf(JsonPointer.SEPARATOR);

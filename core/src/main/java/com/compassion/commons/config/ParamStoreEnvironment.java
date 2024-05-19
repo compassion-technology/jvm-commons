@@ -128,12 +128,12 @@ public class ParamStoreEnvironment implements ConfigEnvironment {
 	 * whether or not SSM overrides are enabled or not.
 	 * @param <C> a YAML configuration class that also implements {@link #ParamStoreAwareConfig}
 	 * @param config the configuration instance
-	 * @param prefix the prefix to use when applying overrides
+	 * @param prefixes the prefixes to use when applying overrides
 	 * @return the configuration instance after overrides have been applied
 	 * @throws IOException if there was a problem loading the initial configuration
 	 */
-	public static <C extends YAMLConfig & ParamStoreAwareConfig> C load(C config, String prefix) throws IOException {
-		return load(config, ConfigOverrides.forPrefix(prefix).with(new ParamStoreEnvironment()));
+	public static <C extends YAMLConfig & ParamStoreAwareConfig> C load(C config, String... prefixes) throws IOException {
+		return load(config, ConfigOverrides.forPrefixes(prefixes).with(new ParamStoreEnvironment()));
 	}
 
 	/**

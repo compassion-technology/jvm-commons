@@ -17,7 +17,7 @@ public class TestConfig extends YAMLConfig {
     }
 
     public TestConfig load() throws IOException {
-        return super.load(ConfigOverrides.forPrefix("testprefix")
+        return super.load(ConfigOverrides.forPrefixes("testprefix")
                 .withEnvironmentVariables()
                 .withSystemProperties());
     }
