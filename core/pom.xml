@@ -8,7 +8,7 @@
 		<artifactId>jvm-commons-parent</artifactId>
 		<version>4.3.7-SNAPSHOT</version>
 	</parent>
-	
+
 	<artifactId>jvm-commons</artifactId>
 	<name>Compassion JVM Commons</name>
 
@@ -26,12 +26,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
 		<!-- Log level verbosity mixin for CLIs -->
 		<dependency>
 		    <groupId>info.picocli</groupId>
 		    <artifactId>picocli</artifactId>
-		    <version>4.7.5</version>
+		    <version>4.7.6</version>
 		</dependency>
 
 		<!-- Vault password overrides -->
@@ -45,14 +45,14 @@
 			<artifactId>log4j-core</artifactId>
 			<version>${log4j.version}</version>
 		</dependency>
-		
+
 		<!-- SSM/secret manager overrides -->
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>ssm</artifactId>
 			<version>2.23.11</version>
 		</dependency>
-		
+
 		<!-- ANSI for colorful log output -->
 		<dependency>
 			<groupId>org.fusesource.jansi</groupId>
@@ -74,12 +74,12 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<plugins>
 		   	<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.1.2</version>
+				<version>3.2.5</version>
 				<configuration>
 					<!-- See https://javachannel.org/posts/help-my-java-locale-is-wrong-in-jdk11/ -->
 					<systemPropertyVariables>
