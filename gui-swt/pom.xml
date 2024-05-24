@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.compassion</groupId>
+		<artifactId>jvm-commons-parent</artifactId>
+		<version>5.0.1-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>jvm-commons-gui-swt</artifactId>
+	<name>Compassion JVM Commons - SWT</name>
+	<description>Utilities for GUIs targeting the Standard Widget Toolkit (SWT)</description>
+	<packaging>pom</packaging>
+
+	<properties>
+		<swt.groupId>org.eclipse.platform</swt.groupId>
+		<swt.version>3.125.0</swt.version>
+	</properties>
+
+	<modules>
+		<module>core</module>
+		<module>linux</module>
+		<module>mac</module>
+		<module>win</module>
+	</modules>
+</project>

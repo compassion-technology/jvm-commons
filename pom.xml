@@ -11,9 +11,9 @@
 
 	<repositories>
 		<repository>
-		   	<id>gitlab-maven</id>
-		   	<name>GitLab Maven Packages - CI</name>
-		   	<url>https://gitlab.com/api/v4/groups/7156077/-/packages/maven</url>
+			<id>gitlab-maven</id>
+			<name>GitLab Maven Packages - CI</name>
+			<url>https://gitlab.com/api/v4/groups/7156077/-/packages/maven</url>
 		</repository>
 	</repositories>
 
@@ -30,6 +30,7 @@
 	<modules>
 		<module>core</module>
 		<module>gui</module>
+		<module>gui-swt</module>
 		<module>pulsar</module>
 		<module>snowflake</module>
 	</modules>

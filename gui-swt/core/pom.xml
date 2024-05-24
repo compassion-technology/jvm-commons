@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.compassion</groupId>
+		<artifactId>jvm-commons-gui-swt</artifactId>
+		<version>5.0.1-SNAPSHOT</version>
+	</parent>
+
+	<name>ERI Viz - GUI SWT (Core)</name>
+	<artifactId>jvm-commons-gui-swt-core</artifactId>
+
+	<properties>
+		<eri.icons.version>1.2.0</eri.icons.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>jvm-commons-gui</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.elderresearch.commons</groupId>
+			<artifactId>eri-commons-icons-ms2003-16</artifactId>
+			<version>${eri.icons.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.elderresearch.commons</groupId>
+			<artifactId>eri-commons-icons-utils</artifactId>
+			<version>${eri.icons.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${swt.groupId}</groupId>
+			<artifactId>${system.swt.artifactId}</artifactId>
+			<version>${swt.version}</version>
+			<!-- Each platform-specific artifact re-declares their dependency -->
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+	            	<groupId>${swt.groupId}</groupId>
+					<artifactId>org.eclipse.swt</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+</project>
