@@ -29,6 +29,7 @@
 
 	<modules>
 		<module>core</module>
+		<module>gui</module>
 		<module>pulsar</module>
 		<module>snowflake</module>
 	</modules>

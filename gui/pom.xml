@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.compassion</groupId>
+		<artifactId>jvm-commons-parent</artifactId>
+		<version>4.3.7-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>jvm-commons-gui</artifactId>
+	<name>Compassion JVM Commons - GUI</name>
+	<description>Utilities for Graphical User Interface (GUI) development</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>jvm-commons</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.elderresearch.commons</groupId>
+			<artifactId>eri-commons-icons-eri-16</artifactId>
+			<version>1.2.0</version>
+		</dependency>
+	</dependencies>
+</project>
