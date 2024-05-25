@@ -8,7 +8,7 @@
 		<version>5.0.1-SNAPSHOT</version>
 	</parent>
 
-	<name>ERI Viz - GUI SWT (Core)</name>
+	<name>Compassion JVM Commons - GUI SWT (Core)</name>
 	<artifactId>jvm-commons-gui-swt-core</artifactId>
 
 	<properties>
