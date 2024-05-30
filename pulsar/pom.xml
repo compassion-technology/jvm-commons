@@ -56,9 +56,9 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-		    <groupId>org.apache.pulsar</groupId>
-		    <artifactId>bouncy-castle-bc</artifactId>
-		    <version>${pulsar.version}</version>
+		    <groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk18on</artifactId>
+		    <version>1.75</version>
 		</dependency>
 
 		<dependency>
