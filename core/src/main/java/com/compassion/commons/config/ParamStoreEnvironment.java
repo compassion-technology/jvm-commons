@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.function.BooleanSupplier;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jooq.lambda.Seq;
 
 import com.compassion.commons.LambdaUtils.IO;
 import com.compassion.commons.config.SecretConverter.DefaultSecretConverter;
@@ -27,6 +28,8 @@ public class ParamStoreEnvironment implements ConfigEnvironment {
 	// Mark a parameter as existing but not looked up yet
 	private static final String SENTINEL = "$";
 
+	private final String[] prefixes;
+
 	@Setter
     private SsmClient client;
     private Map<String, String> map;
@@ -36,6 +39,10 @@ public class ParamStoreEnvironment implements ConfigEnvironment {
 
     @Setter
     private BooleanSupplier enabled = () -> true;
+
+    public ParamStoreEnvironment(String... prefixes) {
+    	this.prefixes = Seq.of(prefixes).map(StringUtils::lowerCase).toArray(String[]::new);
+	}
 
 	@Override
 	public boolean has(String path, JsonNode existing) {
@@ -51,9 +58,12 @@ public class ParamStoreEnvironment implements ConfigEnvironment {
 		if (map == null) { map = new HashMap<>(); }
 		return map;
 	}
+	@SuppressWarnings("unchecked")
 	private Map<String, String> listParams() {
 		if (initMap().isEmpty()) {
-			initClient().describeParametersPaginator().forEach($ -> $.parameters().forEach(p -> {
+			initClient().describeParametersPaginator($ -> $.parameterFilters(filter ->
+				filter.option("BeginsWith").values(prefixes).key("Name")
+			)).forEach($ -> $.parameters().forEach(p -> {
 	    		map.put(p.name(), SENTINEL);
 	    	}));
 		}
@@ -133,7 +143,7 @@ public class ParamStoreEnvironment implements ConfigEnvironment {
 	 * @throws IOException if there was a problem loading the initial configuration
 	 */
 	public static <C extends YAMLConfig & ParamStoreAwareConfig> C load(C config, String... prefixes) throws IOException {
-		return load(config, ConfigOverrides.forPrefixes(prefixes).with(new ParamStoreEnvironment()));
+		return load(config, ConfigOverrides.forPrefixes(prefixes).with(new ParamStoreEnvironment(prefixes)));
 	}
 
 	/**
