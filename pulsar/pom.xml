@@ -13,7 +13,9 @@
 	<name>Compassion JVM Commons - Pulsar</name>
 
 	<properties>
-		<pulsar.version>3.1.1</pulsar.version>
+		<!-- Keep in sync with the version in our cloud StreamNative -->
+		<pulsar.version>3.0.4.6</pulsar.version>
+		<log4j.version>2.20.0</log4j.version>
 
 		<!-- Need the BOM to reconcile version conflicts -->
 		<grpc.version>1.55.3</grpc.version>
@@ -44,13 +46,13 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.apache.pulsar</groupId>
-			<artifactId>pulsar-client-original</artifactId>
+   			<groupId>io.streamnative</groupId>
+   			<artifactId>pulsar-client-original</artifactId>
 			<version>${pulsar.version}</version>
 			<exclusions>
 				<!-- This pulls in a massive 15 MB "pkg" jar. Redeclare regular dependency below -->
 				<exclusion>
-					<groupId>org.apache.pulsar</groupId>
+					<groupId>io.streamnative</groupId>
 					<artifactId>bouncy-castle-bc</artifactId>
 				</exclusion>
 			</exclusions>
@@ -58,11 +60,11 @@
 		<dependency>
 		    <groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-jdk18on</artifactId>
-		    <version>1.75</version>
+		    <version>1.78</version>
 		</dependency>
 
 		<dependency>
-			<groupId>org.apache.pulsar</groupId>
+			<groupId>io.streamnative</groupId>
 			<artifactId>pulsar-functions-local-runner-original</artifactId>
 			<version>${pulsar.version}</version>
 			<optional>true</optional>
@@ -71,15 +73,21 @@
 		<!-- This ordinarily would be scope: provided but for utilities and mocking,
 		     it needs to be on the compile classpath. Functions can redeclare. -->
 		<dependency>
-		    <groupId>org.apache.pulsar</groupId>
+		    <groupId>io.streamnative</groupId>
 		    <artifactId>pulsar-functions-api</artifactId>
 		    <version>${pulsar.version}</version>
+		    <optional>true</optional>
 		</dependency>
 
 		<!-- Logging bridging -->
 		<dependency>
     		<groupId>org.apache.logging.log4j</groupId>
     		<artifactId>log4j-slf4j-impl</artifactId>
+    		<version>${log4j.version}</version>
+		</dependency>
+		<dependency>
+    		<groupId>org.apache.logging.log4j</groupId>
+    		<artifactId>log4j-api</artifactId>
     		<version>${log4j.version}</version>
 		</dependency>
 	</dependencies>
