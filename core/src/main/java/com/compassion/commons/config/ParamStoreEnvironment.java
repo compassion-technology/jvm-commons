@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import org.jooq.lambda.Seq;
 
 import com.compassion.commons.LambdaUtils.IO;
@@ -17,6 +19,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
 import software.amazon.awssdk.services.ssm.SsmClient;
+import software.amazon.awssdk.services.ssm.model.DescribeParametersRequest;
 import software.amazon.awssdk.services.ssm.model.GetParameterRequest;
 import software.amazon.awssdk.services.ssm.model.ParameterNotFoundException;
 import software.amazon.awssdk.services.ssm.model.SsmException;
@@ -61,9 +64,17 @@ public class ParamStoreEnvironment implements ConfigEnvironment {
 	@SuppressWarnings("unchecked")
 	private Map<String, String> listParams() {
 		if (initMap().isEmpty()) {
-			initClient().describeParametersPaginator($ -> $.parameterFilters(filter ->
-				filter.option("BeginsWith").values(prefixes).key("Name")
-			)).forEach($ -> $.parameters().forEach(p -> {
+			Consumer<DescribeParametersRequest.Builder> filter = switch (prefixes.length) {
+				case 0 -> {
+					log.warn("No SSM lookup prefixes provided. This may throw rate limit errors for accounts with many parameters");
+					yield Consumers.nop();
+				}
+				default -> {
+					yield $ -> $.parameterFilters(pf -> pf.option("BeginsWith").values(prefixes).key("Name"));
+				}
+			};
+
+			initClient().describeParametersPaginator(filter).forEach($ -> $.parameters().forEach(p -> {
 	    		map.put(p.name(), SENTINEL);
 	    	}));
 		}
