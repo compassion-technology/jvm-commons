@@ -19,7 +19,7 @@ import lombok.experimental.Accessors;
 @Getter @Setter @Accessors(chain = true)
 public class PulsarConfig extends YAMLConfig implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	private String host = "devint-a200530c-d9e7-4e99-8cdc-6a719deb6326.aws-use2-production-snci-pool-kid.streamnative.aws.snio.cloud";
 	private int port = 6651;
 	private String clientToken;
@@ -33,17 +33,17 @@ public class PulsarConfig extends YAMLConfig implements Serializable {
 		getOauth().setType("sn_service_account");
 		getOauth().setIssuerUrl("https://auth.streamnative.cloud/");
 	}
-	
+
 	@JsonIgnore
 	public String getServiceUrl() {
-		return "pulsar+ssl://" + getHost() + ":" + getPort();	
+		return "pulsar+ssl://" + getHost() + ":" + getPort();
 	}
-	
+
 	@JsonIgnore
 	public String getAdminUrl() {
 		return "https://" + getHost();
 	}
-	
+
 	String oauthParams() throws IOException {
 		if (oauthFile == null) {
 			oauthFile = Files.createTempFile("oauth", ".json");
@@ -51,16 +51,16 @@ public class PulsarConfig extends YAMLConfig implements Serializable {
 		} else {
 			try (var reader = Files.newBufferedReader(getOauthFile())) {
 				oauth = KeyFile.fromJson(reader);
-			}	
+			}
 		}
-		
+
 		var params = new PulsarOAuthParams();
 		params.setIssuerUrl(getOauth().getIssuerUrl());
 		params.setPrivateKey(getOauthFile().toUri().toURL());
 		params.setAudience(getOauthAudience());
 		return ObjectMapperFactory.getMapper().getObjectMapper().writeValueAsString(params);
 	}
-	
+
 	// See https://pulsar.apache.org/docs/next/security-oauth2/#configure-oauth2-authentication-in-pulsar-clients
 	@Getter @Setter
 	private static class PulsarOAuthParams {
