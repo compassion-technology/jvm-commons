@@ -35,18 +35,4 @@
 		<module>snowflake</module>
 		<module>tokens</module>
 	</modules>
-
-	<!-- Dependencies used in all 3 modules -->
-	<dependencies>
-		<dependency>
-			<groupId>org.jooq</groupId>
-			<artifactId>jool</artifactId>
-			<version>0.9.15</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-text</artifactId>
-			<version>1.11.0</version>
-		</dependency>
-	</dependencies>
 </project>

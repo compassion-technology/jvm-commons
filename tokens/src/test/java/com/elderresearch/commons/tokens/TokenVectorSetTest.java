@@ -36,7 +36,7 @@ public class TokenVectorSetTest {
 	
 	@BeforeEach
 	protected void setUp() throws Exception {
-		tvs = new TokenVectorSet<>("test" + ++testCount, TokenVector.class);
+		tvs = new TokenVectorSet<>("test" + ++testCount, TokenVector.class, 1, true);
 		
 		TokenVectorBuilder tvb = new TokenVectorBuilder().setTransformer(String::toLowerCase);
 		tv1 = tvb.build("My dog ate my homework");
@@ -59,9 +59,9 @@ public class TokenVectorSetTest {
 	
 	@Test
 	public void testMerge() {
-		assertTrue(tvs.add(0L, tv1));
-		tvs.merge(0L, tv2);
-		assertEquals(2L, tvs.get(0L).getCount("ate"));
+		assertTrue(tvs.add(1L, tv1));
+		tvs.merge(1L, tv2);
+		assertEquals(2L, tvs.get(1L).getCount("ate"));
 		assertEquals(1L, tvs.size());
 	}
 	
