@@ -4,17 +4,17 @@ package com.elderresearch.commons.tokens;
 import java.io.Serializable;
 import java.util.Objects;
 
-import lombok.Setter;
 import org.apache.commons.lang3.Range;
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.set.primitive.LongSet;
 import org.eclipse.collections.api.set.primitive.MutableLongSet;
 import org.eclipse.collections.api.tuple.primitive.LongFloatPair;
-import org.eclipse.collections.api.tuple.primitive.LongShortPair;
+import org.eclipse.collections.api.tuple.primitive.LongIntPair;
 import org.eclipse.collections.impl.map.mutable.primitive.LongFloatHashMap;
-import org.eclipse.collections.impl.map.mutable.primitive.LongShortHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.LongIntHashMap;
 import org.ehcache.sizeof.annotations.IgnoreSizeOf;
 
+import lombok.Setter;
 import lombok.val;
 
 /**
@@ -36,13 +36,13 @@ public class TokenVector implements Serializable {
 	@IgnoreSizeOf
 	private transient TokenRegistry tokenRegistry;
 	
-	LongShortHashMap countsRaw;
+	LongIntHashMap countsRaw;
 	LongFloatHashMap countsWeighted;
 	
 	public TokenVector() {
 		init(new TokenRegistry.TokenRegistrySmall());
 		
-		countsRaw = new LongShortHashMap();
+		countsRaw = new LongIntHashMap();
 		countsWeighted = new LongFloatHashMap();
 	}
 	
@@ -92,14 +92,14 @@ public class TokenVector implements Serializable {
 	
 	public void increment(long tokenHash) {
 		total++;
-		countsRaw.addToValue(tokenHash, (short) 1);
+		countsRaw.addToValue(tokenHash, 1);
 		countsWeighted.remove(tokenHash);
 	}
 	
 	public void putCount(long tokenHash, int count) {
 		val prev = countsRaw.get(tokenHash);
 		total = total - prev + count;
-		countsRaw.put(tokenHash, (short) count);
+		countsRaw.put(tokenHash, count);
 		countsWeighted.remove(tokenHash);
 	}
 	
@@ -114,7 +114,7 @@ public class TokenVector implements Serializable {
     }
     
     public int getCount(long tokenHash) {
-    	return countsRaw.getIfAbsent(tokenHash, (short) 0);
+    	return countsRaw.getIfAbsent(tokenHash, 0);
     }
     
     /**
@@ -135,7 +135,7 @@ public class TokenVector implements Serializable {
     	tokenRegistry.remove(tokenHash);
     }
     
-    public LongSet getTokensWithCountIn(Range<Short> range) {
+    public LongSet getTokensWithCountIn(Range<Integer> range) {
     	return countsRaw.select((t, c) -> range.contains(c)).keySet();
     }
     public LongSet getTokensWithWeightIn(Range<Float> range) {
@@ -157,7 +157,7 @@ public class TokenVector implements Serializable {
     	return countsWeighted.getIfAbsent(tokenHash, Float.NaN);
     }
     
-    public RichIterable<LongShortPair> tokenCountView() {
+    public RichIterable<LongIntPair> tokenCountView() {
     	return countsRaw.keyValuesView();
     }
     

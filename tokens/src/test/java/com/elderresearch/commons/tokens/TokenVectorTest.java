@@ -4,7 +4,7 @@ package com.elderresearch.commons.tokens;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.eclipse.collections.impl.map.mutable.primitive.LongShortHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.LongIntHashMap;
 import org.junit.jupiter.api.BeforeEach;
 
 public class TokenVectorTest {
@@ -43,11 +43,11 @@ public class TokenVectorTest {
 		tv.increment(TOKEN);
 		assertEquals(2, tv.getCount(TOKEN));
 		
-		LongShortHashMap counts = tv.countsRaw;
+		LongIntHashMap counts = tv.countsRaw;
 		assertEquals(0, counts.get(1L));
-		counts.addToValue(1L, (short) 1);
+		counts.addToValue(1L, 1);
 		assertEquals(1, counts.get(1L));
-		counts.addToValue(1L, (short) 1);
+		counts.addToValue(1L, 1);
 		assertEquals(2, counts.get(1L));
 	}
 	

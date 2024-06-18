@@ -50,7 +50,7 @@ public class TVSReutersTest implements FileVisitor<Path> {
 			.setStatusMonitor(sm)
 			.setMaxDistances(MAX_DIST)
 			.setThreads(24)
-			.setRange(Range.between(Float.MIN_VALUE, Float.POSITIVE_INFINITY))
+			.setRange(Range.of(Float.MIN_VALUE, Float.POSITIVE_INFINITY))
 			.setMetric(new Angle().setFormat(AngleFormat.COSINE));
 		
 		for (TVSDistance d : tvs.computeDistances(settings)) {

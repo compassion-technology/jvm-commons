@@ -14,7 +14,7 @@ import org.apache.commons.lang3.Range;
 import org.apache.commons.math3.util.MathArrays.OrderDirection;
 import org.eclipse.collections.api.list.primitive.MutableLongList;
 import org.eclipse.collections.impl.factory.primitive.LongLists;
-import org.eclipse.collections.impl.map.mutable.primitive.LongShortHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.LongIntHashMap;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -143,7 +143,7 @@ public class TokenVectorSetTest {
 		
 		TokenVector tfidf = tvs.getTokenWeights();
 		assertEquals(9, tfidf.size());
-		tvs.updateWeights(null, tvs.getTokenWeights().getTokensWithCountIn(Range.between((short) 2, Short.MAX_VALUE)));
+		tvs.updateWeights(null, tvs.getTokenWeights().getTokensWithCountIn(Range.of(2, Integer.MAX_VALUE)));
 		assertEquals(3, tfidf.size());
 	}
 	
@@ -168,7 +168,7 @@ public class TokenVectorSetTest {
 			val key = i % 2;
 			Utilities.startDaemon(null, () -> {
 				val tv = new TokenVector();
-				tv.countsRaw = new LongShortHashMap(tv1.countsRaw);
+				tv.countsRaw = new LongIntHashMap(tv1.countsRaw);
 				tvs.merge(key, tv);
 				latch.countDown();
 			}, "merger" + i);

@@ -16,7 +16,7 @@ import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.collections.api.set.primitive.LongSet;
-import org.eclipse.collections.impl.map.mutable.primitive.LongShortHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.LongIntHashMap;
 import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
@@ -300,7 +300,7 @@ public class TokenVectorSet<TV extends TokenVector> implements Iterable<TV>, Aut
 		TV existing = putIfAbsent(key, tv);
 		if (existing == null) { return; }
 		
-		val origCounts = new LongShortHashMap(tv.countsRaw);
+		val origCounts = new LongIntHashMap(tv.countsRaw);
 		boolean first = true;
 		do {
 			if (!first) {

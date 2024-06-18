@@ -48,7 +48,7 @@ public class TVSDistanceSettings {
 	
 	private DistanceMetric distanceMetric = new Angle();
 	private OrderDirection sortOrder = OrderDirection.INCREASING;
-	private Range<Float> range = Range.between(Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY);
+	private Range<Float> range = Range.of(Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY);
 	
 	private MaxDistanceAggregation maxAggregation = MaxDistanceAggregation.NONE;
 	private int maxDistanceCount = maxAggregation.getDefaultMaxDistances();
