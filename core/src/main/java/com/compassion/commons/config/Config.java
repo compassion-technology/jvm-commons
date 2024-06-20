@@ -4,6 +4,7 @@ package com.compassion.commons.config;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -30,7 +31,7 @@ import lombok.val;
  * @author <a href="dimeo@elderresearch.com">John Dimeo</a>
  * @since Jul 9, 2020
  */
-public interface Config {
+public interface Config extends Serializable {
 	/**
 	 * Resolve the path against the current working directory. This will silently return {@code null} if
 	 * the file is not found but will log the error if it is any other kind of {@link IOException}.
