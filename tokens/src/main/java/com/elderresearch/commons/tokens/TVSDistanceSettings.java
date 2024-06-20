@@ -21,7 +21,7 @@ import lombok.Getter;
  *
  * @since Dec 12, 2014
  */
-@Getter(AccessLevel.PACKAGE)
+@Getter(AccessLevel.PROTECTED)
 public class TVSDistanceSettings {
 	private static final int DEFAULT_SORT_BUFFER_DENOM = 10;
 	
