@@ -2,6 +2,10 @@ package com.compassion.commons.config;
 
 import java.util.function.Consumer;
 
+import com.compassion.commons.jackson.MaskingMixins.ApiKeyMixin;
+import com.compassion.commons.jackson.MaskingMixins.PasswordMixin;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -45,4 +49,10 @@ public interface CredentialConfig {
             withSecretPath.accept("signature");
         }
     }
+	
+	static void addMaskingMixins(ObjectMapper mapper) {
+		mapper
+			.addMixIn(ConfigWithApiKey.class, ApiKeyMixin.class)
+			.addMixIn(ConfigWithUserPassword.class, PasswordMixin.class);
+	}
 }
