@@ -2,6 +2,7 @@ package com.compassion.commons.config;
 
 import java.util.function.Consumer;
 
+import com.compassion.commons.LambdaUtils;
 import com.compassion.commons.jackson.PasswordSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import picocli.CommandLine.Option;
 
 public interface CredentialConfig {
 	// Create the related/linked SSM parameters from each child secret attribute
@@ -29,10 +31,23 @@ public interface CredentialConfig {
 		}
 	}
 	
-	@Getter @Setter @Accessors(chain = true)
+	@Accessors(chain = true)
 	public class ConfigWithUserPassword extends YAMLConfig implements CredentialConfig {
+		@Getter @Setter
+		@Option(names = {"-u", "--user"}, description = "The user")
 		private String user;
-		private String password;
+
+		@Option(names = {"-p", "--password"}, description = "The password (if required)")
+		private char[] password;
+		
+		// Don't store password as string internally for security reasons
+		public String getPassword() {
+			return LambdaUtils.apply(password, String::new);
+		}
+		public ConfigWithUserPassword setPassword(String s) {
+			this.password = LambdaUtils.apply(s, String::toCharArray);
+			return this;
+		}
 		
 		@Override
 		public void forEachCredentialPath(Consumer<String> withSecretPath) {

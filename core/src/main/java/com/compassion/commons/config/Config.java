@@ -123,6 +123,7 @@ public interface Config extends Serializable {
      * @param om the object mapper with custom mixins to affect only the log
      */
 	default void logConfig(ObjectMapper om) {
+		CredentialConfig.addMaskingMixins(om);
         val log = LogManager.getLogger(getClass());
         try {
             log.info("Configuration:{}{}", System.lineSeparator(),

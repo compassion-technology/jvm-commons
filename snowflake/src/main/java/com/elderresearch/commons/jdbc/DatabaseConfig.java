@@ -1,7 +1,6 @@
 /* ©2016-2021 Elder Research, Inc. All rights reserved. */
 package com.elderresearch.commons.jdbc;
 
-import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -9,13 +8,15 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.compassion.commons.LambdaUtils;
 import com.compassion.commons.Utilities;
+import com.compassion.commons.config.CredentialConfig.ConfigWithUserPassword;
 import com.elderresearch.commons.jdbc.ConnectionProvider.ConnectionProviderDirect;
 import com.elderresearch.commons.jdbc.ConnectionProvider.ConnectionProviderPooled;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.Synchronized;
 import lombok.experimental.Accessors;
 import picocli.CommandLine;
@@ -31,8 +32,8 @@ import picocli.CommandLine.Option;
  * @author <a href="dimeo@datamininglab.com">John Dimeo</a>
  * @since Oct 16, 2013
  */
-@Data @Accessors(chain = true)
-public class DatabaseConfig implements Serializable {
+@Getter @Setter @Accessors(chain = true)
+public class DatabaseConfig extends ConfigWithUserPassword {
 	private static final long serialVersionUID = 1L;
 
 	/** The RDBMS vendor for this configuration. */
@@ -44,26 +45,9 @@ public class DatabaseConfig implements Serializable {
 	@Option(names = {"-url", "--hostUrl"}, description = "The host URL, including port and schema/catalog (but not including jdbc:..// prefix)")
 	private String hostURL;
 
-	/** The user name. */
-	@Option(names = {"-u", "--user"}, description = "The database user")
-	private String user;
-
-	/** The user's password, if required. */
-	@Option(names = {"-p", "--password"}, description = "The database password (if required)")
-	private char[] password;
-
 	private DatabaseDriver driver;
 
 	private final transient Supplier<ConnectionProviderPooled> $pool = Suppliers.memoize(() -> new ConnectionProviderPooled(this));
-
-	// Don't store password as string internally for security reasons
-	public String getPassword() {
-		return LambdaUtils.apply(password, String::new);
-	}
-	public DatabaseConfig setPassword(String s) {
-		this.password = LambdaUtils.apply(s, String::toCharArray);
-		return this;
-	}
 
 	/**
 	 * Returns if this configuration is valid; namely, that a connection can
@@ -158,14 +142,14 @@ public class DatabaseConfig implements Serializable {
 		ret.driver     = driver;
 		ret.hostURL    = hostURL;
 		if (includeCredentials) {
-			ret.user     = user;
-			ret.password = password;
+			ret.setUser(getUser());
+			ret.setPassword(getPassword());
 		}
 		return ret;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("%s@%s", user, hostURL);
+		return String.format("%s@%s", getUser(), hostURL);
 	}
 }
