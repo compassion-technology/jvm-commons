@@ -112,11 +112,11 @@ public interface CredentialConfig {
 		}
 	}
 	
-	static void addMaskingMixins(ObjectMapper om) {
-		om.addMixIn(ConfigWithApiKey.class,       ConfigWithApiKey.Mixin.class)
-		  .addMixIn(ConfigWithUserPassword.class, ConfigWithUserPassword.Mixin.class)
-		  .addMixIn(ConfigWithToken.class,        ConfigWithToken.Mixin.class)
-		  .addMixIn(ConfigWithOAuth.class,        ConfigWithOAuth.Mixin.class);
+	static ObjectMapper addMaskingMixins(ObjectMapper om) {
+		return om.addMixIn(ConfigWithApiKey.class,       ConfigWithApiKey.Mixin.class)
+		         .addMixIn(ConfigWithUserPassword.class, ConfigWithUserPassword.Mixin.class)
+		         .addMixIn(ConfigWithToken.class,        ConfigWithToken.Mixin.class)
+		         .addMixIn(ConfigWithOAuth.class,        ConfigWithOAuth.Mixin.class);
 	}
 	
 	/**
