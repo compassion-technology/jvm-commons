@@ -4,7 +4,9 @@ import java.util.function.Consumer;
 
 import com.compassion.commons.LambdaUtils;
 import com.compassion.commons.jackson.PasswordSerializer;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import lombok.Getter;
@@ -12,6 +14,15 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import picocli.CommandLine.Option;
 
+/**
+ * Provides common base classes for configuration involving credentials or secrets, like passwords and API keys.
+ * These base classes provide:<ul>
+ * <li>Provide a simple base class for API SDKs that require credentials to auth against the API. This also allows shared config
+ * to inherit from the same base class as a specialized SDK config without having to have the entire SDK on the classpath.</li>
+ * <li>Provide a placeholder when creating secrets in CDK stacks that define the structure of the secret without exposing the secret itself</li>
+ * <li>Provide mixins that mask the secrets when logging the config</li>
+ * </ul>
+ */
 public interface CredentialConfig {
 	// Create the related/linked SSM parameters from each child secret attribute
 	void forEachCredentialPath(Consumer<String> withSecretPath);
@@ -101,10 +112,26 @@ public interface CredentialConfig {
 		}
 	}
 	
-	static void addMaskingMixins(ObjectMapper mapper) {
-		mapper.addMixIn(ConfigWithApiKey.class,       ConfigWithApiKey.Mixin.class)
-		      .addMixIn(ConfigWithUserPassword.class, ConfigWithUserPassword.Mixin.class)
-		      .addMixIn(ConfigWithToken.class,        ConfigWithToken.Mixin.class)
-		      .addMixIn(ConfigWithOAuth.class,        ConfigWithOAuth.Mixin.class);
+	static void addMaskingMixins(ObjectMapper om) {
+		om.addMixIn(ConfigWithApiKey.class,       ConfigWithApiKey.Mixin.class)
+		  .addMixIn(ConfigWithUserPassword.class, ConfigWithUserPassword.Mixin.class)
+		  .addMixIn(ConfigWithToken.class,        ConfigWithToken.Mixin.class)
+		  .addMixIn(ConfigWithOAuth.class,        ConfigWithOAuth.Mixin.class);
+	}
+	
+	/**
+	 * An object mapper to read and write credentials to/from JSON assuming a "snake case" convention which is more
+	 * common across languages instead of Java's camel case.
+	 */
+	ObjectMapper mapper = new ObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE);
+	
+	/**
+	 * Write this credential object as JSON, using a "snake case" convention which is more common across languages instead
+	 * of Java's camel case.
+	 * @return this credential object as JSON
+	 * @throws JsonProcessingException if there was an error serializing this to JSON
+	 */
+	default String toJson() throws JsonProcessingException {
+		return mapper.writeValueAsString(this);
 	}
 }
