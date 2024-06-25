@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.auto.service.AutoService;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -27,6 +28,7 @@ public interface CredentialConfig {
 	// Create the related/linked SSM parameters from each child secret attribute
 	void forEachCredentialPath(Consumer<String> withSecretPath);
 	
+	@AutoService(CredentialConfig.class)
 	@Getter @Setter @Accessors(chain = true)
 	public class ConfigWithApiKey extends YAMLConfig implements CredentialConfig {
 		private String apiKey;
@@ -42,6 +44,7 @@ public interface CredentialConfig {
 		}
 	}
 	
+	@AutoService(CredentialConfig.class)
 	@Accessors(chain = true)
 	public class ConfigWithUserPassword extends YAMLConfig implements CredentialConfig {
 		@Getter @Setter
@@ -72,6 +75,7 @@ public interface CredentialConfig {
 		}
 	}
 	
+	@AutoService(CredentialConfig.class)
 	@Getter @Setter @Accessors(chain = true)
     public class ConfigWithToken extends YAMLConfig implements CredentialConfig {
         private String publicKey;
@@ -93,6 +97,7 @@ public interface CredentialConfig {
         }
     }
 	
+	@AutoService(CredentialConfig.class)
 	@Getter @Setter @Accessors(chain = true)
 	public class ConfigWithOAuth extends YAMLConfig implements CredentialConfig {
 		private String clientSecret;
