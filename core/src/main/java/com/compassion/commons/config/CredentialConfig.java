@@ -117,10 +117,6 @@ public interface CredentialConfig {
 		}
 	}
 	
-	public interface HasEncryption {
-		String getEncryptionKey();
-	}
-	
 	static ObjectMapper addMaskingMixins(ObjectMapper om) {
 		return om.addMixIn(ConfigWithApiKey.class,       ConfigWithApiKey.Mixin.class)
 		         .addMixIn(ConfigWithUserPassword.class, ConfigWithUserPassword.Mixin.class)
