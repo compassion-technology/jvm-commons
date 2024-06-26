@@ -1,13 +1,20 @@
 package com.compassion.commons.config;
 
+import java.io.IOException;
 import java.util.function.Consumer;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.compassion.commons.LambdaUtils;
 import com.compassion.commons.jackson.PasswordSerializer;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
 import com.google.auto.service.AutoService;
 
 import lombok.Getter;
@@ -137,6 +144,17 @@ public interface CredentialConfig {
 	 * @throws JsonProcessingException if there was an error serializing this to JSON
 	 */
 	default String toJson() throws JsonProcessingException {
+		var sp = new DefaultSerializerProvider.Impl();
+        sp.setNullValueSerializer(new NullSerializer());
+        mapper.setSerializerProvider(sp);
+		
 		return mapper.writeValueAsString(this);
+	}
+	
+	class NullSerializer extends JsonSerializer<Object> {
+		@Override
+		public void serialize(Object value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+			gen.writeString(StringUtils.EMPTY);
+		}
 	}
 }
