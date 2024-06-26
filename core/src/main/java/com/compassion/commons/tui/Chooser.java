@@ -5,6 +5,7 @@ import static org.fusesource.jansi.Ansi.ansi;
 import static org.fusesource.jansi.AnsiConsole.out;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,7 +45,7 @@ public class Chooser<T extends Choice> {
 	
 	@Getter private List<T> choices;
 	
-	private String title, prompt;
+	private String title, prompt = "Type a number to select an option", noChoice = "continue";
 	private String selectNoneMessage, selectAllMessage = "Restore defaults";
 	private SelectAllMode selectAllMode = SelectAllMode.RESTORE_DEFAULTS;
 	private boolean selectMultiple = true;
@@ -74,8 +75,8 @@ public class Chooser<T extends Choice> {
 			choices.forEach(c -> out().println(toAnsi(c)));
 			
 			out().print(ansi().eraseLine()
-				.a("Type a number to toggle ").a(prompt).a(" or press ")
-				.bold().a("[Enter]").boldOff().a(" to continue: "));
+				.a(prompt).a(" or press ")
+				.bold().a("[Enter]").boldOff().a(" to " + (anySel? "continue" : noChoice) + ": "));
 			
 			val input = s.hasNextLine()? s.nextLine() : StringUtils.EMPTY;
 			val num = NumberUtils.toInt(input, -1);
@@ -85,12 +86,8 @@ public class Chooser<T extends Choice> {
 				error = false;
 			} else if (num > 0 && num <= choices.size()) {
 				val sel = choices.get(num - 1).toggle();
-				if (!selectMultiple) {
-					if (sel) {
-						Seq.seq(choices).filter($ -> $.ordinal() != num).forEach($ -> $.selected(false));
-					} else {
-						Seq.seq(choices).filter($ -> $.ordinal() != num).findAny().ifPresent($ -> $.selected(true));
-					}
+				if (!selectMultiple && sel) {
+					Seq.seq(choices).filter($ -> $.ordinal() != num).forEach($ -> $.selected(false));
 				}
 				if (error) { clearPreviousLines(1); }
 				error = false;
@@ -114,6 +111,10 @@ public class Chooser<T extends Choice> {
 	
 	private boolean anySelected() {
 		return Seq.seq(choices).anyMatch(Choice::selected);
+	}
+	
+	public Optional<T> getSelection() {
+		return Seq.seq(choices).filter(Choice::selected).findSingle();
 	}
 	
 	private Ansi toAnsi(Choice c) {
