@@ -32,9 +32,9 @@ public class TestConfig extends YAMLConfig implements CredentialConfig {
 	@Test
 	public void testConfigToJson() throws JsonProcessingException {
 		var conf   = new TestConfig();
-		assertEquals("{\"x3\":{\"y3\":\"I want to change to test\"}}", conf.toJson());
+		assertEquals("{\"x3\":{\"y3\":\"I want to change to test\"}}", conf.toPlaceholderJson());
 		conf.getX3().setY3(null);
-		assertEquals("{\"x3\":{\"y3\":\"\"}}", conf.toJson());
+		assertEquals("{\"x3\":{\"y3\":\"\"}}", conf.toPlaceholderJson());
 	}
 
 	@Override
