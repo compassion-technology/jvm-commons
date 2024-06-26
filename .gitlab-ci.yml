@@ -1,13 +1,5 @@
 ---
 include:
-  - project: "ElderResearch/devops/templates/gitlab-ci"
-    ref: "0.0.8"
-    file: "/Maven.test.gitlab-ci.yml"
-
-test:jdk11:
-  stage: test
-
-deploy:
-  stage: deploy
-  script:
-    - 'mvn $MAVEN_CLI_OPTS deploy'
+  - project: "ciorg/ciopensource/jvm/maven-parent"
+    ref: "2.3.0"
+    file: "/.gitlab-ci.yml"
