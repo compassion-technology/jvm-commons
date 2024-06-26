@@ -3,6 +3,7 @@ package com.compassion.commons.config;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 import org.junit.Test;
 
@@ -13,7 +14,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Getter @Setter @Accessors(chain = true)
-public class TestConfig extends YAMLConfig {
+public class TestConfig extends YAMLConfig implements CredentialConfig {
 
     private TestX x3 = new TestX();
 
@@ -29,10 +30,15 @@ public class TestConfig extends YAMLConfig {
     }
     
 	@Test
-	public void testConfigPlaceholder() throws JsonProcessingException {
-		var conf   = new CredentialConfig.ConfigWithApiKey();
-		assertEquals("{\"apiKey\":\"\"}", conf.toJson());
-		conf.setApiKey("abc");
-		assertEquals("{\"apiKey\":\"abc\"}", conf.toJson());
+	public void testConfigToJson() throws JsonProcessingException {
+		var conf   = new TestConfig();
+		assertEquals("{\"x3\":{\"y3\":\"I want to change to test\"}}", conf.toJson());
+		conf.getX3().setY3(null);
+		assertEquals("{\"x3\":{\"y3\":\"\"}}", conf.toJson());
+	}
+
+	@Override
+	public void forEachCredentialPath(Consumer<String> withSecretPath) {
+		withSecretPath.accept("x3");
 	}
 }
