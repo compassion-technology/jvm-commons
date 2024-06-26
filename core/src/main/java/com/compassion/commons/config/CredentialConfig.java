@@ -1,21 +1,13 @@
 package com.compassion.commons.config;
 
-import java.io.IOException;
 import java.util.function.Consumer;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.compassion.commons.LambdaUtils;
-import com.compassion.commons.config.CredentialConfig.NullStringSerializer;
 import com.compassion.commons.jackson.PasswordSerializer;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.auto.service.AutoService;
 
 import lombok.Getter;
@@ -136,9 +128,7 @@ public interface CredentialConfig {
 	 * An object mapper to read and write credentials to/from JSON assuming a "snake case" convention which is more
 	 * common across languages instead of Java's camel case.
 	 */
-	ObjectMapper mapper = new ObjectMapper()
-		.setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE)
-		.registerModule(new SimpleModule("NullStringSerializing").addSerializer(new NullStringSerializer()));
+	ObjectMapper mapper = new ObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE);
 	
 	/**
 	 * Write this credential object as JSON, using a "snake case" convention which is more common across languages instead
@@ -148,12 +138,5 @@ public interface CredentialConfig {
 	 */
 	default String toJson() throws JsonProcessingException {
 		return mapper.writeValueAsString(this);
-	}
-	
-	public class NullStringSerializer extends JsonSerializer<String> {
-	    @Override
-	    public void serialize(String value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-	        jsonGenerator.writeString(StringUtils.EMPTY);
-	    }
 	}
 }
