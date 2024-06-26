@@ -34,11 +34,13 @@ public interface CDKUtils {
 
 	// TODO: Make this more configurable?
 	String AWS_ACCOUNT = "870579819025";
-
+	
+	String application();
+	
 	default <C extends IConstruct> C tag(C c, String env, String name, Pair<String, String>... additionalTags) {
 		val tags = Tags.of(c);
-		tags.add("Name", "ODF " + name);
-		tags.add("application", "odf");
+		tags.add("Name", application().toUpperCase() + " " + name);
+		tags.add("application", application().toLowerCase());
 		tags.add("contact", SystemUtils.USER_NAME + "@us.ci.org");
 		tags.add("creator", "aws-cdk");
 		tags.add("team", "Data Works");
