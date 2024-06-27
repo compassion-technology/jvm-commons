@@ -39,7 +39,7 @@ public interface CDKUtils extends CDKVariables {
 	// TODO: Fix Pair warning
 	default <C extends IConstruct> C tag(C c, String env, String name, Pair... additionalTags) {
 		val tags = Tags.of(c);
-		tags.add("name", application().toUpperCase() + " " + name);
+		tags.add("name", StringUtils.prependIfMissingIgnoreCase(name, application().toUpperCase() + " "));
 		tags.add("application", application().toLowerCase());
 		tags.add("contact", contact() + "@us.ci.org");
 		tags.add("creator", "aws-cdk");
