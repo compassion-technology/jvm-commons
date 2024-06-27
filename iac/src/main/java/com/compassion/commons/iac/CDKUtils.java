@@ -27,6 +27,7 @@ public interface CDKUtils extends CDKVariables {
 	// Legacy tag that exposed an AWS secret to Pulsar functions. Can be removed when targeting StreamNative.
 	static Pair<String, String> ACCESS_FROM_PULSAR_FN = Pair.of("pulsar", "functions");
 
+	// Implementing stacks define the relevant application
 	String application();
 	
 	// TODO: Fix Pair warning
