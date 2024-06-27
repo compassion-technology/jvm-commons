@@ -29,8 +29,8 @@ public interface CDKUtils extends CDKVariables {
 
 	String application();
 	
-	// TODO: Removing tags until I figure out where com.compassion.ns.Pair is
-	default <C extends IConstruct> C tag(C c, String env, String name) {
+	// TODO: Fix Pair warning
+	default <C extends IConstruct> C tag(C c, String env, String name, Pair... additionalTags) {
 		val tags = Tags.of(c);
 		tags.add("Name", application().toUpperCase() + " " + name);
 		tags.add("application", application().toLowerCase());
@@ -38,6 +38,9 @@ public interface CDKUtils extends CDKVariables {
 		tags.add("creator", "aws-cdk");
 		tags.add("team", "Data Works");
 		tags.add("environment", env);
+		for (var tag : additionalTags) {
+			tags.add(tag.getKey().toString(), tag.getValue().toString());
+		}
 		return c;
 	}
 
