@@ -33,13 +33,15 @@ public interface CDKUtils extends CDKVariables {
 
 	// Implementing stacks define the relevant application
 	String application();
+	// Stack can define user, defaulting to system username
+	default String contact() { return SystemUtils.USER_NAME; }
 	
 	// TODO: Fix Pair warning
 	default <C extends IConstruct> C tag(C c, String env, String name, Pair... additionalTags) {
 		val tags = Tags.of(c);
-		tags.add("Name", application().toUpperCase() + " " + name);
+		tags.add("name", application().toUpperCase() + " " + name);
 		tags.add("application", application().toLowerCase());
-		tags.add("contact", SystemUtils.USER_NAME + "@us.ci.org");
+		tags.add("contact", contact() + "@us.ci.org");
 		tags.add("creator", "aws-cdk");
 		tags.add("team", "Data Works");
 		tags.add("environment", env);
