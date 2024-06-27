@@ -1,8 +1,11 @@
 package com.compassion.commons.iac;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jooq.lambda.Seq;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -13,6 +16,7 @@ import lombok.val;
 import lombok.experimental.Delegate;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.Tags;
+import software.amazon.awscdk.services.ec2.ISubnet;
 import software.amazon.awscdk.services.ec2.IVpc;
 import software.amazon.awscdk.services.ec2.Vpc;
 import software.amazon.awscdk.services.ec2.VpcLookupOptions;
@@ -48,6 +52,10 @@ public interface CDKUtils extends CDKVariables {
 	default IVpc findVPC(Stack parent) {
 		return Vpc.fromLookup(parent, "vpc", VpcLookupOptions.builder()
 			.vpcName(VPC_NAME).ownerAccountId(parent.getAccount()).build());
+	}
+	
+	default List<String> findSubnetsForVPC(IVpc vpc) {
+		return Seq.seq(vpc.getPrivateSubnets()).map(ISubnet::getSubnetId).toList();
 	}
 
 	default ParamFromSecretBuilder newParam(Stack parent, String path) {
