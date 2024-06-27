@@ -20,24 +20,17 @@ import software.amazon.awscdk.services.secretsmanager.ISecret;
 import software.amazon.awscdk.services.ssm.CfnParameter;
 import software.constructs.IConstruct;
 
-public interface CDKUtils {
+public interface CDKUtils extends CDKVariables {
 	static ObjectMapper JSON = new ObjectMapper()
 		.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
 
 	// Legacy tag that exposed an AWS secret to Pulsar functions. Can be removed when targeting StreamNative.
 	static Pair<String, String> ACCESS_FROM_PULSAR_FN = Pair.of("pulsar", "functions");
 
-	String SECRET_PATH = "/aws/reference/secretsmanager/";
-
-	// Allows for lookup regardless of account
-	String VPC_NAME = "Compassion VPC";
-
-	// TODO: Make this more configurable?
-	String AWS_ACCOUNT = "870579819025";
-	
 	String application();
 	
-	default <C extends IConstruct> C tag(C c, String env, String name, Pair<String, String>... additionalTags) {
+	// TODO: Removing tags until I figure out where com.compassion.ns.Pair is
+	default <C extends IConstruct> C tag(C c, String env, String name) {
 		val tags = Tags.of(c);
 		tags.add("Name", application().toUpperCase() + " " + name);
 		tags.add("application", application().toLowerCase());
@@ -45,9 +38,6 @@ public interface CDKUtils {
 		tags.add("creator", "aws-cdk");
 		tags.add("team", "Data Works");
 		tags.add("environment", env);
-		for (var tag : additionalTags) {
-			tags.add(tag.getKey(), tag.getValue());
-		}
 		return c;
 	}
 
