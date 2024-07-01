@@ -30,5 +30,5 @@ public interface CDKVariables {
 	       DW_ACCOUNT       = "870579819025",
 	       VPC_NAME         = "Compassion VPC";
 	
-	Pair<String, String> JDK_JAVA_OPTIONS = Pair.of("JDK_JAVA_OPTIONS", "--add-opens java.base/java.nio=ALL-UNNAMED");
+	Pair<String, String> JDK_JAVA_OPTIONS = Pair.of("JDK_JAVA_OPTIONS", "--add-opens=java.base/java.nio=ALL-UNNAMED");
 }
