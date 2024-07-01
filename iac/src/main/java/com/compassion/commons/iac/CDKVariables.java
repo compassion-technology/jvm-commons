@@ -15,6 +15,8 @@ public interface CDKVariables {
 		   ECR_PATH         = "%s.dkr.ecr.us-east-2.amazonaws.com/",
 		   SECRET_PATH      = "/aws/reference/secretsmanager/";
 	
+	// TODO: Create a mostly comprehensive enum with `getPrincipal` appending `.amazonaws.com`
+	
 	String BATCH	        = "batch.amazonaws.com",
 		   ECS		        = "ecs-tasks.amazonaws.com",
 		   EVENTS           = "events.amazonaws.com",
