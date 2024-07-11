@@ -1,6 +1,7 @@
 package com.compassion.commons.pulsar;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,6 +18,10 @@ import lombok.experimental.Accessors;
 
 @Getter @Setter @Accessors(chain = true)
 public class PulsarConfig extends YAMLConfig {
+	public static class PulsarKeyFile extends KeyFile implements Serializable {
+		private static final long serialVersionUID = 1L;
+	}
+	
 	private static final long serialVersionUID = 1L;
 
 	private String host = "devint-a200530c-d9e7-4e99-8cdc-6a719deb6326.aws-use2-production-snci-pool-kid.streamnative.aws.snio.cloud";
@@ -24,7 +29,7 @@ public class PulsarConfig extends YAMLConfig {
 	private String clientToken;
 	private String adminToken;
 	private Path oauthFile;
-	private KeyFile oauth = new KeyFile();
+	private PulsarKeyFile oauth = new PulsarKeyFile();
 	private String oauthAudience = "urn:sn:pulsar:o-xqpg6:devint";
 	private String context;
 
@@ -49,7 +54,7 @@ public class PulsarConfig extends YAMLConfig {
 			Files.writeString(oauthFile, oauth.toJson());
 		} else {
 			try (var reader = Files.newBufferedReader(getOauthFile())) {
-				oauth = KeyFile.fromJson(reader);
+				oauth = ObjectMapperFactory.getMapper().reader().readValue(reader, PulsarKeyFile.class);
 			}
 		}
 
