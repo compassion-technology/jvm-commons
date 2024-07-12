@@ -27,6 +27,7 @@
 		    <groupId>software.amazon.awscdk</groupId>
 		    <artifactId>aws-cdk-lib</artifactId>
 		    <version>${aws.cdk.version}</version>
+		    <scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>
