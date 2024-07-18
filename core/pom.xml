@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.compassion</groupId>
 		<artifactId>jvm-commons-parent</artifactId>
-		<version>5.2.4-SNAPSHOT</version>
+		<version>5.3.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>jvm-commons</artifactId>
