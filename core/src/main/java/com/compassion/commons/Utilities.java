@@ -8,6 +8,9 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -1026,5 +1029,22 @@ public final class Utilities {
 		List<T> ret = new ArrayList<>();
 		for (Collection<T> c : collections) { ret.addAll(c); }
 		return ret;
+	}
+	
+	/**
+	 * Gets the IP address of the host running the JVM according to <a href="https://checkip.amazonaws.com/">AWS</a>.
+	 * If there is an error, the message of that error is returned instead. This convenience utility is meant for
+	 * logging and troubleshooting network access issues and therefore isn't configurable. 
+	 * @return the IP address of the host machine, or the error message if it could not be retrieved
+	 */
+	public String getIpAddress() {
+		var client = HttpClient.newHttpClient();
+		try {
+			return client.send(HttpRequest.newBuilder(
+				URI.create("https://checkip.amazonaws.com/")
+			).build(), BodyHandlers.ofString()).body();
+		} catch (IOException | InterruptedException e) {
+			return Utilities.getMessage(e);
+		}
 	}
 }
