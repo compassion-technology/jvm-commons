@@ -11,8 +11,11 @@ import org.apache.pulsar.common.api.proto.MessageMetadata;
 
 import com.compassion.commons.jackson.PasswordSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -20,7 +23,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.databind.Module;
 
 public interface PulsarJacksonUtils {
 	interface PulsarConfigMixin {
@@ -73,6 +75,21 @@ public interface PulsarJacksonUtils {
 		@Override
 		public void serialize(byte[] value, JsonGenerator gen, SerializerProvider provider) throws IOException {
 			gen.writeObject(mapper.readValue(value, Map.class));
+		}
+	}
+	
+	interface AsJson {
+		default ObjectMapper mapper() {
+			return ByeToMapSerializer.mapper;
+		}
+		
+		@JsonProperty("asJson")
+		default String getAsJson() {
+			try {
+				return mapper().writeValueAsString(this);
+			} catch (JsonProcessingException e) {
+				throw new IllegalArgumentException("Cannot write " + this + " as JSON", e);
+			}
 		}
 	}
 }
