@@ -3,8 +3,6 @@ package com.compassion.commons.iac;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jooq.lambda.Seq;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,10 +10,8 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import lombok.experimental.Delegate;
 import software.amazon.awscdk.Stack;
-import software.amazon.awscdk.Tags;
 import software.amazon.awscdk.services.ec2.ISubnet;
 import software.amazon.awscdk.services.ec2.IVpc;
 import software.amazon.awscdk.services.ec2.Vpc;
@@ -28,26 +24,10 @@ public interface CDKUtils extends CDKVariables {
 	static ObjectMapper JSON = new ObjectMapper()
 		.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
 
-	// Implementing stacks define the relevant application
-	String application();
-	// Stack can define user, defaulting to system username
-	default String contact() { return SystemUtils.USER_NAME; }
-	
-	// TODO: Fix Pair warning
-	default <C extends IConstruct> C tag(C c, String env, String name, Pair... additionalTags) {
-		val tags = Tags.of(c);
-		tags.add("name", StringUtils.prependIfMissingIgnoreCase(name, application().toUpperCase() + " "));
-		tags.add("application", application().toLowerCase());
-		tags.add("contact", contact() + "@us.ci.org");
-		tags.add("creator", "aws-cdk");
-		tags.add("team", "Data Works");
-		tags.add("environment", env);
-		for (var tag : additionalTags) {
-			tags.add(tag.getKey().toString(), tag.getValue().toString());
-		}
-		return c;
+	default Tagger tag(IConstruct c) {
+		return Tagger.with(c);
 	}
-
+	
 	default IVpc findVPC(Stack parent) {
 		return Vpc.fromLookup(parent, "vpc", VpcLookupOptions.builder()
 			.vpcName(VPC_NAME).ownerAccountId(parent.getAccount()).build());
