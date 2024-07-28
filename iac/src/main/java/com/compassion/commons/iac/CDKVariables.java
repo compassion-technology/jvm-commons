@@ -16,6 +16,7 @@ public interface CDKVariables {
 		   SECRET_PATH      = "/aws/reference/secretsmanager/";
 	
 	// TODO: Create a mostly comprehensive enum with `getPrincipal` appending `.amazonaws.com`
+	// TODO: Looked through the CDK code since this can/should be managed there, but didn't find anything
 	
 	String BATCH	        = "batch.amazonaws.com",
 		   ECS		        = "ecs-tasks.amazonaws.com",
@@ -32,5 +33,5 @@ public interface CDKVariables {
 	       DW_ACCOUNT       = "870579819025",
 	       VPC_NAME         = "Compassion VPC";
 	
-	Pair<String, String> JDK_JAVA_OPTIONS = Pair.of("JDK_JAVA_OPTIONS", "--add-opens=java.base/java.nio=ALL-UNNAMED");
+	Pair<String, String> JVM_ARGS_NIO = Pair.of("JDK_JAVA_OPTIONS", "--add-opens=java.base/java.nio=ALL-UNNAMED");
 }
