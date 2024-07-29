@@ -17,8 +17,8 @@ import software.constructs.IConstruct;
 
 @RequiredArgsConstructor(staticName = "with")
 @Setter @Getter @Accessors(fluent = true)
-public class Tagger {
-	private final IConstruct construct;
+public class Tagger<C extends IConstruct> {
+	private final C construct;
 	
 	private String application = "", name, projectCode, purpose,
 		creator      = "aws-cdk",
@@ -27,32 +27,34 @@ public class Tagger {
 	
 	private final Map<String, String> otherTags = new LinkedHashMap<>();
 	
-	public Tagger other(String tag, String value) {
+	public Tagger<C> other(String tag, String value) {
 		otherTags.put(tag, value);
 		return this;
 	}
 	
-	public void tag() {
-		var ret = Tags.of(construct);
+	public C tag() {
+		var tags = Tags.of(construct);
 		
 		// See: https://ciorg.atlassian.net/wiki/spaces/ITA/pages/27600192537/AWS+Resource+Tagging+Standard
 		
 		// Required tags
 		Objects.requireNonNull(application);
-		ret.add("Application", application);
+		tags.add("Application", application);
 		Objects.requireNonNull(creator);
-		ret.add("Creator", creator);
+		tags.add("Creator", creator);
 
 		// IET only
-		accept(projectCode, $ -> ret.add("IETProjectCode", $));
+		accept(projectCode, $ -> tags.add("IETProjectCode", $));
 		
 		// Recommended tags
-		accept(name,        $ -> ret.add("Name", $));
-		accept(contact,     $ -> ret.add("Contact", $));
-		accept(team,        $ -> ret.add("Team", $));
-		accept(purpose,     $ -> ret.add("Purpose", $));
+		accept(name,        $ -> tags.add("Name", $));
+		accept(contact,     $ -> tags.add("Contact", $));
+		accept(team,        $ -> tags.add("Team", $));
+		accept(purpose,     $ -> tags.add("Purpose", $));
 		
 		// Custom tags
-		otherTags.forEach(ret::add);
+		otherTags.forEach(tags::add);
+		
+		return construct;
 	}
 }

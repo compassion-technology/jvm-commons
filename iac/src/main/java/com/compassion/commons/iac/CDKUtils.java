@@ -24,7 +24,7 @@ public interface CDKUtils extends CDKVariables {
 	static ObjectMapper JSON = new ObjectMapper()
 		.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
 
-	default Tagger tag(IConstruct c) {
+	default <C extends IConstruct> Tagger<C> tag(C c) {
 		return Tagger.with(c);
 	}
 	
