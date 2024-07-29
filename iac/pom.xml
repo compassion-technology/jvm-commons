@@ -13,7 +13,6 @@
 	<name>Compassion JVM Commons - Infrastructure as Code</name>
 
 	<properties>
-		<!-- Need the BOM to reconcile version conflicts -->
 		<aws.cdk.version>2.140.0</aws.cdk.version>
 	</properties>
 
@@ -27,7 +26,6 @@
 		    <groupId>software.amazon.awscdk</groupId>
 		    <artifactId>aws-cdk-lib</artifactId>
 		    <version>${aws.cdk.version}</version>
-		    <scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>
