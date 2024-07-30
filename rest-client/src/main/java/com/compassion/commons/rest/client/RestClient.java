@@ -20,7 +20,6 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Invocation;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Feature;
-import lombok.val;
 import lombok.extern.java.Log;
 
 @Log
@@ -76,15 +75,15 @@ public class RestClient implements AutoCloseable {
 	public Invocation.Builder request(RecursiveTarget target, WebParam... params) {
 		// If a request parameter has the same type and name as a perpetual param, let it override the param and don't
 		// apply them twice
-		val allParams = Seq.concat(Seq.of(params), Seq.of(perpetualParams))
+		var allParams = Seq.concat(Seq.of(params), Seq.of(perpetualParams))
 				.distinct(p -> Tuple.tuple(p.getClass(), p.getName()))
 				.toList();
 		
-		WebTarget wt = target.resolve(base);
-		for (val p : allParams) { wt = p.applyToTarget(wt); }
+		var wt = target.isAbsolute()? client.target(target.getPath()) : target.resolve(base);
+		for (var p : allParams) { wt = p.applyToTarget(wt); }
 		
-		Invocation.Builder rb = wt.request();
-		for (val p : allParams) { rb = p.applyToRequest(rb); }
+		var rb = wt.request();
+		for (var p : allParams) { rb = p.applyToRequest(rb); }
 		
 		return rb;
 	}
@@ -95,7 +94,7 @@ public class RestClient implements AutoCloseable {
 	}
 	
 	protected static ClientBuilder builderWithFeatures(Feature... features) {
-		val ret = ClientBuilder.newBuilder();
+		var ret = ClientBuilder.newBuilder();
 		// Allow https over IP addresses. While this is a potential security vulnerability, users of this code are
 		// trusted and likely know what they are doing (e.g. forced to use IP address due to firewall rules).
 		ret.hostnameVerifier((host, session) -> true);

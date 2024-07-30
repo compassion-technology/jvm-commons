@@ -1,5 +1,7 @@
 package com.compassion.commons.rest.client;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
 
 import jakarta.ws.rs.client.WebTarget;
@@ -26,6 +28,14 @@ public class RecursiveTarget {
 	
 	public WebTarget resolve(WebTarget base) {
 		return Optional.ofNullable(parent).map($ -> $.resolve(base)).orElse(base).path(path);
+	}
+	
+	public boolean isAbsolute() {
+		try {
+			return new URI(path).isAbsolute();
+		} catch (URISyntaxException e) {
+			return false;
+		}
 	}
 	
 	public static RecursiveTarget newTarget(RecursiveTarget parent, String path) {
