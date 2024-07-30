@@ -8,7 +8,7 @@
 	</parent>
 
 	<artifactId>jvm-commons-rest-client</artifactId>
-	<name>Compassion JVM Commons - REST Client Utilities</name>
+	<name>Compassion JVM Commons - REST Client</name>
 	<description>Utilities for calling RESTful web services</description>
 
 	<properties>
