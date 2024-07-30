@@ -6,7 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.jooq.lambda.Seq;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,18 @@ public class Tagger<C extends IConstruct> {
 	public Tagger<C> other(String tag, String value) {
 		otherTags.put(tag, value);
 		return this;
+	}
+	
+	/**
+	 * Sets the name of the construct using the application, specified name, and environment (if defined):
+	 * {@code application - name - ... - environment}
+	 * @param names the specific name components of the construct
+	 * @return this tagger for method chaining after the full name has been set from the application, name, 
+	 * and optional environment 
+	 * @see #name(String)
+	 */
+	public Tagger<C> fullName(String... names) {
+		return name(Seq.of(application).append(names).append(environment).filter(StringUtils::isNotBlank).toString(" - "));
 	}
 	
 	public C tag() {
