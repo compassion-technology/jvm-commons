@@ -27,5 +27,12 @@
 		    <artifactId>aws-cdk-lib</artifactId>
 		    <version>${aws.cdk.version}</version>
 		</dependency>
+		
+		<!-- Parse Lambda POMs to get metadata like version and description -->
+		<dependency>
+    		<groupId>org.apache.maven</groupId>
+    		<artifactId>maven-model</artifactId>
+    		<version>3.9.6</version>
+		</dependency>
 	</dependencies>
 </project>
