@@ -20,7 +20,7 @@ import software.constructs.IConstruct;
 public class Tagger<C extends IConstruct> {
 	private final C construct;
 	
-	private String application = "", name, projectCode, purpose,
+	private String application = "", name, projectCode, purpose, environment,
 		creator      = "aws-cdk",
 		contact      = SystemUtils.USER_NAME + "@us.ci.org",
 		team         = "Data Works";
@@ -51,6 +51,7 @@ public class Tagger<C extends IConstruct> {
 		accept(contact,     $ -> tags.add("Contact", $));
 		accept(team,        $ -> tags.add("Team", $));
 		accept(purpose,     $ -> tags.add("Purpose", $));
+		accept(environment, $ -> tags.add("Environment", $));
 		
 		// Custom tags
 		otherTags.forEach(tags::add);
