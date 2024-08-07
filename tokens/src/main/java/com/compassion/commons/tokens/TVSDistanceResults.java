@@ -12,7 +12,7 @@ import org.eclipse.collections.impl.factory.primitive.LongObjectMaps;
 
 import com.compassion.commons.LambdaUtils;
 import com.compassion.commons.hash.DataHash;
-import com.elderresearch.commons.structs.SortedArray;
+import com.compassion.commons.structs.SortedArray;
 
 public class TVSDistanceResults implements Iterable<TVSDistance> {
 	private TVSDistance defDist;

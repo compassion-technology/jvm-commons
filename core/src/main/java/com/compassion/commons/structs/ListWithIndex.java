@@ -1,5 +1,4 @@
-/* ©2017-2021 Elder Research, Inc. All rights reserved. */
-package com.elderresearch.commons.structs;
+package com.compassion.commons.structs;
 
 import java.util.HashMap;
 import java.util.LinkedList;

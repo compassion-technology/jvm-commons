@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Combo;
 
 import com.compassion.commons.gui.swt.events.SelectionLambda;
 import com.compassion.commons.gui.swt.util.SWTUtilities;
-import com.elderresearch.commons.structs.ObservableSet;
+import com.compassion.commons.structs.ObservableSet;
 
 import lombok.val;
 
