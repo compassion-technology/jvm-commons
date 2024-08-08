@@ -3,3 +3,13 @@ include:
   - project: "ciorg/ciopensource/jvm/maven-parent"
     ref: "2.3.0"
     file: "/.gitlab-ci.yml"
+
+test:
+  stage: test
+  script:
+    - 'mvn $MAVEN_CLI_OPTS test -pl rest-client -am'
+  
+deploy:
+  stage: deploy
+  script:
+    - 'mvn $MAVEN_CLI_OPTS deploy -pl rest-client -am'
