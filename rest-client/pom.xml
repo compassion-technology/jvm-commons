@@ -12,7 +12,7 @@
 	<description>Utilities for calling RESTful web services</description>
 
 	<properties>
-		<jersey.version>3.1.7</jersey.version>
+		<jersey.version>2.41</jersey.version>
 	</properties>
 
 	<dependencies>

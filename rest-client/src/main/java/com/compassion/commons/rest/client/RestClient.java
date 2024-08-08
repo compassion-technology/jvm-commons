@@ -4,6 +4,12 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Feature;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.jul.LogManager;
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
@@ -15,11 +21,6 @@ import org.jooq.lambda.tuple.Tuple;
 import com.compassion.commons.LambdaUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Invocation;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.Feature;
 import lombok.extern.java.Log;
 
 @Log

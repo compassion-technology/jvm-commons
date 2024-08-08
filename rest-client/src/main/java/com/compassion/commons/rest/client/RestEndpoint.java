@@ -1,6 +1,6 @@
 package com.compassion.commons.rest.client;
 
-import jakarta.ws.rs.client.Invocation;
+import javax.ws.rs.client.Invocation;
 
 import org.apache.commons.lang3.ArrayUtils;
 

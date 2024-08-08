@@ -1,7 +1,7 @@
 package com.compassion.commons.rest.client;
 
-import jakarta.ws.rs.client.Invocation.Builder;
-import jakarta.ws.rs.client.WebTarget;
+import javax.ws.rs.client.Invocation.Builder;
+import javax.ws.rs.client.WebTarget;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.jooq.lambda.Seq;

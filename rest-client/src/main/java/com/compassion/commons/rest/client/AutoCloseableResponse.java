@@ -1,6 +1,6 @@
 package com.compassion.commons.rest.client;
 
-import jakarta.ws.rs.core.Response;
+import javax.ws.rs.core.Response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

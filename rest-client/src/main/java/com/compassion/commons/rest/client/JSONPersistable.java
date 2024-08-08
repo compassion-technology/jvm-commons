@@ -3,14 +3,15 @@ package com.compassion.commons.rest.client;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
 import org.apache.commons.lang3.BooleanUtils;
 
 import com.compassion.commons.LambdaUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
 import lombok.val;
 import lombok.extern.log4j.Log4j2;
 

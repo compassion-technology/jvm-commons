@@ -4,7 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
-import jakarta.ws.rs.client.WebTarget;
+import javax.ws.rs.client.WebTarget;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
