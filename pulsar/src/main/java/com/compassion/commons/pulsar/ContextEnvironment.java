@@ -1,5 +1,8 @@
 package com.compassion.commons.pulsar;
 
+import java.util.Optional;
+
+import org.apache.pulsar.functions.api.BaseContext;
 import org.apache.pulsar.functions.api.Context;
 
 import com.compassion.commons.config.ConfigEnvironment;
@@ -11,16 +14,23 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor(staticName = "with")
 public class ContextEnvironment implements ConfigEnvironment {
-	private final Context context;
+	private final BaseContext context;
+	
+	private Optional<Object> getUserConfigValue(String path) {
+		if (context instanceof Context) {
+			return ((Context) context).getUserConfigValue(path);
+		}
+		return Optional.empty();
+	}
 	
 	@Override
 	public boolean has(String path, JsonNode existing) {
-		return context.getUserConfigValue(path).isPresent() || context.getSecret(path) != null;
+		return getUserConfigValue(path).isPresent() || context.getSecret(path) != null;
 	}
 	
 	@Override
 	public JsonNode get(String path, JsonNode existing) {
-		return JsonNodeFactory.instance.textNode(context.getUserConfigValue(path)
+		return JsonNodeFactory.instance.textNode(getUserConfigValue(path)
 			.orElseGet(() -> context.getSecret(path)).toString());
 	}
 	
