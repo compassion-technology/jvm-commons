@@ -60,7 +60,7 @@ public class DaoBatcher<P, D extends DAO<?, P, ?>> {
 	}
 	
 	public void flush(boolean force) {
-		if  (force) {
+		if (force) {
 			flush(0, 0L);	
 		} else {
 			flush(maxBatchSize, lastTransactionTime + maxBatchTime);

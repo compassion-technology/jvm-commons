@@ -17,8 +17,8 @@ public class ContextEnvironment implements ConfigEnvironment {
 	private final BaseContext context;
 	
 	private Optional<Object> getUserConfigValue(String path) {
-		if (context instanceof Context) {
-			return ((Context) context).getUserConfigValue(path);
+		if (context instanceof Context c) {
+			return c.getUserConfigValue(path);
 		}
 		return Optional.empty();
 	}
