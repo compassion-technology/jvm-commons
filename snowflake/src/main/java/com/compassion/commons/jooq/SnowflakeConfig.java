@@ -8,8 +8,7 @@ import org.apache.commons.text.StringSubstitutor;
 import org.jooq.SQLDialect;
 import org.jooq.exception.DataAccessException;
 
-import com.elderresearch.commons.jdbc.JDBCDriver;
-import com.elderresearch.commons.jooq.JOOQDatabaseConfig;
+import com.compassion.commons.jdbc.JDBCDriver;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableMap;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDefault;

@@ -22,7 +22,7 @@
  *
  * For more information, please visit: http://www.jooq.org/licenses
  */
-package com.elderresearch.commons.jdbc;
+package com.compassion.commons.jdbc;
 
 import java.sql.Array;
 import java.sql.Blob;

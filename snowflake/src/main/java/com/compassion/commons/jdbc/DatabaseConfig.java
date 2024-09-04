@@ -1,5 +1,4 @@
-/* ©2016-2021 Elder Research, Inc. All rights reserved. */
-package com.elderresearch.commons.jdbc;
+package com.compassion.commons.jdbc;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -9,8 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import com.compassion.commons.LambdaUtils;
 import com.compassion.commons.Utilities;
 import com.compassion.commons.config.CredentialConfig.ConfigWithUserPassword;
-import com.elderresearch.commons.jdbc.ConnectionProvider.ConnectionProviderDirect;
-import com.elderresearch.commons.jdbc.ConnectionProvider.ConnectionProviderPooled;
+import com.compassion.commons.jdbc.ConnectionProvider.ConnectionProviderDirect;
+import com.compassion.commons.jdbc.ConnectionProvider.ConnectionProviderPooled;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;

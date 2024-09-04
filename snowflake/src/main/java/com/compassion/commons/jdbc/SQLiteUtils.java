@@ -1,5 +1,4 @@
-/* ©2016-2021 Elder Research, Inc. All rights reserved. */
-package com.elderresearch.commons.jdbc;
+package com.compassion.commons.jdbc;
 
 import java.io.File;
 import java.io.FileOutputStream;

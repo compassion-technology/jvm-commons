@@ -1,5 +1,4 @@
-/* ©2016-2021 Elder Research, Inc. All rights reserved. */
-package com.elderresearch.commons.jooq;
+package com.compassion.commons.jooq;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -12,9 +11,9 @@ import org.jooq.conf.Settings;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 
-import com.elderresearch.commons.jdbc.DatabaseConfig;
-import com.elderresearch.commons.jdbc.DatabaseDriver;
-import com.elderresearch.commons.jdbc.JDBCDriver;
+import com.compassion.commons.jdbc.DatabaseConfig;
+import com.compassion.commons.jdbc.DatabaseDriver;
+import com.compassion.commons.jdbc.JDBCDriver;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
@@ -86,7 +85,7 @@ public class JOOQDatabaseConfig extends DatabaseConfig implements ConnectionProv
 	}
 	
 	@SuppressWarnings("unused")
-	protected com.elderresearch.commons.jdbc.ConnectionProvider delegateProvider() throws SQLException {
+	protected com.compassion.commons.jdbc.ConnectionProvider delegateProvider() throws SQLException {
 		return asPool();
 	}
 }

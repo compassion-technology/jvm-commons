@@ -1,5 +1,4 @@
-/* ©2017-2021 Elder Research, Inc. All rights reserved. */
-package com.elderresearch.commons.jooq;
+package com.compassion.commons.jooq;
 
 import java.time.Duration;
 import java.util.Date;

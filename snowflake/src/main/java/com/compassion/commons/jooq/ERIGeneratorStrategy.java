@@ -1,5 +1,4 @@
-/* ©2016-2021 Elder Research, Inc. All rights reserved. */
-package com.elderresearch.commons.jooq;
+package com.compassion.commons.jooq;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.codegen.DefaultGeneratorStrategy;

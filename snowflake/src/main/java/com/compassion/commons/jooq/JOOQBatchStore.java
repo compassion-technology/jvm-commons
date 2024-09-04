@@ -1,5 +1,4 @@
-/* ©2016-2021 Elder Research, Inc. All rights reserved. */
-package com.elderresearch.commons.jooq;
+package com.compassion.commons.jooq;
 
 import java.io.Closeable;
 import java.sql.BatchUpdateException;
@@ -13,7 +12,7 @@ import org.jooq.Field;
 import org.jooq.UpdatableRecord;
 import org.jooq.exception.DataAccessException;
 
-import com.elderresearch.commons.jdbc.JDBCUtils;
+import com.compassion.commons.jdbc.JDBCUtils;
 
 import lombok.val;
 import lombok.extern.log4j.Log4j2;
