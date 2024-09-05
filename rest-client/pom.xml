@@ -13,6 +13,7 @@
 
 	<properties>
 		<jersey.version>3.1.7</jersey.version>
+		<methanol.version>1.6.0</methanol.version>
 	</properties>
 
 	<dependencies>
@@ -30,6 +31,11 @@
     		<groupId>org.glassfish.jersey.inject</groupId>
     		<artifactId>jersey-hk2</artifactId>
     		<version>${jersey.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.mizosoft.methanol</groupId>
+			<artifactId>methanol</artifactId>
+			<version>${methanol.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
