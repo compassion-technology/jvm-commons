@@ -104,39 +104,40 @@ public final class SQLRunner implements Runnable {
 	}
 
 	private void readAndExecute(Reader r, Statement stm) throws SQLException {
-		ScriptReader sr = new ScriptReader(r);
-		sr.setSkipRemarks(true);
-
 		int executed = 0;
-		String line;
-		while ((line = sr.readStatement()) != null) {
-			line = line.trim();
-			if (line.isEmpty()) {
-				continue;
-			}
-			if (dropsOnly && !StringUtils.startsWithIgnoreCase(line, "drop")) {
-				continue;
-			}
 
-			if (debug) {
-				log.info(line);
-			}
-			try {
-				if (batch) {
-					stm.addBatch(line);
-				} else {
-					stm.execute(line);
+		try (var sr = new ScriptReader(r)) {
+			sr.setSkipRemarks(true);
+	
+			String line;
+			while ((line = sr.readStatement()) != null) {
+				line = line.trim();
+				if (line.isEmpty()) {
+					continue;
 				}
-				executed++;
-			} catch (SQLException ex) {
-				if (ignoreErrors) {
-					log.warn("Could not execute {}: {}", line, Utilities.getMessage(ex));
-				} else {
-					throw ex;
+				if (dropsOnly && !StringUtils.startsWithIgnoreCase(line, "drop")) {
+					continue;
+				}
+	
+				if (debug) {
+					log.info(line);
+				}
+				try {
+					if (batch) {
+						stm.addBatch(line);
+					} else {
+						stm.execute(line);
+					}
+					executed++;
+				} catch (SQLException ex) {
+					if (ignoreErrors) {
+						log.warn("Could not execute {}: {}", line, Utilities.getMessage(ex));
+					} else {
+						throw ex;
+					}
 				}
 			}
 		}
-
 		if (batch) {
 			try {
 				stm.executeBatch();

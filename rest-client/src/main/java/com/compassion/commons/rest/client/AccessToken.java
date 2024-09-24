@@ -36,12 +36,13 @@ public class AccessToken {
 	public static AccessToken acquire(String subDomain, String scope, String httpAuth) {
 		log.info("Acquiring new access token for {}", subDomain);
 		
-		var client = new RestClient(ClientBuilder.newBuilder());
-		client.setBase(String.format("https://%s.ci.org", subDomain))
-			.addPerpetualParams(WebHeader.of(HttpHeaders.AUTHORIZATION, httpAuth));
+		try (var client = new RestClient(ClientBuilder.newBuilder())) {
+			client.setBase(String.format("https://%s.ci.org", subDomain))
+				.addPerpetualParams(WebHeader.of(HttpHeaders.AUTHORIZATION, httpAuth));
 		
-		return client.request(RecursiveTarget.newTarget(DEF_ENDPOINT), WebQueryParam.of(GRANT_TYPE, CLIENT_CREDS),
+			return client.request(RecursiveTarget.newTarget(DEF_ENDPOINT), WebQueryParam.of(GRANT_TYPE, CLIENT_CREDS),
 				WebQueryParam.of(SCOPE_KEY, scope != null ? scope : SCOPE_VALUE))
-			.get(AccessToken.class);
+					.get(AccessToken.class);	
+		}
 	}
 }
