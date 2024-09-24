@@ -13,7 +13,6 @@
 
 	<properties>
 		<jersey.version>3.1.7</jersey.version>
-		<methanol.version>1.6.0</methanol.version>
 	</properties>
 
 	<dependencies>
