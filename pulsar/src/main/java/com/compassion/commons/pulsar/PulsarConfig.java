@@ -25,9 +25,9 @@ public class PulsarConfig extends YAMLConfig {
 
 		@Override
 		public void forEachCredentialPath(Consumer<String> withSecretPath) {
-			withSecretPath.accept("clientId");
-			withSecretPath.accept("clientSecret");
-			withSecretPath.accept("clientEmail");
+			withSecretPath.accept("client_id");
+			withSecretPath.accept("client_secret");
+			withSecretPath.accept("client_email");
 		}
 	}
 	
