@@ -12,7 +12,9 @@ import org.apache.pulsar.common.util.ObjectMapperFactory;
 
 import com.compassion.commons.config.CredentialConfig;
 import com.compassion.commons.config.YAMLConfig;
+import com.compassion.commons.jackson.PasswordSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +30,11 @@ public class PulsarConfig extends YAMLConfig {
 			withSecretPath.accept("client_id");
 			withSecretPath.accept("client_secret");
 			withSecretPath.accept("client_email");
+		}
+		
+		public interface Mixin {
+			@JsonSerialize(using = PasswordSerializer.class) String getClientId();
+			@JsonSerialize(using = PasswordSerializer.class) String getClientSecret();
 		}
 	}
 	
