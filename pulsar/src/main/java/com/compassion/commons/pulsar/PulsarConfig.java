@@ -32,7 +32,7 @@ public class PulsarConfig extends YAMLConfig {
 			withSecretPath.accept("client_email");
 		}
 		
-		public interface Mixin {
+		public interface PulsarKeyFileMixin {
 			@JsonSerialize(using = PasswordSerializer.class) String getClientId();
 			@JsonSerialize(using = PasswordSerializer.class) String getClientSecret();
 		}
