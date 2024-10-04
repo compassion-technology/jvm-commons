@@ -25,7 +25,7 @@ public class Tagger<C extends IConstruct> {
 	private String application = "", name, projectCode, purpose, environment,
 		creator      = "aws-cdk",
 		contact      = SystemUtils.USER_NAME + "@us.ci.org",
-		team         = "Data Works";
+		team         = "ADAPT";
 	
 	private final Map<String, String> otherTags = new LinkedHashMap<>();
 	
