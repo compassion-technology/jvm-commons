@@ -1,5 +1,7 @@
 package com.compassion.commons.config;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -11,6 +13,7 @@ import org.apache.commons.lang3.SystemUtils;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -18,6 +21,8 @@ import lombok.Setter;
 import software.amazon.awssdk.services.ssm.model.OperatingSystem;
 
 public class VSCodeSettings {
+	private static final ObjectMapper mapper = new ObjectMapper();
+	
 	private final static Map<OperatingSystem, Path> defaultPath = Map.of(
 		OperatingSystem.WINDOWS, Path.of(System.getenv("APPDATA"), "Code", "User", "settings.json"),
 		OperatingSystem.MACOS, Path.of(SystemUtils.USER_HOME, "Library", "Application Support", "Code", "User", "settings.json")
@@ -39,11 +44,11 @@ public class VSCodeSettings {
 	@JsonAnySetter
 	private Map<String, Object> otherSettings = new HashMap<>();
 	
-	public void addJsonSchema(String uri, String fileMatch) {
+	public boolean addJsonSchema(String uri, String fileMatch) {
 		var s = new JsonSchema();
 		s.url = uri;
 		s.getFileMatch().add(fileMatch);
-		getJsonSchemas().add(s);
+		return getJsonSchemas().add(s);
 	}
 	
 	@Getter
@@ -55,5 +60,15 @@ public class VSCodeSettings {
 	
 	public static Path getDefaultPath(OperatingSystem os) {
 		return defaultPath.get(os);
+	}
+	public static Path getDefaultPath() {
+		return getDefaultPath(SystemUtils.IS_OS_WINDOWS? OperatingSystem.WINDOWS : OperatingSystem.MACOS);
+	}
+	public void save() throws IOException {
+		mapper.writer().withDefaultPrettyPrinter().writeValue(getDefaultPath().toFile(), this);
+	}
+	public static VSCodeSettings load() throws IOException {
+		var path = getDefaultPath();
+		return Files.exists(path)? mapper.readValue(path.toFile(), VSCodeSettings.class) : new VSCodeSettings();
 	}
 }
