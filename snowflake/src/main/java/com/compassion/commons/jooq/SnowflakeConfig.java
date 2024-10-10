@@ -98,6 +98,9 @@ public class SnowflakeConfig extends JOOQDatabaseConfig {
 		// Problems are usually networking or password which aren't solved by retry.
 		System.setProperty("c3p0.acquireRetryAttempts", String.valueOf(1));
 		
+		// Set Snowflake JDBC driver logging to Slf4j, which we bridge into Log4j
+		System.setProperty("net.snowflake.jdbc.loggerImpl", "net.snowflake.client.log.SLF4JLogger");
+		
 		log.debug("Opening new connection to Snowflake...");
 		return super.acquire();
 	}
