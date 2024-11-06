@@ -7,18 +7,18 @@ import org.jooq.BindingSetStatementContext;
 import org.jooq.impl.DefaultBinding;
 import org.jooq.impl.SQLDataType;
 
-public class VariantBinding extends DefaultBinding<byte[], byte[]> {
+public class VariantBinding extends DefaultBinding<String, String> {
 	public VariantBinding() {
-		super(DefaultBinding.binding(SQLDataType.VARBINARY));
+		super(DefaultBinding.binding(SQLDataType.VARCHAR));
 	}
 	
 	@Override
-	public void set(BindingSetStatementContext<byte[]> ctx) throws SQLException {
-		ctx.statement().setString(ctx.index(), "parse_json($$" + new String(ctx.value()) + "$$)");
+	public void set(BindingSetStatementContext<String> ctx) throws SQLException {
+		ctx.statement().setString(ctx.index(), "parse_json($$" + ctx.value() + "$$)");
 	}
 
 	@Override
-	public void sql(BindingSQLContext<byte[]> ctx) throws SQLException {
-		ctx.render().sql("parse_json($$" + new String(ctx.value()) + "$$)");
+	public void sql(BindingSQLContext<String> ctx) throws SQLException {
+		ctx.render().sql("parse_json($$" + ctx.value() + "$$)");
 	}
 }

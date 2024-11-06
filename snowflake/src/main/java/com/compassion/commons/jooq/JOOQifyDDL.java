@@ -35,8 +35,8 @@ public class JOOQifyDDL implements UnaryOperator<String> {
 	
 	@Override
 	public String apply(String s) {
-		// Replace unsupported VARIANT type with VARBINARY
-		s = StringUtils.replace(s, "VARIANT", "VARBINARY");
+		// Replace unsupported VARIANT type with VARCHAR
+		s = StringUtils.replace(s, "VARIANT", "VARCHAR");
 		// Autoincrement on integer PKs
 		s = addIgnore(s, "AUTOINCREMENT INCREMENT [0-9]+");
 		// Doesn't understand Snowflake USE SCHEMA
