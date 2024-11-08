@@ -23,11 +23,6 @@ import software.amazon.awssdk.services.ssm.model.OperatingSystem;
 public class VSCodeSettings {
 	private static final ObjectMapper mapper = new ObjectMapper();
 	
-	private final static Map<OperatingSystem, Path> defaultPath = Map.of(
-		OperatingSystem.WINDOWS, Path.of(System.getenv("APPDATA"), "Code", "User", "settings.json"),
-		OperatingSystem.MACOS, Path.of(SystemUtils.USER_HOME, "Library", "Application Support", "Code", "User", "settings.json")
-	);
-	
 	@Getter
 	@JsonProperty("yaml.schemas")
 	private Map<String, String> yamlSchemas = new HashMap<>();
@@ -59,7 +54,12 @@ public class VSCodeSettings {
 	}
 	
 	public static Path getDefaultPath(OperatingSystem os) {
-		return defaultPath.get(os);
+		// Originally this was a static map, but paths may not yet exist on a new computer if VS Code has not been installed
+		return switch (os) {
+			case WINDOWS -> Path.of(System.getenv("APPDATA"), "Code", "User", "settings.json");
+			case MACOS -> Path.of(SystemUtils.USER_HOME, "Library", "Application Support", "Code", "User", "settings.json");
+			default -> null;
+		};
 	}
 	public static Path getDefaultPath() {
 		return getDefaultPath(SystemUtils.IS_OS_WINDOWS? OperatingSystem.WINDOWS : OperatingSystem.MACOS);
