@@ -56,7 +56,7 @@ public class BuildCombo<T> extends BuildControlWithText<Combo, BuildCombo<T>> {
 	public BuildCombo<T> items(ObservableSet<T> set) {
 		set.addObserver(newSet -> SWTUtilities.run(ref.getDisplay(), () -> {
 			clearItems();
-			items(set);
+			items(newSet);
 		}, ref));
 		return this;
 	}
