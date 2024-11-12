@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 
 import com.compassion.commons.LambdaUtils;
@@ -13,6 +14,7 @@ import com.compassion.commons.gui.swt.controls.builders.SWTBuilders;
 import com.compassion.commons.gui.swt.util.ResourceManager;
 import com.compassion.commons.gui.swt.util.SWTUtilities;
 
+import lombok.Getter;
 import picocli.CommandLine.Model.CommandSpec;
 
 /**
@@ -23,10 +25,16 @@ import picocli.CommandLine.Model.CommandSpec;
 public class CLIForm extends CScrolledComposite implements SWTBuilders {
 	private ResourceManager rm;
 	
+	@Getter
+	private Color invalidColor;
+	
 	public CLIForm(ResourceManager rm, Composite parent) {
 		super(parent, SWT.HORIZONTAL | SWT.VERTICAL);
 		this.rm = rm;
 		setLayout(grid(3).get());
+		
+		// TODO: Dark mode
+		invalidColor = rm.getColor(255, 200, 200);
 	}
 	
 	public void init(CommandSpec spec) {
