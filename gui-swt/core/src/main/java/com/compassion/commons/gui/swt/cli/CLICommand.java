@@ -1,6 +1,7 @@
 package com.compassion.commons.gui.swt.cli;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 import org.jooq.lambda.Seq;
@@ -35,6 +36,9 @@ public class CLICommand {
 	
 	static List<CLICommand> wrap(Collection<CommandLine> subcommands) {
 		// Don't include help commands in the UI
-		return Seq.seq(subcommands).map(CLICommand::new).filter($ -> !$.getCommandName().equals(HELP)).toList();
+		return Seq.seq(subcommands)
+			.map(CLICommand::new).filter($ -> !$.getCommandName().equals(HELP))
+			.sorted(Comparator.comparing(CLICommand::getCommandName))
+			.toList();
 	}
 }

@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
@@ -73,7 +74,7 @@ class CLIOption {
 			initName();
 			var textbox = form.text(parent)
 				.text(StringUtils.defaultString(spec.defaultValue()))
-				.layoutData(form.gridData().fill())
+				.layoutData(form.gridData().hFill())
 				.get();
 			input = textbox;
 			initDescription();
@@ -145,6 +146,7 @@ class CLIOption {
 	}
 	
 	static class CLICollection extends CLIOption {
+		private Button add;
 		private List<CLIOption> items = new LinkedList<>();
 		
 		CLICollection(CLIForm form, Composite parent, OptionSpec spec) {
@@ -163,7 +165,7 @@ class CLIOption {
 			initDescription();
 			description.setLayoutData(form.gridData().vSpan(2).get());
 			
-			form.button(form).image(form.image(IconsERI.ADD)).text("Add").layoutData(form.gridData().button()).onSelect(e -> {
+			add = form.button(form).image(form.image(IconsERI.ADD)).text("Add").layoutData(form.gridData().button()).onSelect(e -> {
 				composite.setVisible(true);
 				
 				var item = newOption(form, composite, spec, Utilities.first(spec.auxiliaryTypes()));
@@ -180,11 +182,12 @@ class CLIOption {
 				});
 				
 				form.autoSize();
-			});
+			}).get();
 		}
 		
 		@Override
 		public void dispose() {
+			add.dispose();
 			items.forEach(CLIOption::dispose);
 			super.dispose();
 		}
@@ -213,7 +216,7 @@ class CLIOption {
 			}
 		}
 		
-		log.warn("Unsupported option type: {}", type);
+		log.warn("Unsupported option type {} for option {}", type, spec.longestName());
 		return null;
 	}
 }
