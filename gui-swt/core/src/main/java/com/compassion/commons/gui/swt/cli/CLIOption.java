@@ -24,6 +24,7 @@ import com.elderresearch.commons.icons.eri.IconsERI;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import picocli.CommandLine.Model.ArgSpec;
 import picocli.CommandLine.Model.OptionSpec;
 
 @Log4j2
@@ -33,14 +34,18 @@ class CLIOption {
 	private final Composite parent;
 	
 	@Getter
-	private final OptionSpec spec;
+	private final ArgSpec spec;
 	
 	protected Label name;
 	protected Control input;
 	protected Label description;
 	
 	protected void initName() {
-		name = form.label(parent).text(StringUtils.removeStart(spec.longestName(), "--")).get();
+		if (spec instanceof OptionSpec os) {
+			name = form.label(parent).text(StringUtils.removeStart(os.longestName(), "--")).get();			
+		} else {
+			name = form.label(parent).get();
+		}
 	}
 	
 	protected void initDescription() {
@@ -52,7 +57,7 @@ class CLIOption {
 	}
 	
 	static class CLIFlag extends CLIOption {
-		CLIFlag(CLIForm form, Composite parent, OptionSpec spec) {
+		CLIFlag(CLIForm form, Composite parent, ArgSpec spec) {
 			super(form, parent, spec);
 			
 			initName();
@@ -68,7 +73,7 @@ class CLIOption {
 	}
 	
 	static class CLIText extends CLIOption {
-		CLIText(CLIForm form, Composite parent, OptionSpec spec, Class<?> type) {
+		CLIText(CLIForm form, Composite parent, ArgSpec spec, Class<?> type) {
 			super(form, parent, spec);
 			
 			initName();
@@ -95,7 +100,7 @@ class CLIOption {
 	}
 	
 	static class CLIEnum extends CLIOption {
-		CLIEnum(CLIForm form, Composite parent, OptionSpec spec) {
+		CLIEnum(CLIForm form, Composite parent, ArgSpec spec) {
 			super(form, parent, spec);
 			
 			initName();
@@ -137,7 +142,7 @@ class CLIOption {
 					if (spec.paramLabel().contains(".")) {
 						var filter = StringUtils.substringAfter(spec.paramLabel(), ".");
 						dialog.setFilterExtensions(new String[] { "*." + filter, "*.*" });
-						dialog.setFilterNames(new String[] { filter + " files (*." + filter + ")", "All files (*.*)" });
+						dialog.setFilterNames(new String[] { filter.toUpperCase() + " files (*." + filter + ")", "All files (*.*)" });
 					}
 					LambdaUtils.accept(dialog.open(), filePath::setText);
 				}
@@ -149,7 +154,7 @@ class CLIOption {
 		private Button add;
 		private List<CLIOption> items = new LinkedList<>();
 		
-		CLICollection(CLIForm form, Composite parent, OptionSpec spec) {
+		CLICollection(CLIForm form, Composite parent, ArgSpec spec) {
 			super(form, parent, spec);
 			
 			initName();
@@ -193,11 +198,11 @@ class CLIOption {
 		}
 	}
 	
-	static CLIOption newOption(CLIForm form, OptionSpec spec) {
+	static CLIOption newOption(CLIForm form, ArgSpec spec) {
 		return newOption(form, form, spec, spec.type());
 	}
 	
-	private static CLIOption newOption(CLIForm form, Composite parent, OptionSpec spec, Class<?> type) {
+	private static CLIOption newOption(CLIForm form, Composite parent, ArgSpec spec, Class<?> type) {
 		if (Boolean.class.isAssignableFrom(type) || type.equals(boolean.class)) {
 			return new CLIFlag(form, parent, spec);
 		}
@@ -207,8 +212,8 @@ class CLIOption {
 		if (Enum.class.isAssignableFrom(type)) {
 			return new CLIEnum(form, parent, spec);
 		}
-		if (Path.class.isAssignableFrom(type)) {
-			return new CLIPath(form, parent, spec);
+		if (Path.class.isAssignableFrom(type) && spec instanceof OptionSpec os) {
+			return new CLIPath(form, parent, os);
 		}
 		if (spec.isMultiValue()) {
 			if (Collection.class.isAssignableFrom(type)) {
@@ -216,7 +221,11 @@ class CLIOption {
 			}
 		}
 		
-		log.warn("Unsupported option type {} for option {}", type, spec.longestName());
+		if (spec instanceof OptionSpec os) {
+			log.warn("Unsupported option type {} for option {}", type, os.longestName());	
+		} else {
+			log.warn("Unsupported positional parameter type {}", type);
+		}
 		return null;
 	}
 }

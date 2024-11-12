@@ -81,6 +81,9 @@ public class CLIForm extends CScrolledComposite implements SWTBuilders.WithResou
 				opts.forEach(CLIOption::dispose);
 				opts.clear();
 				
+				for (var pp : c.getCommandSpec().positionalParameters()) {
+					LambdaUtils.accept(CLIOption.newOption(this, pp), opts::add);
+				}
 				for (var opt : c.getCommandSpec().options()) {
 					LambdaUtils.accept(CLIOption.newOption(this, opt), opts::add);
 				}
