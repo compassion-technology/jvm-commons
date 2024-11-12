@@ -22,7 +22,7 @@ import picocli.CommandLine.Model.CommandSpec;
  * 
  * @author <a href="mailto:jdimeo@us.ci.org">John Dimeo</a>
  */
-public class CLIForm extends CScrolledComposite implements SWTBuilders {
+public class CLIForm extends CScrolledComposite implements SWTBuilders.WithResources {
 	private ResourceManager rm;
 	
 	@Getter
@@ -36,6 +36,9 @@ public class CLIForm extends CScrolledComposite implements SWTBuilders {
 		// TODO: Dark mode
 		invalidColor = rm.getColor(255, 200, 200);
 	}
+	
+	@Override
+	public ResourceManager resourceManager() { return rm; }
 	
 	public void init(CommandSpec spec) {
 		var sepData = gridData().hFill().hSpan(3).get();
@@ -76,6 +79,8 @@ public class CLIForm extends CScrolledComposite implements SWTBuilders {
 				commandTooltip.text(StringUtils.normalizeSpace(c.getDescription()));
 				
 				opts.forEach(CLIOption::dispose);
+				opts.clear();
+				
 				for (var opt : c.getCommandSpec().options()) {
 					LambdaUtils.accept(CLIOption.newOption(this, opt), opts::add);
 				}
