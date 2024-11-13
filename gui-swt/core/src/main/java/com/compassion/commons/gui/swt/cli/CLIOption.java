@@ -284,7 +284,7 @@ abstract class CLIOption<T extends Control> {
 		}
 	}
 	
-	static CLIOption<?> newOption(CLIForm form, ArgSpec spec) {
+	static CLIOption<?> withSpec(CLIForm form, ArgSpec spec) {
 		return newOption(form, form, SWT.NONE, spec, spec.type());
 	}
 	

@@ -124,10 +124,10 @@ public class CLIForm extends CScrolledComposite implements SWTBuilders.WithResou
 				opts.clear();
 				extraSpace.dispose();
 				for (var pp : c.getCommandSpec().positionalParameters()) {
-					LambdaUtils.accept(CLIOption.newOption(this, pp), opts::add);
+					LambdaUtils.accept(CLIOption.withSpec(this, pp), opts::add);
 				}
 				for (var opt : Seq.seq(c.getCommandSpec().options()).sorted($ -> $.order())) {
-					LambdaUtils.accept(CLIOption.newOption(this, opt), opts::add);
+					LambdaUtils.accept(CLIOption.withSpec(this, opt), opts::add);
 				}
 				opts.forEach($ -> $.addArgListener(argListener));
 				extraSpace = label(this).layoutData(gridData().hSpan(3).grab()).get();
