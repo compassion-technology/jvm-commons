@@ -1,6 +1,7 @@
 package com.compassion.commons.gui.swt.cli;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,12 +19,14 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.jooq.lambda.Seq;
 
 import com.compassion.commons.LambdaUtils;
 import com.compassion.commons.Utilities;
+import com.compassion.commons.gui.swt.events.SelectionLambda;
 import com.elderresearch.commons.icons.eri.IconsERI;
 
 import lombok.Getter;
@@ -41,6 +44,8 @@ abstract class CLIOption<T extends Control> {
 	
 	@Getter
 	private final ArgSpec spec;
+	@Getter
+	private List<String> cliArgs = List.of();
 	
 	protected Label name;
 	protected T input;
@@ -72,6 +77,18 @@ abstract class CLIOption<T extends Control> {
 		Seq.of(name, input, description).filter(Objects::nonNull).forEach(Widget::dispose);
 	}
 	
+	protected void updateCliArgs(String value) {
+		if (StringUtils.isEmpty(value)) {
+			cliArgs = List.of();
+		} else if (spec instanceof OptionSpec os) {
+			cliArgs = List.of(os.longestName(), value);
+		} else {
+			cliArgs = List.of(value);
+		}
+	}
+	
+	public abstract void addArgListener(Listener l);
+	
 	static class CLIFlag extends CLIOption<Button> {
 		CLIFlag(CLIForm form, Composite parent, int style, ArgSpec spec) {
 			super(form, parent, style, spec);
@@ -85,6 +102,14 @@ abstract class CLIOption<T extends Control> {
 			
 			// Name is just a placeholder, since the checkbox has the name
 			name.setText(StringUtils.EMPTY);
+		}
+		
+		@Override
+		public void addArgListener(Listener l) {
+			input.addSelectionListener((SelectionLambda) e -> {
+				updateCliArgs(Boolean.toString(input.getSelection()));
+				l.handleEvent(null);
+			});
 		}
 	}
 	
@@ -112,6 +137,14 @@ abstract class CLIOption<T extends Control> {
 				});
 			}
 		}
+		
+		@Override
+		public void addArgListener(Listener l) {
+			input.addModifyListener(e -> {
+				updateCliArgs(input.getText());
+				l.handleEvent(null);
+			});
+		}
 	}
 	
 	static class CLIEnum extends CLIOption<Combo> {
@@ -121,6 +154,14 @@ abstract class CLIOption<T extends Control> {
 			initName();
 			input = form.<String>combo(parent).items(spec.completionCandidates()).get();
 			initDescription();
+		}
+		
+		@Override
+		public void addArgListener(Listener l) {
+			input.addSelectionListener((SelectionLambda) e -> {
+				updateCliArgs(input.getText());
+				l.handleEvent(null);
+			});
 		}
 	}
 	
@@ -164,6 +205,16 @@ abstract class CLIOption<T extends Control> {
 		}
 		
 		@Override
+		public void addArgListener(Listener l) {
+			input.addModifyListener(e -> {
+				var path = input.getText();
+				if (!path.isEmpty()) { path = '"' + path + '"'; }
+				updateCliArgs(path);
+				l.handleEvent(null);
+			});
+		}
+		
+		@Override
 		public void dispose() {
 			Seq.of(name, input.getParent(), description).filter(Objects::nonNull).forEach(Widget::dispose);
 		}
@@ -172,6 +223,7 @@ abstract class CLIOption<T extends Control> {
 	static class CLICollection extends CLIOption<Composite> {
 		private Button add;
 		private List<CLIOption<?>> items = new LinkedList<>();
+		private Listener argListener;
 		
 		CLICollection(CLIForm form, Composite parent, int style, ArgSpec spec) {
 			super(form, parent, style, spec);
@@ -187,6 +239,7 @@ abstract class CLIOption<T extends Control> {
 			
 			add = form.button(input).image(form.image(IconsERI.ADD)).text("Add").layoutData(form.gridData().hSpan(4).button()).onSelect(e -> {
 				var item = newOption(form, input, SWT.EMBEDDED, spec, Utilities.first(spec.auxiliaryTypes()));
+				item.addArgListener(argListener);
 				if (item.input.getLayoutData() instanceof GridData gd) {
 					gd.grabExcessHorizontalSpace = true;
 				}
@@ -201,6 +254,18 @@ abstract class CLIOption<T extends Control> {
 				
 				items.add(item);
 			}).get();
+		}
+		
+		@Override
+		public void addArgListener(Listener l) {
+			argListener = l;
+		}
+		
+		@Override
+		public List<String> getCliArgs() {
+			var ret = new ArrayList<String>();
+			items.forEach($ -> ret.addAll($.getCliArgs()));
+			return ret;
 		}
 		
 		@Override
