@@ -6,6 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.jooq.lambda.Seq;
 
 import com.compassion.commons.LambdaUtils;
 import com.compassion.commons.Utilities;
@@ -27,6 +29,7 @@ public class CLIForm extends CScrolledComposite implements SWTBuilders.WithResou
 	
 	@Getter
 	private Color invalidColor;
+	private Control extraSpace;
 	
 	public CLIForm(ResourceManager rm, Composite parent) {
 		super(parent, SWT.HORIZONTAL | SWT.VERTICAL);
@@ -69,9 +72,16 @@ public class CLIForm extends CScrolledComposite implements SWTBuilders.WithResou
 			autoSize();
 		});
 		
-		SWTUtilities.addSeperator(rm, this, "Options", null, SWT.BOLD).setLayoutData(sepData);
+		label(this); // Placeholder
+		var preview = text(this).readOnly().layoutData(gridData().hFill().hSpan(2).height(30).hGrab()).get();
+		preview.setText(spec.name());
 		
-		var opts = new LinkedList<CLIOption>();
+		SWTUtilities.addSeperator(rm, this, "Options", null, SWT.BOLD).setLayoutData(sepData);
+		extraSpace = label(this).layoutData(gridData().hSpan(3).vAlign(SWT.TOP).grab())
+			.font(rm.getFont(10, SWT.ITALIC))
+			.text("Select a command above to see its options").get();
+		
+		var opts = new LinkedList<CLIOption<?>>();
 		
 		commands.selection().addObserver(sel -> {
 			var c = Utilities.first(sel);
@@ -80,13 +90,14 @@ public class CLIForm extends CScrolledComposite implements SWTBuilders.WithResou
 				
 				opts.forEach(CLIOption::dispose);
 				opts.clear();
-				
+				extraSpace.dispose();
 				for (var pp : c.getCommandSpec().positionalParameters()) {
 					LambdaUtils.accept(CLIOption.newOption(this, pp), opts::add);
 				}
-				for (var opt : c.getCommandSpec().options()) {
+				for (var opt : Seq.seq(c.getCommandSpec().options()).sorted($ -> $.order())) {
 					LambdaUtils.accept(CLIOption.newOption(this, opt), opts::add);
 				}
+				extraSpace = label(this).layoutData(gridData().hSpan(3).grab()).get();
 				autoSize();
 			}
 		});
