@@ -18,6 +18,7 @@ import com.compassion.commons.gui.swt.controls.CScrolledComposite;
 import com.compassion.commons.gui.swt.controls.builders.SWTBuilders;
 import com.compassion.commons.gui.swt.util.ResourceManager;
 import com.compassion.commons.gui.swt.util.SWTUtilities;
+import com.elderresearch.commons.icons.ms.IconsMS;
 
 import lombok.Getter;
 import picocli.CommandLine.Model.CommandSpec;
@@ -83,13 +84,18 @@ public class CLIForm extends CScrolledComposite implements SWTBuilders.WithResou
 			autoSize();
 		});
 		
-		label(this); // Placeholder
+		var previewCopy = button(this).text("Copy").image(rm.getImage(IconsMS.COPY)).layoutData(gridData().hAlign(SWT.TRAIL));		
 		var preview = text(this)
 			.readOnly()
 			.font(rm.getFont("Courier New", 10, SWT.NONE))
-			.layoutData(gridData().hFill().hSpan(2).height(30).hGrab())
+			.layoutData(gridData().hFill().hSpan(2).hGrab())
 			.get();
 		preview.setText(spec.name() + " ...");
+		previewCopy.onSelect(e -> {
+			preview.selectAll();
+			preview.copy();
+			preview.clearSelection();
+		});
 		
 		Listener argListener = e -> {
 			cliArgs.clear();

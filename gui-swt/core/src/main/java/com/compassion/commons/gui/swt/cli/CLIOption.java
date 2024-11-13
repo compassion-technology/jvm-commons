@@ -45,7 +45,7 @@ abstract class CLIOption<T extends Control> {
 	@Getter
 	private final ArgSpec spec;
 	@Getter
-	private List<String> cliArgs = List.of();
+	protected List<String> cliArgs = List.of();
 	
 	protected Label name;
 	protected T input;
@@ -102,6 +102,13 @@ abstract class CLIOption<T extends Control> {
 			
 			// Name is just a placeholder, since the checkbox has the name
 			name.setText(StringUtils.EMPTY);
+		}
+		
+		@Override
+		protected void updateCliArgs(String value) {
+			if (getSpec() instanceof OptionSpec os) {
+				cliArgs = List.of(os.longestName() + "=" + value);	
+			}
 		}
 		
 		@Override
@@ -249,6 +256,7 @@ abstract class CLIOption<T extends Control> {
 					items.remove(item);
 					remove.widget.dispose();
 					form.autoSize();
+					argListener.handleEvent(null);
 				});
 				form.autoSize();
 				
