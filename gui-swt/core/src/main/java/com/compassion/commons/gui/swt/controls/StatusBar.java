@@ -8,6 +8,7 @@ import java.util.LinkedList;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
@@ -58,7 +59,7 @@ public class StatusBar implements SWTBuilders {
 	private Deque<String> log = new LinkedList<>();
 	
 	public StatusBar(Controller c, Composite parent, int style) {
-		this(c, parent, style, 0);
+		this(c, parent, style, 0, (SelectionLambda) e -> c.cancelTask());
 	}
 	
 	/**
@@ -73,8 +74,10 @@ public class StatusBar implements SWTBuilders {
 	 * {@code SWT.SEPARATOR} labels, but can be any of the style bits honored by {@link Composite} 
 	 * @param customSections the number of custom labels to create to display additional program 
 	 * state, like mouse coordinates.
+	 * @param cancelAction what to do when the cancel button is pressed. By default {@link Controller#cancelTask()}
+	 * is called.
 	 */
-	public StatusBar(final Controller c, final Composite parent, int style, int customSections) {
+	public StatusBar(final Controller c, final Composite parent, int style, int customSections, SelectionListener cancelAction) {
 		disp = parent.getDisplay();
 		images = new Image[MessageType.values().length];
 		images[MessageType.WARN.ordinal()]  = scale(disp, SWT.ICON_WARNING);
@@ -114,7 +117,7 @@ public class StatusBar implements SWTBuilders {
 			cancel.setToolTipText("Cancels the current task");
 			cancel.setEnabled(cancelable);
 			cancel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-			cancel.addSelectionListener((SelectionLambda) e -> c.cancelTask());
+			cancel.addSelectionListener(cancelAction);
 			
 		int height = cancel.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
 		for (int i = 0; i < separators.length; i++) {

@@ -246,6 +246,15 @@ public class Controller extends Thread implements StatusListener {
 		StatusMonitor sm = active.peek();
 		if (sm != null) { sm.setCanceled("The user canceled the task."); }
 	}
+	
+	/**
+	 * Clears out all pending tasks from the controller's queue. This does not
+	 * interrupt tasks already in progress by the controller's main thread or
+	 * asynchronous daemons.
+	 */
+	public void clearTasks() {
+		queue.clear();
+	}
 
 	/**
 	 * Shuts down this controller manually.
