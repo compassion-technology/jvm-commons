@@ -151,6 +151,10 @@ public class Controller extends Thread implements StatusListener {
 		return this;
 	}
 
+	public int size() {
+		return queue.size();
+	}
+	
 	/**
 	 * Start this controller <b>and</b> its associated interface, specified
 	 * via {@link #setInterface(UserInterface)}. The controller waits for posted
