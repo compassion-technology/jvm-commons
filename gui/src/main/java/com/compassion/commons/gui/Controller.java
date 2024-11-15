@@ -229,7 +229,7 @@ public class Controller extends Thread implements StatusListener {
 				ui.setMessage(MessageType.ERROR, s.getStatus());
 			} else if (newTop == null) {
 				// Show default message (no tasks currently running)
-				ui.setStatus(null, 0L, 0L, false);
+				ui.setStatus(null, 0L, 0L, !queue.isEmpty());
 			} else {
 				// Show next task on stack's status
 				statusChanged(newTop);

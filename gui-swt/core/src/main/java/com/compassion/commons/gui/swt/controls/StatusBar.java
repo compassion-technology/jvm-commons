@@ -184,10 +184,9 @@ public class StatusBar implements SWTBuilders {
 		// Avoid redundant calls
 		if (cancelable != enabled) {
 			SWTUtilities.run(disp, () -> {
-				if (cancel.isDisposed()) { return; }
 				cancel.setEnabled(enabled);
 				cancelable = enabled;
-			});
+			}, cancel);
 		}
 	}
 	
