@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -34,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import picocli.CommandLine.Model.ArgSpec;
 import picocli.CommandLine.Model.OptionSpec;
+import picocli.CommandLine.Model.PositionalParamSpec;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -56,7 +58,7 @@ abstract class CLIOption<T extends Control> {
 		
 		if (spec instanceof OptionSpec os) {
 			name = form.label(parent)
-				.text(StringUtils.removeStart(os.longestName(), "--"))
+				.text(cleanName(os))
 				.layoutData(form.gridData().align(SWT.TRAIL).width(100))
 				.get();
 		} else {
@@ -173,8 +175,21 @@ abstract class CLIOption<T extends Control> {
 	}
 	
 	static class CLIPath extends CLIOption<Text> {
-		CLIPath(CLIForm form, Composite parent, int style, OptionSpec spec) {
+		CLIPath(CLIForm form, Composite parent, int style, ArgSpec spec) {
 			super(form, parent, style, spec);
+			
+			String pathName;
+			if (spec instanceof OptionSpec os) {
+				pathName = cleanName(os);
+			} else {
+				pathName = "input";
+			}
+			
+			var isFolder = pathName.contains("-dir")
+				|| StringUtils.containsAnyIgnoreCase(Utilities.first(spec.description()), "director", "folder");
+			
+			var isOutput = pathName.contains("output")
+				|| StringUtils.containsAnyIgnoreCase(Utilities.first(spec.description()), "output", "save");
 			
 			initName();
 			var composite = form.composite(parent)
@@ -190,16 +205,16 @@ abstract class CLIOption<T extends Control> {
 			
 			form.button(composite).text("Browse...").layoutData(form.gridData().button()).onSelect(e -> {
 				var dialogStyle = SWT.APPLICATION_MODAL;
-				dialogStyle |= spec.longestName().contains("output")? SWT.SAVE : SWT.OPEN;
+				dialogStyle |= isOutput? SWT.SAVE : SWT.OPEN;
 
-				if (spec.longestName().contains("-dir")) {
+				if (isFolder) {
 					var dialog = new DirectoryDialog(form.getShell(), dialogStyle);
-					dialog.setText(name.getText());
+					dialog.setText(pathName);
 					LambdaUtils.accept(dialog.open(), input::setText);
 				} else {
 					var dialog = new FileDialog(form.getShell(), dialogStyle);
 					dialog.setOverwrite(Utilities.isOn(style, SWT.SAVE));
-					dialog.setText(name.getText());
+					dialog.setText(pathName);
 					
 					if (spec.paramLabel().contains(".")) {
 						var filter = StringUtils.substringAfter(spec.paramLabel(), ".");
@@ -214,9 +229,7 @@ abstract class CLIOption<T extends Control> {
 		@Override
 		public void addArgListener(Listener l) {
 			input.addModifyListener(e -> {
-				var path = input.getText();
-				if (!path.isEmpty()) { path = '"' + path + '"'; }
-				updateCliArgs(path);
+				updateCliArgs(addQuotes(input.getText()));
 				l.handleEvent(null);
 			});
 		}
@@ -246,6 +259,8 @@ abstract class CLIOption<T extends Control> {
 			
 			add = form.button(input).image(form.image(IconsERI.ADD)).text("Add").layoutData(form.gridData().hSpan(4).button()).onSelect(e -> {
 				var item = newOption(form, input, SWT.EMBEDDED, spec, Utilities.first(spec.auxiliaryTypes()));
+				if (item == null) { return; }
+				
 				item.addArgListener(argListener);
 				if (item.input.getLayoutData() instanceof GridData gd) {
 					gd.grabExcessHorizontalSpace = true;
@@ -292,14 +307,19 @@ abstract class CLIOption<T extends Control> {
 		if (Boolean.class.isAssignableFrom(type) || type.equals(boolean.class)) {
 			return new CLIFlag(form, parent, style, spec);
 		}
-		if (CharSequence.class.isAssignableFrom(type) || Number.class.isAssignableFrom(type) || type.isPrimitive()) {
+		if (CharSequence.class.isAssignableFrom(type) || Number.class.isAssignableFrom(type) || type.isPrimitive() || Pattern.class.isAssignableFrom(type)) {
 			return new CLIText(form, parent, style, spec, type);
 		}
 		if (Enum.class.isAssignableFrom(type)) {
 			return new CLIEnum(form, parent, style, spec);
 		}
-		if (Path.class.isAssignableFrom(type) && spec instanceof OptionSpec os) {
-			return new CLIPath(form, parent, style, os);
+		if (Path.class.isAssignableFrom(type)) {
+			if (spec instanceof OptionSpec os) {
+				return new CLIPath(form, parent, style, os);	
+			}
+			if (spec instanceof PositionalParamSpec pps) {
+				return new CLIPath(form, parent, style, pps);
+			}
 		}
 		if (spec.isMultiValue()) {
 			if (Collection.class.isAssignableFrom(type)) {
@@ -313,5 +333,21 @@ abstract class CLIOption<T extends Control> {
 			log.warn("Unsupported positional parameter type {}", type);
 		}
 		return null;
+	}
+	
+	private static String cleanName(OptionSpec os) {
+		return StringUtils.removeStart(os.longestName(), "--"); 
+	}
+	
+	private static String addQuotes(String s) {
+		if (StringUtils.isEmpty(s)) { return s; }
+		return '"' + s + '"';
+	}
+	
+	public static String removeQuotes(String s) {
+		if (s.length() > 3 && s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"') {
+			return s.substring(1, s.length() - 1);
+		}
+		return s;
 	}
 }
