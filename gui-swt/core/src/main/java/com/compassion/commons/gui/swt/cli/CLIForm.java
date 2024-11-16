@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Listener;
@@ -16,6 +17,7 @@ import com.compassion.commons.LambdaUtils;
 import com.compassion.commons.Utilities;
 import com.compassion.commons.gui.swt.controls.CScrolledComposite;
 import com.compassion.commons.gui.swt.controls.builders.SWTBuilders;
+import com.compassion.commons.gui.swt.util.MnemonicUtils;
 import com.compassion.commons.gui.swt.util.ResourceManager;
 import com.compassion.commons.gui.swt.util.SWTUtilities;
 import com.elderresearch.commons.icons.ms.IconsMS;
@@ -38,6 +40,8 @@ public class CLIForm extends CScrolledComposite implements SWTBuilders.WithResou
 	private Color invalidColor;
 	private Control extraSpace;
 	
+	private Listener argListener;
+	
 	public CLIForm(ResourceManager rm, Composite parent) {
 		super(parent, SWT.HORIZONTAL | SWT.VERTICAL);
 		this.rm = rm;
@@ -50,39 +54,54 @@ public class CLIForm extends CScrolledComposite implements SWTBuilders.WithResou
 	@Override
 	public ResourceManager resourceManager() { return rm; }
 	
-	public void init(CommandSpec spec) {
+	public void init(CommandSpec spec, String... levels) {
 		setLayout(grid(3).get());
 		var sepData = gridData().hFill().hSpan(3).get();
 		
 		SWTUtilities.addSeperator(rm, this, "Command", null, SWT.TOP | SWT.BOLD).setLayoutData(sepData);
 
-		// TODO: Support arbitrary levels of nesting, not just a top level group followed by specific commands
+		if (levels.length == 0) {
+			levels = new String[] { "Command" };
+		}
 		
-		label(this).text("&Group:").layoutData(gridData().hAlign(SWT.TRAIL));
-		var groupCombo = this.<CLICommand>combo(this).layoutData(gridData().hFill().width(100));
-	
-		var groups = new ObservableSelection<>(groupCombo);
-		groups.items().set(CLICommand.wrap(spec.subcommands().values()));
-	
-		var groupTooltip = label(this).layoutData(gridData());
-	
-		label(this).text("&Command:").layoutData(gridData().hAlign(SWT.TRAIL));
-		var commandCombo = this.<CLICommand>combo(this).layoutData(gridData().hFill().width(100));
-	
-		var commands = new ObservableSelection<>(commandCombo);
-	
-		var commandTooltip = label(this).layoutData(gridData());
-	
+		var combos = new LinkedList<Combo>();
 		var opts = new LinkedList<CLIOption<?>>();
 		
-		groups.selection().addObserver(sel -> {
-			var g = Utilities.first(sel);
-			groupTooltip.text(StringUtils.normalizeSpace(g.getDescription()));
-			commands.items().set(g.getSubcommands());
-			opts.forEach(CLIOption::dispose);
-			opts.clear();
-			autoSize();
-		});
+		ObservableSelection<CLICommand> prev = null;
+		var i = 0;
+		for (var level : levels) {
+			label(this).text(MnemonicUtils.getMnemonic(this, level, null) + ":").layoutData(gridData().hAlign(SWT.TRAIL));
+			
+			var combo = this.<CLICommand>combo(this).layoutData(gridData().hFill().width(100));
+			combos.add(combo.get());
+			
+			var tooltip = label(this).layoutData(gridData());
+			
+			var sel = new ObservableSelection<>(combo);
+			sel.selection().addObserver($ -> tooltip.text(StringUtils.normalizeSpace(Utilities.first($).getDescription())));
+			
+			if (prev == null) {
+				sel.items().set(CLICommand.wrap(spec.subcommands().values()));
+			} else {
+				var levelIdx = i;
+				prev.selection().addObserver($ -> {
+					var cmd = Utilities.first($);
+					if (cmd.getSubcommands().isEmpty()) {
+						combos.subList(levelIdx, combos.size()).forEach(c -> {
+							c.clearSelection();
+							c.setEnabled(false);	
+						});
+						updateOptions(cmd, opts);
+					} else {
+						combo.enabled(true);
+						sel.items().set(cmd.getSubcommands());						
+					}
+				});
+			}
+			prev = sel;
+			i++;
+		}
+		prev.selection().addObserver($ -> updateOptions(Utilities.first($), opts));
 		
 		var previewCopy = button(this).text("Copy").image(rm.getImage(IconsMS.COPY)).layoutData(gridData().hAlign(SWT.TRAIL));		
 		var preview = text(this)
@@ -97,42 +116,46 @@ public class CLIForm extends CScrolledComposite implements SWTBuilders.WithResou
 			preview.clearSelection();
 		});
 		
-		Listener argListener = e -> {
+		argListener = e -> {
 			cliArgs.clear();
 			cliArgs.add(spec.name());
-			cliArgs.add(groupCombo.get().getText());
-			cliArgs.add(commandCombo.get().getText());
+			for (var cmd : combos) {
+				cliArgs.add(cmd.getText());
+			}
 			for (var opt : opts) {
 				cliArgs.addAll(opt.getCliArgs());
 			}
 			preview.setText(String.join(StringUtils.SPACE, cliArgs));
 		};
-		groupCombo.get().addListener(SWT.Selection, argListener);
-		commandCombo.get().addListener(SWT.Selection, argListener);
+		for (var combo : combos) {
+			combo.addListener(SWT.Selection, argListener);
+		}
 		
 		SWTUtilities.addSeperator(rm, this, "Options", null, SWT.BOLD).setLayoutData(sepData);
 		extraSpace = label(this).layoutData(gridData().hSpan(3).vAlign(SWT.TOP).grab())
 			.font(rm.getFont(10, SWT.ITALIC))
 			.text("Select a command above to see its options").get();
-		
-		commands.selection().addObserver(sel -> {
-			var c = Utilities.first(sel);
-			if (c != null) {
-				commandTooltip.text(StringUtils.normalizeSpace(c.getDescription()));
-				
-				opts.forEach(CLIOption::dispose);
-				opts.clear();
-				extraSpace.dispose();
-				for (var pp : c.getCommandSpec().positionalParameters()) {
-					LambdaUtils.accept(CLIOption.withSpec(this, pp), opts::add);
-				}
-				for (var opt : Seq.seq(c.getCommandSpec().options()).sorted($ -> $.order())) {
-					LambdaUtils.accept(CLIOption.withSpec(this, opt), opts::add);
-				}
-				opts.forEach($ -> $.addArgListener(argListener));
-				extraSpace = label(this).layoutData(gridData().hSpan(3).grab()).get();
-				autoSize();
-			}
-		});
+	}
+	
+	private void updateOptions(CLICommand c, List<CLIOption<?>> opts) {
+		opts.forEach(CLIOption::dispose);
+		opts.clear();
+		extraSpace.dispose();
+		for (var pp : c.getCommandSpec().positionalParameters()) {
+			LambdaUtils.accept(CLIOption.withSpec(this, pp), opts::add);
+		}
+		for (var opt : Seq.seq(c.getCommandSpec().options()).sorted(o -> o.order())) {
+			LambdaUtils.accept(CLIOption.withSpec(this, opt), opts::add);
+		}
+		opts.forEach(o -> o.addArgListener(argListener));
+		extraSpace = label(this).layoutData(gridData().hSpan(3).fill()).get();
+		autoSize();
+	}
+	
+	public static String removeQuotes(String s) {
+		if (s.length() > 3 && s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"') {
+			return s.substring(1, s.length() - 1);
+		}
+		return s;
 	}
 }

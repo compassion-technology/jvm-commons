@@ -28,6 +28,7 @@ import org.jooq.lambda.Seq;
 import com.compassion.commons.LambdaUtils;
 import com.compassion.commons.Utilities;
 import com.compassion.commons.gui.swt.events.SelectionLambda;
+import com.compassion.commons.gui.swt.util.MnemonicUtils;
 import com.elderresearch.commons.icons.eri.IconsERI;
 
 import lombok.Getter;
@@ -58,7 +59,7 @@ abstract class CLIOption<T extends Control> {
 		
 		if (spec instanceof OptionSpec os) {
 			name = form.label(parent)
-				.text(cleanName(os))
+				.text(MnemonicUtils.getMnemonic(form, cleanName(os), null))
 				.layoutData(form.gridData().align(SWT.TRAIL).width(100))
 				.get();
 		} else {
@@ -76,6 +77,7 @@ abstract class CLIOption<T extends Control> {
 	}
 	
 	public void dispose() {
+		if (name != null) { MnemonicUtils.freeMnemonic(form, name.getText()); }
 		Seq.of(name, input, description).filter(Objects::nonNull).forEach(Widget::dispose);
 	}
 	
@@ -342,12 +344,5 @@ abstract class CLIOption<T extends Control> {
 	private static String addQuotes(String s) {
 		if (StringUtils.isEmpty(s)) { return s; }
 		return '"' + s + '"';
-	}
-	
-	public static String removeQuotes(String s) {
-		if (s.length() > 3 && s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"') {
-			return s.substring(1, s.length() - 1);
-		}
-		return s;
 	}
 }
