@@ -5,6 +5,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.EventObject;
 import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.function.Consumer;
@@ -861,6 +862,21 @@ public final class SWTUtilities {
 	 */
 	public static void selectAndNotify(Control c) {
 		c.notifyListeners(SWT.Selection, BLANK_EVENT);
+	}
+	
+	/**
+	 * Gets the selection state of the event's source object, which must be a {@link Button}. This is
+	 * helpful for check and toggle buttons to easily get their state after the selection event without
+	 * requiring a reference to button.
+	 * @param e the event
+	 * @return the selection of the event source's button
+	 * @see Button#getSelection()
+	 */
+	public static boolean getButtonSelection(EventObject e) {
+		if (e.getSource() instanceof Button b) {
+			return b.getSelection();
+		}
+		throw new IllegalArgumentException("Event " + e + " does not have an SWT button as its source");
 	}
 
 	/**
