@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Text;
 import org.jooq.lambda.Seq;
 
 import com.compassion.commons.LambdaUtils;
@@ -35,6 +36,8 @@ public class CLIForm extends CScrolledComposite implements SWTBuilders.WithResou
 	
 	@Getter
 	private final List<String> cliArgs;
+	@Getter
+	private Text command;
 	
 	@Getter
 	private Color invalidColor;
@@ -103,17 +106,17 @@ public class CLIForm extends CScrolledComposite implements SWTBuilders.WithResou
 		}
 		prev.selection().addObserver($ -> updateOptions(Utilities.first($), opts));
 		
-		var previewCopy = button(this).text("Copy").image(rm.getImage(IconsMS.COPY)).layoutData(gridData().hAlign(SWT.TRAIL));		
-		var preview = text(this)
+		var commandCopy = button(this).text("Copy").image(rm.getImage(IconsMS.COPY)).layoutData(gridData().hAlign(SWT.TRAIL));		
+		command = text(this)
 			.readOnly()
 			.font(rm.getFont("Courier New", 10, SWT.NONE))
 			.layoutData(gridData().hFill().hSpan(2).hGrab())
 			.get();
-		preview.setText(spec.name() + " ...");
-		previewCopy.onSelect(e -> {
-			preview.selectAll();
-			preview.copy();
-			preview.clearSelection();
+		command.setText(spec.name() + " ...");
+		commandCopy.onSelect(e -> {
+			command.selectAll();
+			command.copy();
+			command.clearSelection();
 		});
 		
 		argListener = e -> {
@@ -125,7 +128,7 @@ public class CLIForm extends CScrolledComposite implements SWTBuilders.WithResou
 			for (var opt : opts) {
 				cliArgs.addAll(opt.getCliArgs());
 			}
-			preview.setText(String.join(StringUtils.SPACE, cliArgs));
+			command.setText(String.join(StringUtils.SPACE, cliArgs));
 		};
 		for (var combo : combos) {
 			combo.addListener(SWT.Selection, argListener);
