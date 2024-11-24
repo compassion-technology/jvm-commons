@@ -15,11 +15,13 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Widget;
 
 import com.compassion.commons.gui.Controller;
 import com.compassion.commons.gui.UserInterface.MessageType;
@@ -51,7 +53,7 @@ public class StatusBar implements SWTBuilders {
 	private Display     disp;
 	private Composite   comp;
 	private CLabel      status;
-	private Label[]     custom;
+	private Control[]   custom;
 	private ProgressBar barD, barI;
 	private Button      cancel;
 	private boolean     cancelable;
@@ -96,13 +98,13 @@ public class StatusBar implements SWTBuilders {
 		status.setToolTipText("Click to display a log of status messages.");
 		status.setText(defaultStatus);
 		
-		custom = new Label[customSections];
+		custom = new Control[customSections];
 		Label[] separators = new Label[customSections + 1];
 		
 		for (int i = 0; i <= customSections; i++) {
 			separators[i] = separator(comp, SWT.VERTICAL).get();
 			if (i < customSections) {
-				custom[i] = label(comp).layoutData(gridData().hAlign(SWT.FILL)).get();
+				custom[i] = newCustomControl(comp, i);
 			}
 		}
 		
@@ -150,6 +152,10 @@ public class StatusBar implements SWTBuilders {
 		status.addDisposeListener(e -> Arrays.stream(images).filter(i -> i != null).forEach(i -> i.dispose()));
 	}
 	
+	protected Control newCustomControl(Composite parent, int i) {
+		return label(parent).layoutData(gridData().hAlign(SWT.FILL)).get();
+	}
+	
 	public Image getImage(MessageType type) {
 		return images[type.ordinal()];
 	}
@@ -172,7 +178,7 @@ public class StatusBar implements SWTBuilders {
 		SWTUtilities.run(disp, new SetText(index, text));
 	}
 	
-	public Label getCustomLabel(int index) {
+	public Widget getCustomWidget(int index) {
 		return custom[index];
 	}
 	
@@ -282,10 +288,10 @@ public class StatusBar implements SWTBuilders {
 			
 			if (allText != null) {
 				for (int i = 0; i < allText.length && i < custom.length; i++) {
-					custom[i].setText(allText[i]);
+					SWTUtilities.setText(custom[i], allText[i]);
 				}
 			} else {
-				custom[index].setText(text);
+				SWTUtilities.setText(custom[index], text);
 			}
 			custom[0].getParent().layout();
 		}
