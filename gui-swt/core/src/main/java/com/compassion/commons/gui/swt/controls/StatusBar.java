@@ -89,7 +89,7 @@ public class StatusBar implements SWTBuilders {
 		
 		int cols = 2 * customSections + 5;
 		
-		comp = composite(parent, style).layout(grid(cols).hMargin(0).vMargin(0, 4)).get();
+		comp = composite(parent, style).layout(grid(cols).margin(0)).get();
 		
 		separator(comp, SWT.HORIZONTAL).layoutData(gridData().hFill().hSpan(cols));
 			

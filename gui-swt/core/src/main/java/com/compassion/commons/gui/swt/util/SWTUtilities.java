@@ -930,14 +930,17 @@ public final class SWTUtilities {
 	 * Sets the provided control as the "top" control of its parent's stack layout and
 	 * lays out the parent. The control's parent must have a {@link StackLayout} as its layout manager.
 	 * @param c the control to set as the top control
+	 * @return if the top control was changed, or {@code false} if this control was already the top control
 	 */
-	public static void setTopControl(Control c) {
+	public static boolean setTopControl(Control c) {
 		Composite parent = c.getParent();
 		StackLayout l = (StackLayout) parent.getLayout();
 		if (l.topControl != c) {
 			l.topControl = c;
 			parent.layout();
+			return true;
 		}
+		return false;
 	}
 
 	/**
