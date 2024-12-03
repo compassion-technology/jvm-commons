@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.compassion</groupId>
 		<artifactId>jvm-commons-gui-swt</artifactId>
-		<version>5.7.1-SNAPSHOT</version>
+		<version>5.7.2-SNAPSHOT</version>
 	</parent>
 
 	<name>Compassion JVM Commons - GUI SWT (Win)</name>
