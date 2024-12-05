@@ -38,6 +38,7 @@ public class CLIUtils {
 		System.setProperty("org.jooq.no-logo", "true");
 		System.setProperty("org.jooq.no-tips", "true");
 		System.setProperty("picocli.usage.width", "100");
+		System.setProperty("net.snowflake.jdbc.loggerImpl", "net.snowflake.client.log.SLF4JLogger");
 	}
 	
 	/**
