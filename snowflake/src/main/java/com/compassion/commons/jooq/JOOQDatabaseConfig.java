@@ -53,7 +53,7 @@ public class JOOQDatabaseConfig extends DatabaseConfig implements ConnectionProv
 	 * @return a new context
 	 */
 	public DSLContext newContext(Settings settings) {
-		return DSL.using(this, getDialect(), settings);
+		return DSL.using(copyInto(new JOOQDatabaseConfig(), true), getDialect(), settings);
 	}
 	
 	/**

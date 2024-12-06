@@ -133,18 +133,18 @@ public class DatabaseConfig extends ConfigWithUserPassword {
 	 * Copy the database configuration.
 	 * @param includeCredentials whether or not to include the credentials
 	 * (user name and password) when copying the configuration.
-	 * @return a copy of this configuration
+	 * @param copy the instance (may be a more specialized config type) into which to copy this configuration
+	 * @return the copy instance
 	 */
-	public DatabaseConfig copy(boolean includeCredentials) {
-		DatabaseConfig ret = new DatabaseConfig();
-		ret.driverName = driverName;
-		ret.driver     = driver;
-		ret.hostURL    = hostURL;
+	public <T extends DatabaseConfig> T copyInto(T copy, boolean includeCredentials) {
+		copy.setDriverName(driverName);
+		copy.setDriver(driver);
+		copy.setHostURL(hostURL);
 		if (includeCredentials) {
-			ret.setUser(getUser());
-			ret.setPassword(getPassword());
+			copy.setUser(getUser());
+			copy.setPassword(getPassword());
 		}
-		return ret;
+		return copy;
 	}
 
 	@Override
