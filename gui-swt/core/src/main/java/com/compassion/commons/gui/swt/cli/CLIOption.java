@@ -82,6 +82,9 @@ abstract class CLIOption<T extends Control> {
 	}
 	
 	protected void updateCliArgs(String value) {
+		if (value.contains(StringUtils.SPACE)) {
+			value = addQuotes(value);
+		}
 		if (StringUtils.isEmpty(value)) {
 			cliArgs = List.of();
 		} else if (spec instanceof OptionSpec os) {
@@ -342,7 +345,7 @@ abstract class CLIOption<T extends Control> {
 	}
 	
 	private static String addQuotes(String s) {
-		if (StringUtils.isEmpty(s)) { return s; }
+		if (StringUtils.isEmpty(s) || s.indexOf(0) == '"') { return s; }
 		return '"' + s + '"';
 	}
 }
