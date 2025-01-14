@@ -23,6 +23,7 @@
 		<module>core</module>
 		<module>linux</module>
 		<module>mac</module>
+		<module>mac-x86</module>
 		<module>win</module>
 	</modules>
 </project>
