@@ -21,7 +21,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${swt.groupId}</groupId>
-			<artifactId>org.eclipse.swt.cocoa.macosx.aarch64</artifactId>
+			<artifactId>${swt.artifactId.mac.arm}</artifactId>
 			<version>${swt.version}</version>
 			<exclusions>
 				<exclusion>

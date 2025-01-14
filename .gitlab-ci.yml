@@ -1,5 +1,5 @@
 ---
 include:
   - project: "ciorg/ciopensource/jvm/maven-parent"
-    ref: "2.3.0"
+    ref: "2.4.0"
     file: "/.gitlab-ci.yml"
