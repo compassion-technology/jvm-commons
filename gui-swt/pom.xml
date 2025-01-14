@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>jvm-commons-gui-swt</artifactId>
-	<name>Compassion JVM Commons - SWT</name>
+	<name>Compassion JVM Commons - GUI SWT</name>
 	<description>Utilities for GUIs targeting the Standard Widget Toolkit (SWT)</description>
 	<packaging>pom</packaging>
 
