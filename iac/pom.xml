@@ -13,7 +13,7 @@
 	<name>Compassion JVM Commons - Infrastructure as Code</name>
 
 	<properties>
-		<aws.cdk.version>2.140.0</aws.cdk.version>
+		<aws.cdk.version>2.175.1</aws.cdk.version>
 	</properties>
 
 	<dependencies>
