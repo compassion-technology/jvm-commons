@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -21,6 +22,8 @@ import lombok.extern.log4j.Log4j2;
  */
 @UtilityClass
 public class LambdaUtils {
+	public final BooleanSupplier TRUE = () -> true, FALSE = () -> false;
+	
 	/**
 	 * Invoke the supplier, returning {@code null} if the supplier is {@code null}.
 	 * @param supplier the supplier
