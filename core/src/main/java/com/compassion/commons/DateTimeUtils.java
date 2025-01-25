@@ -1,4 +1,3 @@
-/* ©2021 Elder Research, Inc. All rights reserved. */
 package com.compassion.commons;
 
 import java.time.Instant;

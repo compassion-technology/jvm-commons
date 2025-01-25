@@ -1,4 +1,3 @@
-/* ©2019-2020 Elder Research, Inc. All rights reserved. */
 package com.compassion.commons.utf;
 
 // CHECKSTYLE:OFF

@@ -1,4 +1,3 @@
-/* ©2020 Elder Research, Inc. All rights reserved. */
 package com.compassion.commons.config;
 
 import java.io.IOException;
