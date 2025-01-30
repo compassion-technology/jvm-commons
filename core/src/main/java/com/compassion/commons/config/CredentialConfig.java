@@ -77,6 +77,45 @@ public interface CredentialConfig {
 	
 	@AutoService(CredentialConfig.class)
 	@Getter @Setter @Accessors(chain = true)
+	public class ConfigWithUserPasswordToken extends YAMLConfig implements CredentialConfig {
+		@Getter @Setter
+		@Option(names = {"-u", "--user"}, description = "The user")
+		private String user;
+
+		@Option(names = {"-p", "--password"}, description = "The password (if required)")
+		private char[] password;
+		
+		// Don't store password as string internally for security reasons
+		public String getPassword() {
+			return LambdaUtils.apply(password, String::new);
+		}
+		public ConfigWithUserPasswordToken setPassword(String s) {
+			this.password = LambdaUtils.apply(s, String::toCharArray);
+			return this;
+		}
+		@Option(names = {"--private-key"}, description = "The private encryption key (if required)")
+		private String privateKey;
+		@Option(names = {"--public-key"}, description = "The public encryption key (if required)")
+		private String publicKey;
+		
+		@Override
+		public void forEachCredentialPath(Consumer<String> withSecretPath) {
+			withSecretPath.accept("user");
+			withSecretPath.accept("password");
+			withSecretPath.accept("privateKey");
+			withSecretPath.accept("publicKey");
+		}
+		
+		public interface Mixin {
+			@JsonSerialize(using = PasswordSerializer.class)
+			String getPassword();
+			@JsonSerialize(using = PasswordSerializer.class)
+			String getPrivateKey();
+		}
+	}
+	
+	@AutoService(CredentialConfig.class)
+	@Getter @Setter @Accessors(chain = true)
     public class ConfigWithToken extends YAMLConfig implements CredentialConfig {
         private String publicKey;
         private String privateKey;
@@ -118,10 +157,11 @@ public interface CredentialConfig {
 	}
 	
 	static ObjectMapper addMaskingMixins(ObjectMapper om) {
-		return om.addMixIn(ConfigWithApiKey.class,       ConfigWithApiKey.Mixin.class)
-		         .addMixIn(ConfigWithUserPassword.class, ConfigWithUserPassword.Mixin.class)
-		         .addMixIn(ConfigWithToken.class,        ConfigWithToken.Mixin.class)
-		         .addMixIn(ConfigWithOAuth.class,        ConfigWithOAuth.Mixin.class);
+		return om.addMixIn(ConfigWithApiKey.class,            ConfigWithApiKey.Mixin.class)
+		         .addMixIn(ConfigWithUserPassword.class, 	  ConfigWithUserPassword.Mixin.class)
+		         .addMixIn(ConfigWithUserPasswordToken.class, ConfigWithUserPasswordToken.Mixin.class)
+		         .addMixIn(ConfigWithToken.class,             ConfigWithToken.Mixin.class)
+		         .addMixIn(ConfigWithOAuth.class,             ConfigWithOAuth.Mixin.class);
 	}
 	
 	/**
