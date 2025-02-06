@@ -106,9 +106,7 @@ public interface CredentialConfig {
 			withSecretPath.accept("publicKey");
 		}
 		
-		public interface Mixin {
-			@JsonSerialize(using = PasswordSerializer.class)
-			String getPassword();
+		public interface Mixin extends ConfigWithUserPassword.Mixin {
 			@JsonSerialize(using = PasswordSerializer.class)
 			String getPrivateKey();
 		}
