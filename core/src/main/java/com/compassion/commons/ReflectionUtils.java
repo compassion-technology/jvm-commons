@@ -188,6 +188,17 @@ public class ReflectionUtils {
 	}
 
 	/**
+	 * Recursively counts the number of super classes for the specified type.
+	 * @param c the class
+	 * @return the number of superclasses
+	 * @see Class#getSuperclass()
+	 */
+	public int countSuperclasses(Class<?> c) {
+		var sc = c.getSuperclass();
+		return sc == null? 0 : countSuperclasses(sc) + 1;
+	}
+
+	/**
 	 * Factory implementation that uses reflection to create new instances of
 	 * type {@code T}.
 	 * @param <T> the type of objects to create

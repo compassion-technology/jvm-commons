@@ -1,8 +1,13 @@
 package com.compassion.commons.config;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ServiceLoader;
 import java.util.function.Consumer;
 
 import com.compassion.commons.LambdaUtils;
+import com.compassion.commons.ReflectionUtils;
 import com.compassion.commons.jackson.PasswordSerializer;
 import com.compassion.commons.jackson.PlaceholderMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -77,52 +82,15 @@ public interface CredentialConfig {
 	
 	@AutoService(CredentialConfig.class)
 	@Getter @Setter @Accessors(chain = true)
-	public class ConfigWithUserPasswordToken extends YAMLConfig implements CredentialConfig {
-		@Getter @Setter
-		@Option(names = {"-u", "--user"}, description = "The user")
-		private String user;
-
-		@Option(names = {"-p", "--password"}, description = "The password (if required)")
-		private char[] password;
-		
-		// Don't store password as string internally for security reasons
-		public String getPassword() {
-			return LambdaUtils.apply(password, String::new);
-		}
-		public ConfigWithUserPasswordToken setPassword(String s) {
-			this.password = LambdaUtils.apply(s, String::toCharArray);
-			return this;
-		}
-		@Option(names = {"--private-key"}, description = "The private encryption key (if required)")
-		private String privateKey;
-		@Option(names = {"--public-key"}, description = "The public encryption key (if required)")
-		private String publicKey;
-		
-		@Override
-		public void forEachCredentialPath(Consumer<String> withSecretPath) {
-			withSecretPath.accept("user");
-			withSecretPath.accept("password");
-			withSecretPath.accept("privateKey");
-			withSecretPath.accept("publicKey");
-		}
-		
-		public interface Mixin extends ConfigWithUserPassword.Mixin {
-			@JsonSerialize(using = PasswordSerializer.class)
-			String getPrivateKey();
-		}
-	}
-	
-	@AutoService(CredentialConfig.class)
-	@Getter @Setter @Accessors(chain = true)
     public class ConfigWithToken extends YAMLConfig implements CredentialConfig {
-        private String publicKey;
-        private String privateKey;
+		private String privateKey;
+		private String publicKey;
         private String signature;
         
         @Override
         public void forEachCredentialPath(Consumer<String> withSecretPath) {
-            withSecretPath.accept("publicKey");
-            withSecretPath.accept("privateKey");
+        	withSecretPath.accept("privateKey");
+        	withSecretPath.accept("publicKey");
             withSecretPath.accept("signature");
         }
         
@@ -133,6 +101,24 @@ public interface CredentialConfig {
         	String getSignature();
         }
     }
+	
+	@AutoService(CredentialConfig.class)
+	@Getter @Setter @Accessors(chain = true)
+	public class ConfigWithUserPasswordToken extends ConfigWithUserPassword {
+		private String privateKey;
+		private String publicKey;
+		
+		@Override
+		public void forEachCredentialPath(Consumer<String> withSecretPath) {
+			super.forEachCredentialPath(withSecretPath);
+			withSecretPath.accept("privateKey");
+			withSecretPath.accept("publicKey");
+		}
+		
+		public interface Mixin extends ConfigWithUserPassword.Mixin, ConfigWithToken.Mixin {
+			// No additional methods
+		}
+	}
 	
 	@AutoService(CredentialConfig.class)
 	@Getter @Setter @Accessors(chain = true)
@@ -171,5 +157,19 @@ public interface CredentialConfig {
 	 */
 	default String toPlaceholderJson() throws JsonProcessingException {
 		return PlaceholderMapper.INSTANCE.writeValueAsString(this);
+	}
+	
+	/**
+	 * Load all implementations of {@link CredentialConfig} via the service loader and 
+	 * return instances of them (suitable for finding the right placeholder type for an
+	 * extending configuration subclass).
+	 * @return a list of all available implementations sorted by the most specific
+	 * implementation first
+	 */
+	static List<CredentialConfig> getPlaceholders() {
+		var ret = new ArrayList<CredentialConfig>();
+		ServiceLoader.load(CredentialConfig.class).forEach(ret::add);
+		ret.sort(Comparator.comparingInt(cc -> ReflectionUtils.countSuperclasses(cc.getClass())).reversed());
+		return ret;
 	}
 }
