@@ -78,6 +78,13 @@
 			<artifactId>jansi</artifactId>
 			<version>2.4.1</version>
 		</dependency>
+		
+		<!-- Parse POMs to get version when running in IDE/from source code -->
+		<dependency>
+    		<groupId>org.apache.maven</groupId>
+    		<artifactId>maven-model</artifactId>
+    		<version>3.9.9</version>
+		</dependency>
 
 		<!-- Unit tests -->
 		<dependency>
