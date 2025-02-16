@@ -44,7 +44,7 @@ public abstract class CLIVersion implements IVersionProvider {
 		// If it's null, we are running from raw source in an IDE. Find the code and find the POM
 		try {
 			var p = Path.of(c.getProtectionDomain().getCodeSource().getLocation().toURI());
-			while (p != null && !p.getFileName().toString().equals(pomFolder)) { p = p.getParent(); }
+			while (p != null && p.getFileName() != null && !p.getFileName().toString().equals(pomFolder)) { p = p.getParent(); }
 			if (p == null) { return null; }
 
 			try (var is = Files.newInputStream(p.resolve(POM_FILE))) {
