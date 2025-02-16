@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>com.compassion</groupId>
 		<artifactId>jvm-commons-gui-swt</artifactId>
-		<version>5.8.4-SNAPSHOT</version>
+		<version>5.8.5-SNAPSHOT</version>
 	</parent>
 
 	<name>Compassion JVM Commons - GUI SWT (Mac OSX)</name>
