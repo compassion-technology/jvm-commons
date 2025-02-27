@@ -17,9 +17,9 @@ public class TestDataDogTags {
 		custom.setVersion("1.2.3");
 		
 		assertEquals(List.of(
-			"test_environment: DEVINT",
-			"test_have_zildjians: true",
-			"test_version: 1.2.3"
+			"test_environment:DEVINT",
+			"test_have_zildjians:true",
+			"test_version:1.2.3"
 		), MyCustomTagsContainer.wrap(custom).tagList());
 	}
 }
