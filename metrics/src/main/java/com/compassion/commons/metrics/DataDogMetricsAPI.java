@@ -13,7 +13,7 @@ public class DataDogMetricsAPI extends ApiClient implements AutoCloseable {
 	
 	public DataDogMetricsAPI(DataDogMetricsConfig conf) {
 		setDebugging(conf.isVerbose());
-		setApiKey(conf.getApiKeyAuth());
+		setApiKey(conf.getApiKey());
 		
 		metrics = new MetricsApi(this);
 	}
