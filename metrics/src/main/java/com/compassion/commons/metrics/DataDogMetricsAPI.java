@@ -4,10 +4,9 @@ import com.datadog.api.client.ApiClient;
 import com.datadog.api.client.v2.api.MetricsApi;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
-@Getter @Setter @Accessors(fluent = true)
+@Getter @Accessors(fluent = true)
 public class DataDogMetricsAPI extends ApiClient implements AutoCloseable {
 	private MetricsApi metrics;
 	
