@@ -1,4 +1,4 @@
-package com.compassion.commons.metric;
+package com.compassion.commons.metrics;
 
 import java.util.List;
 

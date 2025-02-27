@@ -1,4 +1,4 @@
-package com.compassion.commons.metric;
+package com.compassion.commons.metrics;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
