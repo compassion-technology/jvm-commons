@@ -18,9 +18,5 @@ public class DataDogMetricsAPI extends ApiClient implements AutoCloseable {
 		metrics = new MetricsApi(this);
 	}
 
-	@Override
-	public void close() throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
+	@Override public void close() throws Exception { getHttpClient().close(); }
 }
