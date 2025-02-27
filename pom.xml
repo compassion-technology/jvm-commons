@@ -35,6 +35,7 @@
 		<module>snowflake</module>
 		<module>tokens</module>
 		<module>iac</module>
+		<module>metrics</module>
 		<module>rest-client</module>
 		<module>rest-server</module>
 	</modules>
