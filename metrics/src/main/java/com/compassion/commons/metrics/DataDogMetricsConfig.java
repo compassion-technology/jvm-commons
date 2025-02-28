@@ -7,5 +7,6 @@ import lombok.Setter;
 
 @Getter @Setter
 public class DataDogMetricsConfig extends ConfigWithApiKey {
-	private boolean verbose, retry;
+	private String basePath = "https://api.datadoghq.com";
+	private boolean verbose;
 }
