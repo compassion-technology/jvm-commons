@@ -2,7 +2,6 @@ package com.compassion.commons.iac;
 
 import org.jooq.lambda.Seq;
 
-import com.compassion.commons.Utilities;
 import com.compassion.commons.config.CIEnvironment;
 import com.compassion.commons.config.CredentialConfig.ConfigWithUserPassword;
 import com.compassion.commons.iac.CDKUtils.ParamFromSecretBuilder;
@@ -37,8 +36,8 @@ public class CISnowflake extends ConfigWithUserPassword implements CDKCredential
 		return Seq.of(
 			utils.newParam(path + "/user").pathDescription("Username").secret(secret),
 			utils.newParam(path + "/password").pathDescription("Password").secret(secret),
-			Utilities.cast(utils.newParam(path + "/database").pathDescription("Database").value(getDatabase())),
-			Utilities.cast(utils.newParam(path + "/role").pathDescription("Database Role").value(getRole()))
+			build(utils.newParam(path + "/database").pathDescription("Database"), $ -> $.value(getDatabase())),
+			build(utils.newParam(path + "/role").pathDescription("Database Role"), $ -> $.value(getRole()))
 		);
 	}
 }

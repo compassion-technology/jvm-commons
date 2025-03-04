@@ -1,5 +1,7 @@
 package com.compassion.commons.iac;
 
+import java.util.function.Consumer;
+
 import org.jooq.lambda.Seq;
 
 import com.compassion.commons.config.CredentialConfig;
@@ -9,6 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import software.amazon.awscdk.SecretValue;
 import software.amazon.awscdk.services.secretsmanager.ISecret;
 import software.amazon.awscdk.services.secretsmanager.Secret;
+import software.amazon.awscdk.services.ssm.CfnParameter;
 import software.constructs.Construct;
 
 public interface CDKCredentials extends CredentialConfig {
@@ -18,6 +21,18 @@ public interface CDKCredentials extends CredentialConfig {
 		} catch (JsonProcessingException e) {
 			throw new IllegalArgumentException("Cannot generate placeholder JSON from " + this, e);
 		}
+	}
+	
+	/**
+	 * Helper that returns the original specialized parameter builder since chained calls may return the
+	 * {@link CfnParameter} builder delegate.
+	 * @param param the specialized parameter builder
+	 * @param callback the operations to perform on that builder
+	 * @return the {@code param} parameter
+	 */
+	default ParamFromSecretBuilder build(ParamFromSecretBuilder param, Consumer<ParamFromSecretBuilder> callback) {
+		callback.accept(param);
+		return param;
 	}
 	
 	/**

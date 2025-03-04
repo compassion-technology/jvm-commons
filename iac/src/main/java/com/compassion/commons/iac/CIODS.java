@@ -2,7 +2,6 @@ package com.compassion.commons.iac;
 
 import org.jooq.lambda.Seq;
 
-import com.compassion.commons.Utilities;
 import com.compassion.commons.config.CIEnvironment;
 import com.compassion.commons.config.CredentialConfig.ConfigWithUserPassword;
 import com.compassion.commons.iac.CDKUtils.ParamFromSecretBuilder;
@@ -34,7 +33,7 @@ public class CIODS extends ConfigWithUserPassword implements CDKCredentials {
 		return Seq.of(
 			utils.newParam(path + "/user").pathDescription("Username").secret(secret),
 			utils.newParam(path + "/password").pathDescription("Password").secret(secret),
-			Utilities.cast(utils.newParam(path + "/hostURL").pathDescription("Host URL and Database").value(getHostURL()))
+			build(utils.newParam(path + "/hostURL").pathDescription("Host URL and Database"), $ -> $.value(getHostURL()))
 		);
 	}
 }
