@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -128,6 +129,7 @@ public interface CDKUtils extends CDKVariables {
 		private final CfnParameter.Builder delegate;
 		private final String path;
 		
+		@Getter
 		private String pathDescription;
 
 		// Assumes the last path fragment is the access path inside the secret
