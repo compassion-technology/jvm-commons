@@ -15,6 +15,8 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import lombok.experimental.Delegate;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.services.ec2.ISubnet;
@@ -119,11 +121,14 @@ public interface CDKUtils extends CDKVariables {
 		}
 	}
 
+	@Setter @Accessors(fluent = true)
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	class ParamFromSecretBuilder implements Builder<CfnParameter> {
 		@Delegate
 		private final CfnParameter.Builder delegate;
 		private final String path;
+		
+		private String pathDescription;
 
 		// Assumes the last path fragment is the access path inside the secret
 		public ParamFromSecretBuilder secret(ISecret s) {
@@ -133,6 +138,24 @@ public interface CDKUtils extends CDKVariables {
 		// Custom path in the secret regardless of the parameter path
 		public ParamFromSecretBuilder secret(ISecret s, String secretPath) {
 			value(SECRET_PATH + s.getSecretName() + "/" + secretPath);
+			return this;
+		}
+		
+		/**
+		 * Sets the description for the parameter. If you have already set a 
+		 * path description via {@link #pathDescription(String)} that will be 
+		 * appended to the end of this description to form the final description.
+		 * If not, this description will be used as-is.
+		 * @param baseDescription the base description for related parameters
+		 * at the same level of the hierarchy.
+		 * @return this for chaining
+		 */
+		public ParamFromSecretBuilder description(String baseDescription) {
+			if (pathDescription == null) {
+				delegate.description(baseDescription);
+			} else {
+				delegate.description(baseDescription + " - " + pathDescription);
+			}
 			return this;
 		}
 	}
