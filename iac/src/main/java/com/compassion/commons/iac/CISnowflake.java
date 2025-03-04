@@ -6,18 +6,14 @@ import com.compassion.commons.Utilities;
 import com.compassion.commons.config.CIEnvironment;
 import com.compassion.commons.config.CredentialConfig.ConfigWithUserPassword;
 import com.compassion.commons.iac.CDKUtils.ParamFromSecretBuilder;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import software.amazon.awscdk.SecretValue;
 import software.amazon.awscdk.services.secretsmanager.ISecret;
-import software.amazon.awscdk.services.secretsmanager.Secret;
-import software.constructs.Construct;
 
 @Getter @Setter @Accessors(chain = true)
-public class CISnowflake extends ConfigWithUserPassword {
+public class CISnowflake extends ConfigWithUserPassword implements CDKCredentials {
 	public enum CISnowflakeRole {
 		WRITER,
 		READER,
@@ -36,14 +32,7 @@ public class CISnowflake extends ConfigWithUserPassword {
 		return this;
 	}
 	
-	public Secret.Builder asSecret(Construct stack, String id) {
-		try {
-			return Secret.Builder.create(stack, id).secretStringValue(SecretValue.unsafePlainText(toPlaceholderJson()));
-		} catch (JsonProcessingException e) {
-			throw new IllegalArgumentException("Cannot generate placeholder JSON from " + this, e);
-		}
-	}
-	
+	@Override
 	public Seq<ParamFromSecretBuilder> asParams(CDKUtils utils, String path, ISecret secret) {
 		return Seq.of(
 			utils.newParam(path + "/user").pathDescription("Username").secret(secret),
