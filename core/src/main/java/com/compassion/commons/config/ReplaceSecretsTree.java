@@ -55,4 +55,7 @@ public class ReplaceSecretsTree extends ConfigOverrides {
  	public static ReplaceSecretsTree ssmParamsSecrets(String... prefixes) {
  		return new ReplaceSecretsTree(prefixes).withSSM().withSecrets();
  	}
+ 	public static ReplaceSecretsTree ssmParamsSecrets(CIEnvironment env, String prefix) {
+ 		return ssmParamsSecrets(prefix, env.toString().toLowerCase() + "/" + prefix);
+ 	}
 }
