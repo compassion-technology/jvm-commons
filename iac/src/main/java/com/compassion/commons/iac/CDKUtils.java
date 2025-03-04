@@ -26,6 +26,7 @@ import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.Runtime;
 import software.amazon.awscdk.services.secretsmanager.ISecret;
 import software.amazon.awscdk.services.ssm.CfnParameter;
+import software.amazon.jsii.Builder;
 import software.constructs.IConstruct;
 
 @FunctionalInterface
@@ -119,7 +120,7 @@ public interface CDKUtils extends CDKVariables {
 	}
 
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-	class ParamFromSecretBuilder {
+	class ParamFromSecretBuilder implements Builder<CfnParameter> {
 		@Delegate
 		private final CfnParameter.Builder delegate;
 		private final String path;
