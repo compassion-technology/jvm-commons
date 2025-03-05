@@ -7,6 +7,8 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.apache.commons.lang3.StringUtils;
+
 @Retention(RUNTIME)
 @Target(ElementType.METHOD) 
 @interface MetricValueProviders {
@@ -21,6 +23,6 @@ import java.lang.annotation.Target;
 		 * Define a custom granularity for this metric type, such as Events Excluded broken
 		 * down by reasons: `duplicate`, `absent_source_ref`.
 		 */
-		String customGranularity() default "";
+		String customGranularity() default StringUtils.EMPTY;
 	}
 }
