@@ -1,14 +1,13 @@
 package com.compassion.commons.metrics;
 
-import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 @Retention(RUNTIME)
-@Target(TYPE) 
-public @interface MetricProvider {
-	StandardMetricType[] types();
-	Class<? extends DataDogTags> tagProvider();
+@Target(ElementType.METHOD)
+public @interface MetricsTagProvider {
+	StandardMetricType[] types() default {};
 }
