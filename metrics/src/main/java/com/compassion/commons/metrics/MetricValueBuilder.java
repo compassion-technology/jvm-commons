@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.jooq.lambda.Seq;
 
 import com.compassion.commons.Utilities;
@@ -38,6 +39,7 @@ public abstract class MetricValueBuilder {
 			types = ArrayUtils.isEmpty(types) ? StandardMetricType.values() : types;
 			Arrays.asList(types).forEach($ -> mapOf.put($, value.get()));
 		}
+		
 		for (var m : base.getClass().getDeclaredMethods()) {
 			var prov = Seq.of(m.getDeclaredAnnotation(MetricValueProviders.class))
 				.filter(Objects::nonNull)
@@ -46,32 +48,32 @@ public abstract class MetricValueBuilder {
 				.filter(Objects::nonNull)
 				.toList();
 			if (prov.isEmpty()) { continue; }
-			var value = invoke(base, m);
-			if (value.isEmpty()) { continue; }
-			prov.forEach(i -> {
-				payload.addSeriesItem(
-					new MetricSeries()
-		                .metric(i.type().toString())
-		                .type(i.type().getIntakeType())
-		                .tags(mapOf.get(i.type()).tagList())
-		                .points(List.of(
-		                    new MetricPoint()
-		                        .timestamp(now())
-		                        .value(value.get()))));
-			});
+			
+			Object value;
+			try {
+				value = MethodUtils.invokeMethod(base, m.getName());
+			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+				log.warn("Error accessing metric value on {}", base, e);
+				continue;
+			}
+			
+			if (value instanceof Number n) {
+				prov.forEach(i -> {
+					payload.addSeriesItem(
+						new MetricSeries()
+			                .metric(i.type().toString())
+			                .type(i.type().getIntakeType())
+			                .tags(mapOf.get(i.type()).tagList())
+			                .points(List.of(
+			                    new MetricPoint()
+			                        .timestamp(now())
+			                        .value(n.doubleValue()))));
+				});	
+			}
 		}
 		return payload;
 	}
 	
-	private static Optional<Double> invoke(Object ret, Method m) {
-		try {
-			return Utilities.cast(Optional.ofNullable(m.invoke(ret)));
-		} catch (IllegalAccessException | InvocationTargetException e) {
-			log.error(e);
-			return Optional.empty();
-		}
-	}
-
 	private static Optional<? extends DataDogTags> invokeClass(Object ret, Method m) {
 		try {
 			var r = Optional.ofNullable(m.invoke(ret));
