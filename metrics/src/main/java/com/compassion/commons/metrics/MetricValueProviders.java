@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 
 @Retention(RUNTIME)
 @Target(ElementType.METHOD) 
-@interface MetricValueProviders {
+public @interface MetricValueProviders {
 	MetricValueProvider[] value();
 	
 	@Retention(RUNTIME)
