@@ -29,5 +29,7 @@ public class MyCustomTags {
 	public static class MyCustomTagsContainer implements DataDogTags {
 		@JsonUnwrapped(prefix = "test_")
 		private final MyCustomTags container;
+		
+		@Override public String appPrefix() { return "test"; }
 	}
 }
