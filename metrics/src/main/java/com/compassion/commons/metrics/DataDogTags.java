@@ -24,4 +24,6 @@ public interface DataDogTags {
 			throw new IllegalStateException("Cannot serialize DataDog tags", e);
 		}
 	}
+	
+	String appPrefix();
 }

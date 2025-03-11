@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.jooq.lambda.Seq;
 
@@ -59,9 +60,10 @@ public abstract class MetricValueBuilder {
 			
 			if (value instanceof Number n) {
 				prov.forEach(i -> {
+					var tagProv = mapOf.get(i.type());
 					payload.addSeriesItem(
 						new MetricSeries()
-			                .metric(i.type().toString())
+			                .metric(appPrefix(tagProv.appPrefix(), i.type().toString()))
 			                .type(i.type().getIntakeType())
 			                .tags(mapOf.get(i.type()).tagList())
 			                .points(List.of(
@@ -88,5 +90,9 @@ public abstract class MetricValueBuilder {
 	
 	private static long now() {
 		return OffsetDateTime.now(ZoneOffset.UTC).toInstant().getEpochSecond();
+	}
+	
+	private static String appPrefix(String pref, String metricName) {
+		return StringUtils.joinWith(".", pref, metricName);
 	}
 }
