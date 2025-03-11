@@ -27,10 +27,6 @@ import lombok.extern.log4j.Log4j2;
 public abstract class MetricValueBuilder {
 	
 	public static MetricPayload with(Object base) {
-		return with(base, false);
-	}
-	
-	public static MetricPayload with(Object base, boolean errorState) {
 		var payload = new MetricPayload(new ArrayList<>());
 		var mapOf   = new HashMap<StandardMetricType, DataDogTags>();
 		

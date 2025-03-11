@@ -6,16 +6,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor @NoArgsConstructor @Getter
+@AllArgsConstructor @NoArgsConstructor
 public enum StandardMetricType {
 	API_CALLS,
 	EVENTS_EXCLUDED,
 	EVENTS_PROCESSED,
 	EXECUTION_TIME,
-	EXCEPTION_COUNT(MetricIntakeType.GAUGE, true);
+	EXCEPTION_COUNT(MetricIntakeType.GAUGE);
 	
-	private MetricIntakeType intakeType = MetricIntakeType.COUNT;
-	private boolean errorState;
+	@Getter private MetricIntakeType intakeType = MetricIntakeType.COUNT;
 	
 	@Override
 	public String toString() {
