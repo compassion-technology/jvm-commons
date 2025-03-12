@@ -5,11 +5,16 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
+@JsonPropertyOrder(alphabetic = true)
+@JsonNaming(SnakeCaseStrategy.class)
 public interface DataDogTags {
 	static ObjectMapper mapper = new YAMLMapper()
 		.configure(YAMLGenerator.Feature.USE_PLATFORM_LINE_BREAKS, false)
