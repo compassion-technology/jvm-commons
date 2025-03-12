@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.compassion</groupId>
 		<artifactId>jvm-commons-parent</artifactId>
-		<version>5.8.8-SNAPSHOT</version>
+		<version>5.8.8</version>
 	</parent>
 
 	<artifactId>jvm-commons-gui-swt</artifactId>
