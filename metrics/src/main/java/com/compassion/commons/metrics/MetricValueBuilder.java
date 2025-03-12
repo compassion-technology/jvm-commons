@@ -45,7 +45,7 @@ public abstract class MetricValueBuilder {
 				prov.forEach(i -> {
 					payload.addSeriesItem(
 						new MetricSeries()
-			                .metric(appPrefix(tags.appPrefix(), i.type().toString()))
+			                .metric(appPrefix(tags.appPrefix(), i.type().toString(), i.customGranularity()))
 			                .type(i.type().getIntakeType())
 			                .tags(tags.tagList())
 			                .points(List.of(
@@ -62,7 +62,7 @@ public abstract class MetricValueBuilder {
 		return OffsetDateTime.now(ZoneOffset.UTC).toInstant().getEpochSecond();
 	}
 	
-	private static String appPrefix(String pref, String metricName) {
-		return StringUtils.joinWith(".", pref, metricName);
+	private static String appPrefix(String pref, String metricName, String subMetric) {
+		return StringUtils.removeEnd(StringUtils.joinWith(".", pref, metricName, subMetric), ".");
 	}
 }

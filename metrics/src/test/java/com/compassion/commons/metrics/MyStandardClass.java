@@ -1,7 +1,6 @@
 package com.compassion.commons.metrics;
 
 import com.compassion.commons.metrics.MetricValueProviders.MetricValueProvider;
-import com.compassion.commons.metrics.MyCustomTags.MyCustomTagsContainer;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -10,16 +9,11 @@ import lombok.experimental.Accessors;
 @Getter @Setter @Accessors(chain = true)
 public class MyStandardClass {
 	private String cofVersion, id, name;
-	private int responses, filtered;
+	private int responses, filtered, rejected;
 	private Throwable error;
 
 	public void incrementResponseCount() {
 		responses++;
-	}
-	
-	@MetricsTagProvider
-	public MyCustomTagsContainer metricTags() {
-		return MyCustomTagsContainer.wrap(new MyCustomTags(this)); 
 	}
 	
 	@MetricValueProvider(type = StandardMetricType.EVENTS_PROCESSED)
@@ -30,11 +24,16 @@ public class MyStandardClass {
 
 	@MetricValueProvider(type = StandardMetricType.EVENTS_EXCLUDED, customGranularity = "source_ref_absent")
 	public Double eventsExcluded() {
-		return Double.valueOf(filtered);
+		return filtered > 0 ? Double.valueOf(filtered) : null;
+	}
+	
+	@MetricValueProvider(type = StandardMetricType.EVENTS_EXCLUDED, customGranularity = "source_rejected")
+	public Double eventsRejected() {
+		return rejected > 0 ? Double.valueOf(rejected) : null;
 	}
 	
 	@MetricValueProvider(type = StandardMetricType.EXCEPTION_COUNT)
 	public Double metricValue() {
-		return 1.0;
+		return error != null ? 1.0 : null;
 	}
 }
