@@ -25,7 +25,7 @@ public interface DataDogTags {
 	
 	default List<String> tagList() {
 		try {
-			return List.of(StringUtils.split(mapper.writeValueAsString(this).replace(": ", ":"), '\n'));
+			return List.of(StringUtils.split(mapper.writeValueAsString(this).replace(": ", ":").toLowerCase(), '\n'));
 		} catch (JsonProcessingException e) {
 			throw new IllegalStateException("Cannot serialize DataDog tags", e);
 		}
