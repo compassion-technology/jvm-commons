@@ -27,7 +27,7 @@ public class TestDataDogTags {
 		conf.getTags().setTestEnvironment("DEVINT").setTestVersion("1.2.3").setTestHaveZildjians(true);
 		
 		assertEquals(List.of(
-			"test_environment:DEVINT",
+			"test_environment:devint",
 			"test_have_zildjians:true",
 			"test_version:1.2.3"
 		), conf.getTags().tagList());
