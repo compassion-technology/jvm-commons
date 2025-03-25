@@ -68,7 +68,7 @@ public class CMessageBox implements SWTBuilders {
 	 */
 	public int open() {
 		answer = SWT.CANCEL;
-		SWTUtilities.open(dialog(parent).text(text).autoSize().centerInParent().layout(grid(1, 1)).children(s -> {
+		SWTUtilities.open(dialog(parent).text(text).layout(grid(1, 1)).children(s -> {
 			// Icon on the left side
 			label(s).image(style & ICON_MASK).layoutData(gridData().vAlign(SWT.TOP).vGrab().vSpan(2));
  			
@@ -92,7 +92,7 @@ public class CMessageBox implements SWTBuilders {
 	 			button(c).text("&No").layoutData(gd).onSelect(e -> dismiss.accept(SWT.NO));
 	 			button(c, SWT.CANCEL).text("Cancel").layoutData(gd).onSelect(e -> s.dispose());
 	 		});
-		}).get());
+		}).autoSize().centerInParent().get());
 	 	return answer;
 	}
 }

@@ -151,6 +151,10 @@ public class Controller extends Thread implements StatusListener {
 		return this;
 	}
 
+	public int size() {
+		return queue.size();
+	}
+	
 	/**
 	 * Start this controller <b>and</b> its associated interface, specified
 	 * via {@link #setInterface(UserInterface)}. The controller waits for posted
@@ -225,7 +229,7 @@ public class Controller extends Thread implements StatusListener {
 				ui.setMessage(MessageType.ERROR, s.getStatus());
 			} else if (newTop == null) {
 				// Show default message (no tasks currently running)
-				ui.setStatus(null, 0L, 0L, false);
+				ui.setStatus(null, 0L, 0L, !queue.isEmpty());
 			} else {
 				// Show next task on stack's status
 				statusChanged(newTop);
@@ -241,6 +245,15 @@ public class Controller extends Thread implements StatusListener {
 	public void cancelTask() {
 		StatusMonitor sm = active.peek();
 		if (sm != null) { sm.setCanceled("The user canceled the task."); }
+	}
+	
+	/**
+	 * Clears out all pending tasks from the controller's queue. This does not
+	 * interrupt tasks already in progress by the controller's main thread or
+	 * asynchronous daemons.
+	 */
+	public void clearTasks() {
+		queue.clear();
 	}
 
 	/**

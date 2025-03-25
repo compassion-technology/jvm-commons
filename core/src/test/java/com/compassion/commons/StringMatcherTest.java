@@ -1,4 +1,3 @@
-/* ©2017-2020 Elder Research, Inc. All rights reserved. */
 package com.compassion.commons;
 
 import static org.junit.Assert.assertFalse;

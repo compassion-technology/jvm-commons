@@ -56,11 +56,15 @@ public class DaoBatcher<P, D extends DAO<?, P, ?>> {
 	
 	private void add(List<P> batch, P obj) {
 		batch.add(obj);
-		flush(maxBatchSize, lastTransactionTime + maxBatchTime);
+		flush(false);
 	}
 	
-	public void flush() {
-		flush(0, 0L);
+	public void flush(boolean force) {
+		if (force) {
+			flush(0, 0L);
+		} else {
+			flush(maxBatchSize, lastTransactionTime + maxBatchTime);
+		}
 	}
 	
 	private void flush(int maxSize, long nextTime) {

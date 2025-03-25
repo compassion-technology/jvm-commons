@@ -8,8 +8,7 @@ import org.apache.commons.text.StringSubstitutor;
 import org.jooq.SQLDialect;
 import org.jooq.exception.DataAccessException;
 
-import com.elderresearch.commons.jdbc.JDBCDriver;
-import com.elderresearch.commons.jooq.JOOQDatabaseConfig;
+import com.compassion.commons.jdbc.JDBCDriver;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableMap;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDefault;
@@ -98,6 +97,9 @@ public class SnowflakeConfig extends JOOQDatabaseConfig {
 		// Default of 30 retries can lock users out of account.
 		// Problems are usually networking or password which aren't solved by retry.
 		System.setProperty("c3p0.acquireRetryAttempts", String.valueOf(1));
+		
+		// Set Snowflake JDBC driver logging to Slf4j, which we bridge into Log4j
+		System.setProperty("net.snowflake.jdbc.loggerImpl", "net.snowflake.client.log.SLF4JLogger");
 		
 		log.debug("Opening new connection to Snowflake...");
 		return super.acquire();

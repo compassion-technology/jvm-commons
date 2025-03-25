@@ -5,6 +5,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.EventObject;
 import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.function.Consumer;
@@ -862,6 +863,21 @@ public final class SWTUtilities {
 	public static void selectAndNotify(Control c) {
 		c.notifyListeners(SWT.Selection, BLANK_EVENT);
 	}
+	
+	/**
+	 * Gets the selection state of the event's source object, which must be a {@link Button}. This is
+	 * helpful for check and toggle buttons to easily get their state after the selection event without
+	 * requiring a reference to button.
+	 * @param e the event
+	 * @return the selection of the event source's button
+	 * @see Button#getSelection()
+	 */
+	public static boolean getButtonSelection(EventObject e) {
+		if (e.getSource() instanceof Button b) {
+			return b.getSelection();
+		}
+		throw new IllegalArgumentException("Event " + e + " does not have an SWT button as its source");
+	}
 
 	/**
 	 * Returns the currently selected value of the spinner as a floating-point
@@ -914,14 +930,17 @@ public final class SWTUtilities {
 	 * Sets the provided control as the "top" control of its parent's stack layout and
 	 * lays out the parent. The control's parent must have a {@link StackLayout} as its layout manager.
 	 * @param c the control to set as the top control
+	 * @return if the top control was changed, or {@code false} if this control was already the top control
 	 */
-	public static void setTopControl(Control c) {
+	public static boolean setTopControl(Control c) {
 		Composite parent = c.getParent();
 		StackLayout l = (StackLayout) parent.getLayout();
 		if (l.topControl != c) {
 			l.topControl = c;
 			parent.layout();
+			return true;
 		}
+		return false;
 	}
 
 	/**

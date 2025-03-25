@@ -5,12 +5,16 @@ import java.io.Serializable;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 import org.apache.pulsar.client.impl.auth.oauth2.KeyFile;
 import org.apache.pulsar.common.util.ObjectMapperFactory;
 
+import com.compassion.commons.config.CredentialConfig;
 import com.compassion.commons.config.YAMLConfig;
+import com.compassion.commons.jackson.PasswordSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -18,8 +22,20 @@ import lombok.experimental.Accessors;
 
 @Getter @Setter @Accessors(chain = true)
 public class PulsarConfig extends YAMLConfig {
-	public static class PulsarKeyFile extends KeyFile implements Serializable {
+	public static class PulsarKeyFile extends KeyFile implements Serializable, CredentialConfig {
 		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void forEachCredentialPath(Consumer<String> withSecretPath) {
+			withSecretPath.accept("client_id");
+			withSecretPath.accept("client_secret");
+			withSecretPath.accept("client_email");
+		}
+		
+		public interface PulsarKeyFileMixin {
+			@JsonSerialize(using = PasswordSerializer.class) String getClientId();
+			@JsonSerialize(using = PasswordSerializer.class) String getClientSecret();
+		}
 	}
 	
 	private static final long serialVersionUID = 1L;

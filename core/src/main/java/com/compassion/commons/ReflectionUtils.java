@@ -1,4 +1,3 @@
-/* ©2011-2020 Elder Research, Inc. All rights reserved. */
 package com.compassion.commons;
 
 import java.lang.reflect.Constructor;
@@ -186,6 +185,17 @@ public class ReflectionUtils {
 	 */
 	public Class<?>[] getTypes(Object... args) {
 		return Arrays.stream(args).map(Object::getClass).toArray(i -> new Class<?>[i]);
+	}
+
+	/**
+	 * Recursively counts the number of super classes for the specified type.
+	 * @param c the class
+	 * @return the number of superclasses
+	 * @see Class#getSuperclass()
+	 */
+	public int countSuperclasses(Class<?> c) {
+		var sc = c.getSuperclass();
+		return sc == null? 0 : countSuperclasses(sc) + 1;
 	}
 
 	/**

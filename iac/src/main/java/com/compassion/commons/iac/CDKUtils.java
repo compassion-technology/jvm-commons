@@ -14,7 +14,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import lombok.experimental.Delegate;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.services.ec2.ISubnet;
@@ -26,28 +29,32 @@ import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.Runtime;
 import software.amazon.awscdk.services.secretsmanager.ISecret;
 import software.amazon.awscdk.services.ssm.CfnParameter;
+import software.amazon.jsii.Builder;
 import software.constructs.IConstruct;
 
+@FunctionalInterface
 public interface CDKUtils extends CDKVariables {
 	static ObjectMapper JSON = new ObjectMapper()
 		.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
 
+	Stack stack();
+	
 	default <C extends IConstruct> Tagger<C> tag(C c) {
 		return Tagger.with(c);
 	}
 	
-	default IVpc findVPC(Stack parent) {
-		return Vpc.fromLookup(parent, "vpc", VpcLookupOptions.builder()
-			.vpcName(VPC_NAME).ownerAccountId(parent.getAccount()).build());
+	default IVpc findVPC() {
+		return Vpc.fromLookup(stack(), "vpc", VpcLookupOptions.builder()
+			.vpcName(VPC_NAME).ownerAccountId(stack().getAccount()).build());
 	}
 	
 	default List<String> findSubnetsForVPC(IVpc vpc) {
 		return Seq.seq(vpc.getPrivateSubnets()).map(ISubnet::getSubnetId).toList();
 	}
 
-	default ParamFromSecretBuilder newParam(Stack parent, String path) {
+	default ParamFromSecretBuilder newParam(String path) {
 		path = StringUtils.prependIfMissing(path, "/");
-		return new ParamFromSecretBuilder(CfnParameter.Builder.create(parent, path)
+		return new ParamFromSecretBuilder(CfnParameter.Builder.create(stack(), path)
 			.type("String").tier("Standard").name(path), path);
 	}
 	
@@ -85,7 +92,6 @@ public interface CDKUtils extends CDKVariables {
 	 * <p>In this way, the POM will be available at {@code target/dependency/my-artifact.pom} and parseable for
 	 * metadata about the Lambda function.</p>
 	 * 
-	 * @param stack the parent construct
 	 * @param artifactId the artifact ID of the Maven project containing the function's implementing code.
 	 * This is optional and can be {@code null} if the path to a POM file is specified.
 	 * @param pomPaths the path (or candidate paths) to the POM file. If none are specified, the POM file
@@ -94,7 +100,7 @@ public interface CDKUtils extends CDKVariables {
 	 * @throws IllegalArgumentException if the POM file could not be found 
 	 * @throws IOException if there was a problem reading the POM file
 	 */
-	default Function.Builder lambdaFromPOM(Stack stack, String artifactId, Path... pomPaths) throws IOException {
+	default Function.Builder lambdaFromPOM(String artifactId, Path... pomPaths) throws IOException {
 		var pathsToTry = Seq.of(pomPaths);
 		if (artifactId != null) {
 			// This assumes the POM has been unpacked by the dependency plugin as part of the build
@@ -107,7 +113,7 @@ public interface CDKUtils extends CDKVariables {
 		try (var reader = Files.newInputStream(path)) {
 			var pom = new MavenXpp3Reader().read(reader);
 			// TODO: Ideally get Java version from effective POM
-			var ret = Function.Builder.create(stack, pom.getArtifactId()).runtime(Runtime.JAVA_17);
+			var ret = Function.Builder.create(stack(), pom.getArtifactId()).runtime(Runtime.JAVA_17);
 			ret.functionName(pom.getArtifactId()).description(pom.getDescription());
 			ret.code(Code.fromAsset(path.resolveSibling(pom.getArtifactId() + "-shaded.jar").toString()));
 			return ret;
@@ -116,11 +122,15 @@ public interface CDKUtils extends CDKVariables {
 		}
 	}
 
+	@Setter @Accessors(fluent = true)
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-	class ParamFromSecretBuilder {
+	class ParamFromSecretBuilder implements Builder<CfnParameter> {
 		@Delegate
 		private final CfnParameter.Builder delegate;
 		private final String path;
+		
+		@Getter
+		private String pathDescription;
 
 		// Assumes the last path fragment is the access path inside the secret
 		public ParamFromSecretBuilder secret(ISecret s) {
@@ -130,6 +140,24 @@ public interface CDKUtils extends CDKVariables {
 		// Custom path in the secret regardless of the parameter path
 		public ParamFromSecretBuilder secret(ISecret s, String secretPath) {
 			value(SECRET_PATH + s.getSecretName() + "/" + secretPath);
+			return this;
+		}
+		
+		/**
+		 * Sets the description for the parameter. If you have already set a 
+		 * path description via {@link #pathDescription(String)} that will be 
+		 * appended to the end of this description to form the final description.
+		 * If not, this description will be used as-is.
+		 * @param baseDescription the base description for related parameters
+		 * at the same level of the hierarchy.
+		 * @return this for chaining
+		 */
+		public ParamFromSecretBuilder description(String baseDescription) {
+			if (pathDescription == null) {
+				delegate.description(baseDescription);
+			} else {
+				delegate.description(baseDescription + " - " + pathDescription);
+			}
 			return this;
 		}
 	}

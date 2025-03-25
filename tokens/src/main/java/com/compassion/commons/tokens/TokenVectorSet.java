@@ -336,7 +336,7 @@ public class TokenVectorSet<TV extends TokenVector> implements Iterable<TV>, Aut
 		tokens.compact();
 		tfidf = new TokenVector();
 		totalTokenCount = 0L;
-		for (val tv : this) {
+		for (@SuppressWarnings("resource") val tv : this) {
 			if (sm != null) {
 				if (!sm.isRunning()) { return this; }
 				sm.setProgress(1L, true);
@@ -424,7 +424,7 @@ public class TokenVectorSet<TV extends TokenVector> implements Iterable<TV>, Aut
 			tfidf.countsWeighted = tfidf.countsWeighted.select((token, w) -> tokenFilter.contains(token));
 		}
 
-		for (val tv : this) {
+		for (@SuppressWarnings("resource") val tv : this) {
 			update(tv.getKey(), $ -> $.countsRaw = tv.countsRaw.select((token, count) -> {
 				boolean keep = tokenFilter == null || tokenFilter.contains(token);
 				if (keep) {
@@ -509,7 +509,7 @@ public class TokenVectorSet<TV extends TokenVector> implements Iterable<TV>, Aut
 		if (sm != null) { sm.newTask("Removing documents...", size()); }
 		
 		val toRemove = new LongHashSet();
-		for (val tv : this) {
+		for (@SuppressWarnings("resource") val tv : this) {
 			if (!sizeRange.contains(tv.getTotal())) {
 				toRemove.add(tv.getKey());
 				vectors.remove(tv.getKey());

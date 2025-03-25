@@ -8,17 +8,20 @@ import java.util.LinkedList;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Widget;
 
 import com.compassion.commons.gui.Controller;
 import com.compassion.commons.gui.UserInterface.MessageType;
@@ -50,7 +53,7 @@ public class StatusBar implements SWTBuilders {
 	private Display     disp;
 	private Composite   comp;
 	private CLabel      status;
-	private Label[]     custom;
+	private Control[]   custom;
 	private ProgressBar barD, barI;
 	private Button      cancel;
 	private boolean     cancelable;
@@ -58,7 +61,7 @@ public class StatusBar implements SWTBuilders {
 	private Deque<String> log = new LinkedList<>();
 	
 	public StatusBar(Controller c, Composite parent, int style) {
-		this(c, parent, style, 0);
+		this(c, parent, style, 0, (SelectionLambda) e -> c.cancelTask());
 	}
 	
 	/**
@@ -73,8 +76,10 @@ public class StatusBar implements SWTBuilders {
 	 * {@code SWT.SEPARATOR} labels, but can be any of the style bits honored by {@link Composite} 
 	 * @param customSections the number of custom labels to create to display additional program 
 	 * state, like mouse coordinates.
+	 * @param cancelAction what to do when the cancel button is pressed. By default {@link Controller#cancelTask()}
+	 * is called.
 	 */
-	public StatusBar(final Controller c, final Composite parent, int style, int customSections) {
+	public StatusBar(final Controller c, final Composite parent, int style, int customSections, SelectionListener cancelAction) {
 		disp = parent.getDisplay();
 		images = new Image[MessageType.values().length];
 		images[MessageType.WARN.ordinal()]  = scale(disp, SWT.ICON_WARNING);
@@ -84,7 +89,7 @@ public class StatusBar implements SWTBuilders {
 		
 		int cols = 2 * customSections + 5;
 		
-		comp = composite(parent, style).layout(grid(cols).hMargin(0).vMargin(0, 4)).get();
+		comp = composite(parent, style).layout(grid(cols).margin(0)).get();
 		
 		separator(comp, SWT.HORIZONTAL).layoutData(gridData().hFill().hSpan(cols));
 			
@@ -93,13 +98,13 @@ public class StatusBar implements SWTBuilders {
 		status.setToolTipText("Click to display a log of status messages.");
 		status.setText(defaultStatus);
 		
-		custom = new Label[customSections];
+		custom = new Control[customSections];
 		Label[] separators = new Label[customSections + 1];
 		
 		for (int i = 0; i <= customSections; i++) {
 			separators[i] = separator(comp, SWT.VERTICAL).get();
 			if (i < customSections) {
-				custom[i] = label(comp).layoutData(gridData().hAlign(SWT.FILL)).get();
+				custom[i] = newCustomControl(comp, i);
 			}
 		}
 		
@@ -114,7 +119,7 @@ public class StatusBar implements SWTBuilders {
 			cancel.setToolTipText("Cancels the current task");
 			cancel.setEnabled(cancelable);
 			cancel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-			cancel.addSelectionListener((SelectionLambda) e -> c.cancelTask());
+			cancel.addSelectionListener(cancelAction);
 			
 		int height = cancel.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
 		for (int i = 0; i < separators.length; i++) {
@@ -147,6 +152,10 @@ public class StatusBar implements SWTBuilders {
 		status.addDisposeListener(e -> Arrays.stream(images).filter(i -> i != null).forEach(i -> i.dispose()));
 	}
 	
+	protected Control newCustomControl(Composite parent, int i) {
+		return label(parent).layoutData(gridData().hAlign(SWT.FILL)).get();
+	}
+	
 	public Image getImage(MessageType type) {
 		return images[type.ordinal()];
 	}
@@ -169,7 +178,7 @@ public class StatusBar implements SWTBuilders {
 		SWTUtilities.run(disp, new SetText(index, text));
 	}
 	
-	public Label getCustomLabel(int index) {
+	public Widget getCustomWidget(int index) {
 		return custom[index];
 	}
 	
@@ -181,10 +190,9 @@ public class StatusBar implements SWTBuilders {
 		// Avoid redundant calls
 		if (cancelable != enabled) {
 			SWTUtilities.run(disp, () -> {
-				if (cancel.isDisposed()) { return; }
 				cancel.setEnabled(enabled);
 				cancelable = enabled;
-			});
+			}, cancel);
 		}
 	}
 	
@@ -280,10 +288,10 @@ public class StatusBar implements SWTBuilders {
 			
 			if (allText != null) {
 				for (int i = 0; i < allText.length && i < custom.length; i++) {
-					custom[i].setText(allText[i]);
+					SWTUtilities.setText(custom[i], allText[i]);
 				}
 			} else {
-				custom[index].setText(text);
+				SWTUtilities.setText(custom[index], text);
 			}
 			custom[0].getParent().layout();
 		}

@@ -1,8 +1,13 @@
 package com.compassion.commons.config;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ServiceLoader;
 import java.util.function.Consumer;
 
 import com.compassion.commons.LambdaUtils;
+import com.compassion.commons.ReflectionUtils;
 import com.compassion.commons.jackson.PasswordSerializer;
 import com.compassion.commons.jackson.PlaceholderMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -78,14 +83,14 @@ public interface CredentialConfig {
 	@AutoService(CredentialConfig.class)
 	@Getter @Setter @Accessors(chain = true)
     public class ConfigWithToken extends YAMLConfig implements CredentialConfig {
-        private String publicKey;
-        private String privateKey;
+		private String privateKey;
+		private String publicKey;
         private String signature;
         
         @Override
         public void forEachCredentialPath(Consumer<String> withSecretPath) {
-            withSecretPath.accept("publicKey");
-            withSecretPath.accept("privateKey");
+        	withSecretPath.accept("privateKey");
+        	withSecretPath.accept("publicKey");
             withSecretPath.accept("signature");
         }
         
@@ -96,6 +101,24 @@ public interface CredentialConfig {
         	String getSignature();
         }
     }
+	
+	@AutoService(CredentialConfig.class)
+	@Getter @Setter @Accessors(chain = true)
+	public class ConfigWithUserPasswordToken extends ConfigWithUserPassword {
+		private String privateKey;
+		private String publicKey;
+		
+		@Override
+		public void forEachCredentialPath(Consumer<String> withSecretPath) {
+			super.forEachCredentialPath(withSecretPath);
+			withSecretPath.accept("privateKey");
+			withSecretPath.accept("publicKey");
+		}
+		
+		public interface Mixin extends ConfigWithUserPassword.Mixin, ConfigWithToken.Mixin {
+			// No additional methods
+		}
+	}
 	
 	@AutoService(CredentialConfig.class)
 	@Getter @Setter @Accessors(chain = true)
@@ -118,10 +141,11 @@ public interface CredentialConfig {
 	}
 	
 	static ObjectMapper addMaskingMixins(ObjectMapper om) {
-		return om.addMixIn(ConfigWithApiKey.class,       ConfigWithApiKey.Mixin.class)
-		         .addMixIn(ConfigWithUserPassword.class, ConfigWithUserPassword.Mixin.class)
-		         .addMixIn(ConfigWithToken.class,        ConfigWithToken.Mixin.class)
-		         .addMixIn(ConfigWithOAuth.class,        ConfigWithOAuth.Mixin.class);
+		return om.addMixIn(ConfigWithApiKey.class,            ConfigWithApiKey.Mixin.class)
+		         .addMixIn(ConfigWithUserPassword.class, 	  ConfigWithUserPassword.Mixin.class)
+		         .addMixIn(ConfigWithUserPasswordToken.class, ConfigWithUserPasswordToken.Mixin.class)
+		         .addMixIn(ConfigWithToken.class,             ConfigWithToken.Mixin.class)
+		         .addMixIn(ConfigWithOAuth.class,             ConfigWithOAuth.Mixin.class);
 	}
 	
 	/**
@@ -133,5 +157,19 @@ public interface CredentialConfig {
 	 */
 	default String toPlaceholderJson() throws JsonProcessingException {
 		return PlaceholderMapper.INSTANCE.writeValueAsString(this);
+	}
+	
+	/**
+	 * Load all implementations of {@link CredentialConfig} via the service loader and 
+	 * return instances of them (suitable for finding the right placeholder type for an
+	 * extending configuration subclass).
+	 * @return a list of all available implementations sorted by the most specific
+	 * implementation first
+	 */
+	static List<CredentialConfig> getPlaceholders() {
+		var ret = new ArrayList<CredentialConfig>();
+		ServiceLoader.load(CredentialConfig.class).forEach(ret::add);
+		ret.sort(Comparator.comparingInt(cc -> ReflectionUtils.countSuperclasses(cc.getClass())).reversed());
+		return ret;
 	}
 }
