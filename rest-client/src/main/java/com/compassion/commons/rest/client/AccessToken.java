@@ -2,6 +2,8 @@ package com.compassion.commons.rest.client;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.ws.rs.client.ClientBuilder;
+
 import com.compassion.commons.rest.client.WebParam.WebHeader;
 import com.compassion.commons.rest.client.WebParam.WebQueryParam;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -9,7 +11,6 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.google.common.net.HttpHeaders;
 
-import jakarta.ws.rs.client.ClientBuilder;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
