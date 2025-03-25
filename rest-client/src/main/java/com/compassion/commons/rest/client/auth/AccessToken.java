@@ -33,12 +33,12 @@ public class AccessToken {
 		log.info("Access token valid until {}", String.format("%1$tm/%1$td %1$tI:%1$tM:%1$tS", expiresAfter));
 	}
 	
-	public static AccessToken acquire(AuthEnvironment env, String scope, String httpAuth) {
+	public static AccessToken acquire(AuthEnvironment env, String scope, WebHeader httpAuth) {
 		log.info("Acquiring new access token for {}", env.getAuthSubdomain());
 		
 		try (var client = new RestClient(ClientBuilder.newBuilder())) {
 			client.setBase(String.format("https://%s.ci.org", env.getAuthSubdomain()))
-				.addPerpetualParams(WebHeader.of(HttpHeaders.AUTHORIZATION, httpAuth));
+				.addPerpetualParams(httpAuth);
 		
 			return client.request(RecursiveTarget.newTarget(DEF_ENDPOINT), WebQueryParam.of(GRANT_TYPE, CLIENT_CREDS),
 				WebQueryParam.of(SCOPE_KEY, scope))
