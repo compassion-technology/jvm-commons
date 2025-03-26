@@ -2,8 +2,6 @@ package com.compassion.commons.rest.client.auth;
 
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.compassion.commons.rest.client.WebParam;
 import com.compassion.commons.rest.client.WebParam.WebHeader;
 import com.compassion.commons.rest.client.auth.AccessToken.IAccessToken;
