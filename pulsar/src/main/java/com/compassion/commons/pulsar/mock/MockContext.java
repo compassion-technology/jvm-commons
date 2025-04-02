@@ -85,4 +85,5 @@ public class MockContext implements Context {
 	@Override public void deleteState(String key) { /* No impl */ }
 	@Override public PulsarAdmin getPulsarAdmin() { return null; }
 	@Override public <X> FunctionRecordBuilder<X> newOutputRecordBuilder(Schema<X> schema) { return null; }
+	@Override public void fatal(Throwable t) { log.error("Pulsar error", t); }
 }
