@@ -2,21 +2,19 @@ package com.compassion.commons.rest.client.auth;
 
 import java.io.IOException;
 
-import com.compassion.commons.rest.client.WebParam.WebHeader;
-import com.compassion.commons.rest.client.WebParam.WebQueryParam;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.google.common.net.HttpHeaders;
+import com.compassion.commons.rest.client.RecursiveTarget;
+import com.compassion.commons.rest.client.RestClient;
+import com.compassion.commons.rest.client.WebParam;
 
 import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public abstract class AccessToken {
-	
 	public static IAccessToken acquire(OAuthMethod method, OAuthAwareConfig config) throws IOException {
 		log.info("Acquiring new access token for {}", config.baseUrl());
 		
