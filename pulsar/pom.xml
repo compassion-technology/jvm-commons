@@ -14,11 +14,11 @@
 
 	<properties>
 		<!-- Keep in sync with the version in our cloud StreamNative -->
-		<pulsar.version>3.0.4.6</pulsar.version>
-		<log4j.version>2.20.0</log4j.version>
+		<pulsar.version>3.3.3.3</pulsar.version>
+		<log4j.version>2.23.1</log4j.version>
 
 		<!-- Need the BOM to reconcile version conflicts -->
-		<grpc.version>1.55.3</grpc.version>
+		<grpc.version>1.56.1</grpc.version>
 	</properties>
 
 	<dependencyManagement>
