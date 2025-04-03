@@ -1,5 +1,6 @@
 package com.compassion.commons.pulsar;
 
+import java.util.Collection;
 import java.util.Optional;
 
 import org.apache.pulsar.functions.api.BaseContext;
@@ -7,6 +8,7 @@ import org.apache.pulsar.functions.api.Context;
 
 import com.compassion.commons.config.ConfigEnvironment;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.base.CaseFormat;
 
@@ -30,8 +32,12 @@ public class ContextEnvironment implements ConfigEnvironment {
 	
 	@Override
 	public JsonNode get(String path, JsonNode existing) {
-		return JsonNodeFactory.instance.textNode(getUserConfigValue(path)
-			.orElseGet(() -> context.getSecret(path)).toString());
+		var override = getUserConfigValue(path).orElseGet(() -> context.getSecret(path));
+		if (existing.isArray() && override instanceof Collection<?> c) {
+			c.forEach(e -> ((ArrayNode) existing).add(JsonNodeFactory.instance.textNode(e.toString())));
+			return existing;
+		}
+		return JsonNodeFactory.instance.textNode(override.toString());
 	}
 	
 	@Override

@@ -98,7 +98,13 @@ public class ConfigOverrides {
 
 	            if (node.isArray()) {
 	            	var arr = (ArrayNode) node;
-	        		applyOverrides(env, path, node, arr::add);
+	        		applyOverrides(env, path, node, override -> {
+	        			if (override.isArray()) {
+	        				objNode.replace(prop, override);
+	        			} else {
+	        				arr.add(override);
+	        			}
+	        		});
 
 	        		var idx = new MutableInt();
 	            	for (var child : node) {
