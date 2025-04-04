@@ -18,7 +18,6 @@ import picocli.CommandLine.Parameters;
  */
 @NoArgsConstructor
 public class CLIStringSet extends LinkedHashSet<String> {
-	@JsonCreator
 	public CLIStringSet(String... arr) {
 		for (var s : arr) { add(s); }
 	}
