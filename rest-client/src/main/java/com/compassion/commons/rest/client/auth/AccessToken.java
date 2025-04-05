@@ -8,9 +8,10 @@ import com.compassion.commons.rest.client.WebParam;
 
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.Response.Status.Family;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
@@ -20,12 +21,12 @@ public abstract class AccessToken {
 		
 		try (var client = new RestClient(ClientBuilder.newBuilder())) {
 			var ret = client.request(RecursiveTarget.newTarget(config.baseUrl()), config.authCreds())
-				.post(Entity.json(null));
+				.post(method.getRequestBody());
 			
-				if (ret.getStatus() < 200 || ret.getStatus() >= 300) {
-					throw new IOException(
-						String.format("Retrieving access token failed with status code %d and details: %s", ret.getStatus(), ret.readEntity(String.class)));
-				}
+			if (ret.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
+				throw new IOException(
+					String.format("Retrieving access token failed with status code %d and details: %s", ret.getStatus(), ret.readEntity(String.class)));
+			}
 			return ret.readEntity(method.getPojo());
 		}
 	}
@@ -35,12 +36,13 @@ public abstract class AccessToken {
 		WebParam providedSessionCreds();
 	}
 	
-	@NoArgsConstructor @AllArgsConstructor @Getter
+	@AllArgsConstructor @Getter
 	public enum OAuthMethod {
-		SALESFORCE(SFSessionResponse.class),
-		OATMEAL(OatmealSessionResponse.class);
+		SALESFORCE(SFSessionResponse.class, Entity.json(null)),
+		OATMEAL(OatmealSessionResponse.class, Entity.form(new Form()));
 		
 		private Class<? extends IAccessToken> pojo;
+		private Entity<?> requestBody;
 	}
 	
 	public interface OAuthAwareConfig {
