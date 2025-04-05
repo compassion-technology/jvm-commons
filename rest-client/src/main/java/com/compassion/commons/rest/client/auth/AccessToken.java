@@ -2,17 +2,14 @@ package com.compassion.commons.rest.client.auth;
 
 import java.io.IOException;
 
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-
 import com.compassion.commons.rest.client.RecursiveTarget;
 import com.compassion.commons.rest.client.RestClient;
 import com.compassion.commons.rest.client.WebParam;
 
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.Form;
-import jakarta.ws.rs.core.Response.Status.Family;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.Response.Status.Family;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
