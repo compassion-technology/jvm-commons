@@ -25,15 +25,10 @@
 
 	<properties>
 		<git.projectId>50439669</git.projectId>
+		<jvm.commons.version>5.8.9</jvm.commons.version>
 	</properties>
 
 	<modules>
-		<module>core</module>
-		<module>pulsar</module>
-		<module>snowflake</module>
-		<module>tokens</module>
-		<module>iac</module>
-		<module>metrics</module>
 		<module>rest-client</module>
 		<module>rest-server</module>
 	</modules>
