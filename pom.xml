@@ -29,8 +29,6 @@
 
 	<modules>
 		<module>core</module>
-		<module>gui</module>
-		<module>gui-swt</module>
 		<module>pulsar</module>
 		<module>snowflake</module>
 		<module>tokens</module>
