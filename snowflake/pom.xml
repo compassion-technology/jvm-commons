@@ -13,7 +13,7 @@
 	<name>Compassion JVM Commons - Snowflake</name>
 
 	<properties>
-		<jooq.version>3.19.8</jooq.version>
+		<jooq.version>3.19.17</jooq.version>
 	</properties>
 
 	<dependencies>
@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>net.snowflake</groupId>
 			<artifactId>snowflake-jdbc-thin</artifactId>
-			<version>3.16.0</version>
+			<version>3.21.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.cloud</groupId>
@@ -66,19 +66,19 @@
 		<dependency>
 		    <groupId>org.xerial</groupId>
 		    <artifactId>sqlite-jdbc</artifactId>
-		    <version>3.45.3.0</version>
+		    <version>3.47.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<version>2.2.224</version>
+			<version>2.3.232</version>
 		</dependency>
 
 		<!-- Needed for annotating config -->
 		<dependency>
    			<groupId>net.almson</groupId>
    			<artifactId>mbknor-jackson-jsonschema-java</artifactId>
-   			<version>1.1.1</version>
+   			<version>1.1.2</version>
 		</dependency>
 	</dependencies>
 </project>

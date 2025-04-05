@@ -1,6 +1,7 @@
 package com.compassion.commons.cli;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,6 +24,16 @@ public class CLIStringSet extends LinkedHashSet<String> {
 	
 	public CLIStringSet(Iterable<?> iter) {
 		for (var o : iter) { add(o.toString()); }
+	}
+	
+	/**
+	 * Trim all the elements in this set. This can be helpful if the user separated
+	 * the elements with ", " in the configuration.
+	 */
+	public void trim() {
+		var copy = List.copyOf(this);
+    	clear();
+    	copy.forEach($ -> add($.trim()));
 	}
 
 	@JsonCreator
