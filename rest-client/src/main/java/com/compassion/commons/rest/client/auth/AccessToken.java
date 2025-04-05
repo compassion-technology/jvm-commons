@@ -17,9 +17,9 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public abstract class AccessToken {
 	public static IAccessToken acquire(RestClient client, OAuthMethod method, OAuthAwareConfig config) throws IOException {
-		log.info("Acquiring new access token for {}", config.baseUrl());
+		log.info("Acquiring new access token at {}", config.authUrl());
 		
-		var ret = client.request(RecursiveTarget.newTarget(config.baseUrl()), config.authCreds())
+		var ret = client.request(RecursiveTarget.newTarget(config.authUrl()), config.authCreds())
 			.post(method.getRequestBody());
 		
 		if (ret.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
@@ -47,6 +47,6 @@ public abstract class AccessToken {
 		WebParam authCreds();
 		WebParam sessionCreds();
 		String getScope();
-		String baseUrl();
+		String authUrl();
 	}
 }
