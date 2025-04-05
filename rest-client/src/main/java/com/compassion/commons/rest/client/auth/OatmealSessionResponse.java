@@ -30,7 +30,7 @@ public class OatmealSessionResponse implements IAccessToken {
 	
 	@Override
 	public Boolean checkActive() {
-		return accessToken != null && System.currentTimeMillis() > getExpiresAfter();
+		return accessToken != null && System.currentTimeMillis() <= getExpiresAfter();
 	}
 
 	@Override
