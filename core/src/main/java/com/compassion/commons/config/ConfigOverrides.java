@@ -96,23 +96,15 @@ public class ConfigOverrides {
 	            var objNode = (ObjectNode) parent;
 	            var prop = last(path);
 
+	            applyOverrides(env, path, node, $ -> objNode.replace(prop, $));
+	            
 	            if (node.isArray()) {
 	            	var arr = (ArrayNode) node;
-	        		applyOverrides(env, path, node, override -> {
-	        			if (override.isArray()) {
-	        				objNode.replace(prop, override);
-	        			} else {
-	        				arr.add(override);
-	        			}
-	        		});
-
 	        		var idx = new MutableInt();
 	            	for (var child : node) {
 	            		applyOverrides(env, path.appendIndex(idx.intValue()), child, $ -> arr.set(idx.intValue(), $));
 	            		idx.increment();
 	            	}
-	            } else {
-	            	applyOverrides(env, path, node, $ -> objNode.replace(prop, $));
 	            }
 	        }
 	        ret = Utilities.cast(om.treeToValue(tree, obj.getClass()));
