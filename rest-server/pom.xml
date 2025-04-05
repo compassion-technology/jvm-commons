@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.compassion</groupId>
 		<artifactId>jvm-commons-parent</artifactId>
-		<version>5.8.9-jersey2</version>
+		<version>5.8.11-jersey2</version>
 	</parent>
 
 	<artifactId>jvm-commons-rest-server</artifactId>
