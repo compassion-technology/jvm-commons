@@ -22,7 +22,7 @@ public class PlaceholderMapper extends ObjectMapper {
 	private static final long serialVersionUID = 1L;
 
 	public PlaceholderMapper() {
-		setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+		setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE);
 		_serializerProvider.setNullValueSerializer(new NullAsEmptySerializer());
 	}
 	
