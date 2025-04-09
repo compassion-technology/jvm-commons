@@ -18,9 +18,4 @@ public enum CIEnvironment {
 	public String newPath(String... paths) {
 		return pathSep + StringUtils.join(Seq.of(toString().toLowerCase()).append(paths), pathSep);
 	}
-	
-	@Override
-	public String toString() {
-		return super.toString().toUpperCase();
-	}
 }
