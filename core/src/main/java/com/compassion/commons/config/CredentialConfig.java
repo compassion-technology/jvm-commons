@@ -99,6 +99,8 @@ public interface CredentialConfig {
         	String getPrivateKey();
         	@JsonSerialize(using = PasswordSerializer.class)
         	String getSignature();
+        	@JsonSerialize(using = PasswordSerializer.class)
+        	String getPublicKey();
         }
     }
 	
