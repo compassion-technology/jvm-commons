@@ -48,6 +48,6 @@ public class SiteUtils {
 	 * @return the string with any newlines replaced with an HTML line break tag
 	 */
 	public static String preserveNewlines(String s) {
-		return StringUtils.replace(s, "\n", "<br/>");
+		return StringUtils.remove(StringUtils.replace(s, "\n", "<br/>"), '\r');
 	}
 }
