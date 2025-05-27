@@ -40,7 +40,7 @@ public interface CredentialConfig {
 		
 		@Override
 		public void forEachCredentialPath(Consumer<String> withSecretPath) {
-			withSecretPath.accept("apiKey");
+			withSecretPath.accept("api_key");
 		}
 		
 		public interface Mixin {
@@ -89,8 +89,8 @@ public interface CredentialConfig {
         
         @Override
         public void forEachCredentialPath(Consumer<String> withSecretPath) {
-        	withSecretPath.accept("privateKey");
-        	withSecretPath.accept("publicKey");
+        	withSecretPath.accept("private_key");
+        	withSecretPath.accept("public_key");
             withSecretPath.accept("signature");
         }
         
@@ -113,8 +113,8 @@ public interface CredentialConfig {
 		@Override
 		public void forEachCredentialPath(Consumer<String> withSecretPath) {
 			super.forEachCredentialPath(withSecretPath);
-			withSecretPath.accept("privateKey");
-			withSecretPath.accept("publicKey");
+			withSecretPath.accept("private_key");
+			withSecretPath.accept("public_key");
 		}
 		
 		public interface Mixin extends ConfigWithUserPassword.Mixin, ConfigWithToken.Mixin {
@@ -130,8 +130,8 @@ public interface CredentialConfig {
 		
 		@Override
 		public void forEachCredentialPath(Consumer<String> withSecretPath) {
-			withSecretPath.accept("clientSecret");
-			withSecretPath.accept("clientId");
+			withSecretPath.accept("client_secret");
+			withSecretPath.accept("client_id");
 		}
 		
 		public interface Mixin {
