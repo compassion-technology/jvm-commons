@@ -70,7 +70,7 @@ public abstract class RestApplication<C extends Configuration> extends Applicati
 		val j = environment.jersey();
 		j.register(MultiPartFeature.class);
 		j.register(CSVMessageWriter.class);
-		registerResources(config, apis -> {
+		registerResources(config, environment, apis -> {
 			for (val api : apis) { j.register(api); } 
 		});
 	}
@@ -78,9 +78,10 @@ public abstract class RestApplication<C extends Configuration> extends Applicati
 	/**
 	 * Invoke the callback with any resources that should be registered with the Jersey environment.
 	 * @param c the application config
+	 * @param env the application environment
 	 * @param r the callback to invoke to register each resource
 	 */
-	protected abstract void registerResources(C c, Registrar r);
+	protected abstract void registerResources(C c, Environment env, Registrar r);
 	
 	@FunctionalInterface
 	protected interface Registrar {
