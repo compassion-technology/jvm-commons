@@ -13,6 +13,7 @@ import jakarta.ws.rs.core.UriInfo;
  * @since Mar 1, 2017
  */
 public abstract class RestResource {
+	public static final String TEXT_YAML = "text/yaml";
 	public static final String TEXT_CSV = "text/csv";
 	public static final String APPLICATION_CSV = "application/csv";
 	
