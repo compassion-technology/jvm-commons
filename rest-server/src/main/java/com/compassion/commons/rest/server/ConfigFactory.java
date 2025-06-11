@@ -71,7 +71,7 @@ public class ConfigFactory<C extends Config> extends YamlConfigurationFactory<C>
 		@Override @SuppressWarnings("resource")
 		public ConfigurationFactory<T> create(Class<T> klass, Validator validator, ObjectMapper mapper, String dwPrefix) {
 			var ret = new ConfigFactory<>(klass, validator, configureObjectMapper(mapper), StringUtils.defaultIfBlank(prefix, dwPrefix));
-			ret.setOverrides((config, $) -> $.with(new ParamStoreEnvironment().enabled(config::isSsm)));
+			ret.setOverrides((config, $) -> $.with(new ParamStoreEnvironment(prefix).enabled(config::isSsm)));
 			return ret;
 		}
 	}
