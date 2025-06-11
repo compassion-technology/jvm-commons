@@ -40,16 +40,6 @@ public abstract class RestApplication<C extends Configuration> extends Applicati
 	}
 	
 	@Override
-	protected void bootstrapLogging() {
-		// This method (when not overridden) bombs start up because we are also using Log4j. Eventually, we would like
-		// to remove all slf4j impls and leave the log4j impl of slf4j, but there still were import statments into
-		// logback-classic as of Dropwizard 1.2.0. See:
-		// http://www.dropwizard.io/1.2.0/docs/manual/core.html#logging
-		// https://github.com/dropwizard/dropwizard/pull/2112
-		// https://github.com/dropwizard/dropwizard/pull/1900
-	}
-	
-	@Override
 	public void initialize(Bootstrap<C> bootstrap) {
 		bootstrap.addBundle(new AssetsBundle(docsPath, docsUri, "index.html"));
 		bootstrap.setConfigurationSourceProvider(new SubstitutingSourceProvider(
