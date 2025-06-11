@@ -132,4 +132,16 @@ public class ConfigOverrides {
 		int i = p.toString().lastIndexOf(JsonPointer.SEPARATOR);
 		return p.toString().substring(i + 1);
 	}
+	
+	public static ConfigOverrides compose(ConfigOverrides... overrides) {
+		return new ConfigOverrides() {
+			@Override
+			public <T> T applyOverrides(ObjectMapper om, T obj) throws IOException {
+				for (var o : overrides) {
+					obj = o.applyOverrides(om, obj);
+				}
+				return obj;
+			}
+		};
+	}
 }
