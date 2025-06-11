@@ -1,13 +1,15 @@
 package com.compassion.commons.rest.server;
 
 import java.io.IOException;
-import java.util.function.UnaryOperator;
+import java.util.function.BiFunction;
 
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import com.compassion.commons.config.Config;
 import com.compassion.commons.config.ConfigOverrides;
+import com.compassion.commons.config.ParamStoreEnvironment;
+import com.compassion.commons.config.ParamStoreEnvironment.ParamStoreAwareConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
@@ -34,7 +36,7 @@ public class ConfigFactory<C extends Config> extends YamlConfigurationFactory<C>
 	@Setter
 	private ObjectMapper loggingMapper = new YAMLMapper().findAndRegisterModules();
 	@Setter
-	private UnaryOperator<ConfigOverrides> overrides = $ -> $.withEnvironmentVariables().withSystemProperties();
+	private BiFunction<C, ConfigOverrides, ConfigOverrides> overrides = (config, $) -> $.withEnvironmentVariables().withSystemProperties();
 	
 	public ConfigFactory(Class<C> klass, @Nullable Validator validator, ObjectMapper objectMapper,
 			String propertyPrefix) {
@@ -45,7 +47,7 @@ public class ConfigFactory<C extends Config> extends YamlConfigurationFactory<C>
 	@Override
 	public C build(ConfigurationSourceProvider provider, String path) throws IOException, ConfigurationException {
 		var ret = super.build(provider, path);
-		ret = Config.load(log, mapper, ret, overrides.apply(ConfigOverrides.forPrefixes(prefix)));
+		ret = Config.load(log, mapper, ret, overrides.apply(ret, ConfigOverrides.forPrefixes(prefix)));
 		if (loggingMapper != null) {
 			ret.logConfig(loggingMapper);
 		}
@@ -59,6 +61,18 @@ public class ConfigFactory<C extends Config> extends YamlConfigurationFactory<C>
 		@Override
 		public ConfigurationFactory<T> create(Class<T> klass, Validator validator, ObjectMapper mapper, String dwPrefix) {
 			return new ConfigFactory<>(klass, validator, configureObjectMapper(mapper), StringUtils.defaultIfBlank(prefix, dwPrefix));
+		}
+	}
+	
+	@RequiredArgsConstructor
+	public static class SSMConfigFactoryFactory<T extends Config & ParamStoreAwareConfig> extends DefaultConfigurationFactoryFactory<T> {
+		private final String prefix;
+		
+		@Override @SuppressWarnings("resource")
+		public ConfigurationFactory<T> create(Class<T> klass, Validator validator, ObjectMapper mapper, String dwPrefix) {
+			var ret = new ConfigFactory<>(klass, validator, configureObjectMapper(mapper), StringUtils.defaultIfBlank(prefix, dwPrefix));
+			ret.setOverrides((config, $) -> $.with(new ParamStoreEnvironment().enabled(config::isSsm)));
+			return ret;
 		}
 	}
 }
