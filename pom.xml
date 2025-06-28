@@ -19,7 +19,7 @@
 
 	<artifactId>jvm-commons-parent</artifactId>
 	<name>Compassion JVM Commons Parent</name>
-	<version>5.9.2-SNAPSHOT</version>
+	<version>5.9.3-SNAPSHOT</version>
 	<inceptionYear>2023</inceptionYear>
 	<packaging>pom</packaging>
 
