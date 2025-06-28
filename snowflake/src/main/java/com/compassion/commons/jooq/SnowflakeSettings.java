@@ -1,6 +1,7 @@
 package com.compassion.commons.jooq;
 
 import org.jooq.conf.ParamCastMode;
+import org.jooq.conf.RenderQuotedNames;
 import org.jooq.conf.Settings;
 
 public class SnowflakeSettings extends Settings {
@@ -13,5 +14,7 @@ public class SnowflakeSettings extends Settings {
 		withReturnRecordToPojo(false);
 		// We often use the wrong dialect, like Postgres, which casts columns to PG specific types
 		withParamCastMode(ParamCastMode.NEVER);
+		// Don't double quote names unless necessary
+		withRenderQuotedNames(RenderQuotedNames.EXPLICIT_DEFAULT_UNQUOTED);
 	}
 }
