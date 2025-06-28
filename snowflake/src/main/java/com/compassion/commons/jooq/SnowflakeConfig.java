@@ -1,12 +1,11 @@
 package com.compassion.commons.jooq;
 
-import java.sql.Connection;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.text.StringSubstitutor;
+import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
-import org.jooq.exception.DataAccessException;
+import org.jooq.conf.Settings;
 
 import com.compassion.commons.jdbc.JDBCDriver;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -89,7 +88,9 @@ public class SnowflakeConfig extends JOOQDatabaseConfig {
 	}
 	
 	@Override
-	public Connection acquire() throws DataAccessException {
+	public DSLContext newContext(Settings settings) {
+		setHostURL(getHostURL());
+		
 		// Set c3p0 props now before the first connection is opened
 		System.setProperty("c3p0.minPoolSize", String.valueOf(getMinConnections()));
 		System.setProperty("c3p0.initialPoolSize", String.valueOf(getMinConnections()));
@@ -102,6 +103,6 @@ public class SnowflakeConfig extends JOOQDatabaseConfig {
 		System.setProperty("net.snowflake.jdbc.loggerImpl", "net.snowflake.client.log.SLF4JLogger");
 		
 		log.debug("Opening new connection to Snowflake...");
-		return super.acquire();
+		return super.newContext(settings);
 	}
 }
