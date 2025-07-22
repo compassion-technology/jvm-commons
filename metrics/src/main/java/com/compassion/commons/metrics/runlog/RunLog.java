@@ -1,16 +1,16 @@
 package com.compassion.commons.metrics.runlog;
 
-import static org.jooq.generated.tables._CiRunLog._CI_RUN_LOG;
+import static com.compassion.commons.metrics.runlog.sql.tables._CiRunLog._CI_RUN_LOG;
 
 import java.time.OffsetDateTime;
 import java.util.function.Consumer;
 
-import org.jooq.generated.tables.daos._CiRunLogDao;
-import org.jooq.generated.tables.interfaces.I_CiRunLog;
-import org.jooq.generated.tables.pojos._CiRunLog;
 import org.jooq.impl.DSL;
 
 import com.compassion.commons.jdbc.JDBCUtils;
+import com.compassion.commons.metrics.runlog.sql.tables.daos._CiRunLogDao;
+import com.compassion.commons.metrics.runlog.sql.tables.interfaces.I_CiRunLog;
+import com.compassion.commons.metrics.runlog.sql.tables.pojos._CiRunLog;
 import com.google.common.collect.Comparators;
 
 public class RunLog {
