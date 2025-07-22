@@ -17,7 +17,7 @@
 		<jooq.package>${project.groupId}.commons.metrics.runlog.sql</jooq.package>
 		<jooq.source.dir>${project.basedir}/src/main/sql/ci_metrics</jooq.source.dir>
 		<jooq.target.dir>${project.generatedSource.directory}/jooq</jooq.target.dir>
-		<lombok.src.dir>${project.generatedSource.directory}/java</lombok.src.dir>
+		<lombok.src.dir>${project.generatedSource.directory}/jooq</lombok.src.dir>
 	</properties>
 
 	<dependencies>
