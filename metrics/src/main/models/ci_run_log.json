@@ -299,6 +299,33 @@
           "code": "TIMESTAMP_MAX_WRITTEN",
           "description": "For each records that was written to the target, the most recent timestamp represented by each record, like a last modified timestamp. This is helpful for calculating data \"freshness\" written to the target.",
           "error": {}
+        },
+        {
+          "name": "Details",
+          "hackoladeMeta": {},
+          "isActivated": true,
+          "autoincrement": {
+            "step_num": 1
+          },
+          "tPrecision": 9,
+          "primaryKey": false,
+          "required": false,
+          "childType": "varchar",
+          "type": "string",
+          "compositeKey": [
+            "clusteringKey",
+            "partitioningKey",
+            "compositePrimaryKey",
+            "compositeUniqueKey"
+          ],
+          "clusteringKey": false,
+          "partitioningKey": false,
+          "compositePrimaryKey": false,
+          "GUID": "aaffb01b-3ad0-49ca-a2d5-243c939bba06",
+          "code": "DETAILS",
+          "description": "More details/information about the job if applicable.",
+          "length": 100000,
+          "error": {}
         }
       ],
       "definitions": {
@@ -351,7 +378,8 @@
     "a014e355-55f9-4555-9bb3-b79f851acae0": "Max Timestamp Read",
     "c1ba2ebd-8794-4621-971b-56d9bfe3aa8f": "Max Timestamp Written",
     "45210415-6950-41e6-b8c2-28b6e7bf49e7": "Phase",
-    "8b98fe3d-7231-4bf3-b535-e06fdfe13bd4": "Run Log"
+    "8b98fe3d-7231-4bf3-b535-e06fdfe13bd4": "Run Log",
+    "aaffb01b-3ad0-49ca-a2d5-243c939bba06": "Details"
   },
   "definitions": {
     "type": "definitions",
@@ -375,7 +403,7 @@
   "creationTS": "2025-07-17T17:08:22.682Z",
   "GUID": "1e0ed205-7679-49cb-b4de-9fd2a2e2b5e9",
   "isLineageEnabled": false,
-  "lastModifTS": "2025-07-17T21:29:41.431Z",
+  "lastModifTS": "2025-07-22T14:11:59.443Z",
   "persistenceSchemaVersion": "8",
   "isCreatedByPlugin": true,
   "pluginInformation": {
@@ -401,8 +429,8 @@
             "GUID": "b2ba3adb-eee6-4044-b7c0-fc2d01872235",
             "x": 1202,
             "y": 1317,
-            "width": 327,
-            "height": 231,
+            "width": 340,
+            "height": 249,
             "color": {}
           }
         ],

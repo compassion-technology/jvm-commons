@@ -13,4 +13,5 @@ CREATE TABLE
 		TIMESTAMP_START TIMESTAMP WITH TIME ZONE COMMENT $$The timestamp that the job began executing.$$,
 		TIMESTAMP_END TIMESTAMP WITH TIME ZONE COMMENT $$The timestamp that the job stopped executing.$$,
 		TIMESTAMP_MAX_READ TIMESTAMP WITH TIME ZONE COMMENT $$For each records that was read from the source, the most recent timestamp represented by each record, like a last modified timestamp. This is helpful for calculating data "freshness" read from the source.$$,
-		TIMESTAMP_MAX_WRITTEN TIMESTAMP WITH TIME ZONE COMMENT $$For each records that was written to the target, the most recent timestamp represented by each record, like a last modified timestamp. This is helpful for calculating data "freshness" written to the target.$$);
+		TIMESTAMP_MAX_WRITTEN TIMESTAMP WITH TIME ZONE COMMENT $$For each records that was written to the target, the most recent timestamp represented by each record, like a last modified timestamp. This is helpful for calculating data "freshness" written to the target.$$,
+		DETAILS VARCHAR(100000) COMMENT $$More details/information about the job if applicable.$$);
