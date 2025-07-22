@@ -8,8 +8,11 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.sql.Wrapper;
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jooq.AttachableQueryPart;
+import org.jooq.DSLContext;
 
 import com.compassion.commons.LambdaUtils;
 import com.compassion.commons.Utilities;
@@ -317,6 +320,26 @@ public final class JDBCUtils {
 		val cs = c.prepareCall(sb.append(")}").toString());
 		if (retType != Types.NULL) { cs.registerOutParameter(1, retType); }
 		return cs;
+	}
+	
+	/**
+	 * Remove Postgres specific {@code do $$ BEGIN ... END $$$} syntax leaving just {@code BEGIN ... END} which Snowflake and other databases understand.
+	 * @param sql the JOOQ context
+	 * @param q the query
+	 */
+	public static void executeBlock(DSLContext sql, AttachableQueryPart q) {
+		executeBlock(sql, q, UnaryOperator.identity());
+	}
+	
+	/**
+	 * Remove Postgres specific {@code do $$ BEGIN ... END $$$} syntax leaving just {@code BEGIN ... END} which Snowflake and other databases understand.
+	 * @param sql the JOOQ context
+	 * @param q the query
+	 * @param hackSQL any additional modifications with the raw SQL - use with caution since this does
+	 * not protect against SQL injection
+	 */
+	public static void executeBlock(DSLContext sql, AttachableQueryPart q, UnaryOperator<String> hackSQL) {
+		sql.execute(hackSQL.apply(StringUtils.removeEnd(StringUtils.removeStart(q.getSQL(), "do $$ "), " $$")));
 	}
 
 	/**

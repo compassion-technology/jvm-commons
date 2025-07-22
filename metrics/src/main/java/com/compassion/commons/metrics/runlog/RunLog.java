@@ -8,16 +8,23 @@ import java.util.function.Consumer;
 import org.jooq.generated.tables.daos._CiRunLogDao;
 import org.jooq.generated.tables.interfaces.I_CiRunLog;
 import org.jooq.generated.tables.pojos._CiRunLog;
+import org.jooq.impl.DSL;
 
+import com.compassion.commons.jdbc.JDBCUtils;
 import com.google.common.collect.Comparators;
 
 public class RunLog {
 	private final _CiRunLogDao dao;
 	private _CiRunLog stats = new _CiRunLog();
 	
-	public RunLog(_CiRunLogDao dao) {
+	public RunLog(String database, String schema, _CiRunLogDao dao) {
 		this.dao = dao;
-		dao.ctx().createTableIfNotExists(_CI_RUN_LOG).execute();
+		
+		JDBCUtils.executeBlock(dao.ctx(), dao.ctx()
+			.createTableIfNotExists(DSL.name(database, schema, _CI_RUN_LOG.getName()))
+			.columns(_CI_RUN_LOG.fields()), $ -> $
+			.replace("timestamp(6) with time zone", "timestamp_tz")
+			.replace("ID int", "ID int AUTOINCREMENT INCREMENT 1"));
 	}
 	
 	public void set(Consumer<I_CiRunLog> callback) {
