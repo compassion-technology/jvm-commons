@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.compassion</groupId>
 		<artifactId>jvm-commons-parent</artifactId>
-		<version>5.9.3-SNAPSHOT</version>
+		<version>5.9.3</version>
 	</parent>
 
 	<artifactId>jvm-commons-rest-client</artifactId>
