@@ -11,18 +11,19 @@
 
 	<artifactId>jvm-commons-metrics</artifactId>
 	<name>Compassion JVM Commons - Metrics</name>
+	
+	<properties>
+		<jooq.version>3.19.17</jooq.version>
+		<jooq.source.dir>${project.basedir}/src/main/sql/ci_metrics</jooq.source.dir>
+		<jooq.target.dir>${project.generatedSource.directory}/jooq</jooq.target.dir>
+		<lombok.src.dir>${project.generatedSource.directory}/java</lombok.src.dir>
+	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>jvm-commons</artifactId>
+			<artifactId>jvm-commons-snowflake</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-		    <groupId>org.apache.commons</groupId>
-		    <artifactId>commons-statistics-descriptive</artifactId>
-		    <version>1.1</version>
 		</dependency>
 
 		<dependency>
@@ -31,4 +32,61 @@
 			<version>2.10.0</version>
 		</dependency>
 	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.jooq</groupId>
+				<artifactId>jooq-codegen-maven</artifactId>
+				<version>${jooq.version}</version>
+
+				<executions>
+					<execution>
+						<goals><goal>generate</goal></goals>
+					</execution>
+				</executions>
+
+				<dependencies>
+					<dependency>
+						<groupId>org.jooq</groupId>
+						<artifactId>jooq-meta-extensions</artifactId>
+						<version>${jooq.version}</version>
+					</dependency>
+				</dependencies>
+
+				<configuration>
+					<generator>
+						<generate>
+							<daos>true</daos>
+							<interfaces>true</interfaces>
+							<globalObjectReferences>false</globalObjectReferences>
+							<fluentSetters>true</fluentSetters>
+							<varargSetters>false</varargSetters>
+							<comments>true</comments>
+							<pojosEqualsAndHashCode>true</pojosEqualsAndHashCode>
+						</generate>
+						<database>
+							<name>org.jooq.meta.extensions.ddl.DDLDatabase</name>
+							<schemaVersionProvider>${project.version}</schemaVersionProvider>
+							<properties>
+								<property>
+									<key>scripts</key>
+									<value>${jooq.source.dir}/*.sql</value>
+								</property>
+								<property>
+									<key>defaultNameCase</key>
+									<value>UPPER</value>
+								</property>
+							</properties>
+							<inputSchema>RUN_LOG</inputSchema>
+						</database>
+						<target>
+							<directory>${jooq.target.dir}</directory>
+							<packageName>${jooq.package}</packageName>
+						</target>
+					</generator>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
