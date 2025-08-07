@@ -55,6 +55,13 @@
 			<groupId>io.dropwizard</groupId>
 			<artifactId>dropwizard-forms</artifactId>
 		</dependency>
+		
+		<!-- Basic API key authentication via AWS API Gateway -->
+		<dependency>
+		    <groupId>software.amazon.awssdk</groupId>
+    		<artifactId>apigateway</artifactId>
+    		<version>2.32.16</version>
+		</dependency>
 
 		<!-- CSV response support -->
 		<dependency>
