@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import com.compassion.commons.Utilities;
 import com.compassion.commons.config.CIEnvironment;
 
 import io.dropwizard.auth.AuthenticationException;
