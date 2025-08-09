@@ -17,7 +17,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>33.4.0-jre</version>
+			<version>33.4.8-jre</version>
 			<exclusions>
 				<!-- See https://groups.google.com/forum/#!topic/guava-discuss/AKBGPca9unw -->
 				<exclusion>
@@ -42,7 +42,7 @@
 		<dependency>
 		    <groupId>info.picocli</groupId>
 		    <artifactId>picocli</artifactId>
-		    <version>4.7.6</version>
+		    <version>4.7.7</version>
 		</dependency>
 
 		<!-- Vault password overrides -->
@@ -61,7 +61,7 @@
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>ssm</artifactId>
-			<version>2.29.51</version>
+			<version>${aws.sdk.version}</version>
 		</dependency>
 		
 		<!-- Config overrides from a Lambda context -->
@@ -76,14 +76,14 @@
 		<dependency>
 			<groupId>org.fusesource.jansi</groupId>
 			<artifactId>jansi</artifactId>
-			<version>2.4.1</version>
+			<version>2.4.2</version>
 		</dependency>
 		
 		<!-- Parse POMs to get version when running in IDE/from source code -->
 		<dependency>
     		<groupId>org.apache.maven</groupId>
     		<artifactId>maven-model</artifactId>
-    		<version>3.9.9</version>
+    		<version>3.9.11</version>
 		</dependency>
 
 		<!-- Unit tests -->
