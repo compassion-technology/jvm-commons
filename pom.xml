@@ -11,7 +11,7 @@
 
 	<repositories>
 		<repository>
-			<id>github-maven</id>
+			<id>github</id>
 			<name>GitHub Maven Packages - CI</name>
 			<url>https://maven.pkg.github.com/compassion-technology</url>
 		</repository>
