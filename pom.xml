@@ -13,7 +13,7 @@
 		<repository>
 			<id>github</id>
 			<name>GitHub Maven Packages - CI</name>
-			<url>https://maven.pkg.github.com/compassion-technology</url>
+			<url>https://maven.pkg.github.com/compassion-technology/maven-parent</url>
 		</repository>
 	</repositories>
 
