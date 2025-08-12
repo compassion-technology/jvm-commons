@@ -10,4 +10,4 @@ jobs:
   build:
     uses: compassion-technology/maven-parent/.github/workflows/maven.yml@main
     secrets:
-      token: ${{ secrets.GITHUB_TOKEN }}
+      token: ${{ secrets.GH_PACKAGES_NPM_TOKEN }}
