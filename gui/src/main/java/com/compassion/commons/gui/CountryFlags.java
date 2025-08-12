@@ -5,8 +5,8 @@ import java.lang.reflect.Field;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import com.compassion.commons.ReflectionUtils;
-import com.elderresearch.commons.icons.eri.IconsERI;
-import com.elderresearch.commons.icons.eri.IconsFlags;
+import com.compassion.commons.gui.icons.IconsERI;
+import com.compassion.commons.gui.icons.IconsFlags;
 
 import lombok.experimental.UtilityClass;
 
