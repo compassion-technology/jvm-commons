@@ -1,10 +1,13 @@
 name: Java CI with Maven
  
-jobs:
-  build:
-    uses: compassion-technology/maven-parent/.github/workflows/maven.yml@main
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+
+jobs:
+  build:
+    uses: compassion-technology/maven-parent/.github/workflows/maven.yml@main
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
