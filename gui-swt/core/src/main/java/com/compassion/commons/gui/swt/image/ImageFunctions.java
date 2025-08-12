@@ -24,9 +24,9 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Transform;
 
 import com.compassion.commons.Utilities;
+import com.compassion.commons.gui.icons.IconSerializer;
 import com.compassion.commons.gui.swt.util.ResourceManager;
 import com.compassion.commons.gui.swt.util.SWTUtilities;
-import com.elderresearch.commons.icons.utils.IconSerializer;
 
 public class ImageFunctions {
 	private ImageData data;

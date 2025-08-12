@@ -30,14 +30,14 @@ import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
+import com.compassion.commons.gui.icons.IconsERI;
+import com.compassion.commons.gui.icons.IconsMS;
 import com.compassion.commons.gui.swt.controls.builders.SWTBuilders;
 import com.compassion.commons.gui.swt.events.MouseDownLambda;
 import com.compassion.commons.gui.swt.events.ResizeLambda;
 import com.compassion.commons.gui.swt.events.SelectionLambda;
 import com.compassion.commons.gui.swt.util.ResourceManager;
 import com.compassion.commons.gui.swt.util.SWTUtilities;
-import com.elderresearch.commons.icons.eri.IconsERI;
-import com.elderresearch.commons.icons.ms.IconsMS;
 
 import lombok.val;
 

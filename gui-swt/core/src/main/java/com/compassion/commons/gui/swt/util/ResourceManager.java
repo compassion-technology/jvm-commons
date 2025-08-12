@@ -26,11 +26,11 @@ import org.eclipse.swt.widgets.Display;
 import org.jooq.lambda.Seq;
 
 import com.compassion.commons.Utilities;
+import com.compassion.commons.gui.icons.IconSerializer;
 import com.compassion.commons.gui.swt.image.ImageFunctions;
-import com.compassion.commons.gui.swt.image.ImageScaler;
 import com.compassion.commons.gui.swt.image.ImageFunctions.ImageMode;
+import com.compassion.commons.gui.swt.image.ImageScaler;
 import com.compassion.commons.gui.swt.image.ImageScaler.SamplingMethod;
-import com.elderresearch.commons.icons.utils.IconSerializer;
 
 import lombok.val;
 import lombok.extern.log4j.Log4j2;

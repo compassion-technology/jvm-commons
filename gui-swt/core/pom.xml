@@ -11,26 +11,11 @@
 	<name>Compassion JVM Commons - GUI SWT (Core)</name>
 	<artifactId>jvm-commons-gui-swt-core</artifactId>
 
-	<properties>
-		<eri.icons.version>1.2.0</eri.icons.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>jvm-commons-gui</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.elderresearch.commons</groupId>
-			<artifactId>eri-commons-icons-ms2003-16</artifactId>
-			<version>${eri.icons.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.elderresearch.commons</groupId>
-			<artifactId>eri-commons-icons-utils</artifactId>
-			<version>${eri.icons.version}</version>
 		</dependency>
 
 		<dependency>

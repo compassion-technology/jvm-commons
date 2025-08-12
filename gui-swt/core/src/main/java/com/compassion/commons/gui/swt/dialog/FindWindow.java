@@ -25,11 +25,11 @@ import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
+import com.compassion.commons.gui.icons.IconsMS;
 import com.compassion.commons.gui.swt.controls.builders.SWTBuilders;
 import com.compassion.commons.gui.swt.util.MnemonicUtils;
 import com.compassion.commons.gui.swt.util.ResourceManager;
 import com.compassion.commons.gui.swt.util.SWTUtilities;
-import com.elderresearch.commons.icons.ms.IconsMS;
 
 /**
  * A general "find" dialog box that is stylistically similar to those dialogs accessible

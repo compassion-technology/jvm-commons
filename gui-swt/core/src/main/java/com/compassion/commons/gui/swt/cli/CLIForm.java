@@ -16,12 +16,12 @@ import org.jooq.lambda.Seq;
 
 import com.compassion.commons.LambdaUtils;
 import com.compassion.commons.Utilities;
+import com.compassion.commons.gui.icons.IconsMS;
 import com.compassion.commons.gui.swt.controls.CScrolledComposite;
 import com.compassion.commons.gui.swt.controls.builders.SWTBuilders;
 import com.compassion.commons.gui.swt.util.MnemonicUtils;
 import com.compassion.commons.gui.swt.util.ResourceManager;
 import com.compassion.commons.gui.swt.util.SWTUtilities;
-import com.elderresearch.commons.icons.ms.IconsMS;
 
 import lombok.Getter;
 import picocli.CommandLine.Model.CommandSpec;

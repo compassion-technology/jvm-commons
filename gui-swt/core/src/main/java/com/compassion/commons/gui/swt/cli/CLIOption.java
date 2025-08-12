@@ -27,9 +27,9 @@ import org.jooq.lambda.Seq;
 
 import com.compassion.commons.LambdaUtils;
 import com.compassion.commons.Utilities;
+import com.compassion.commons.gui.icons.IconsERI;
 import com.compassion.commons.gui.swt.events.SelectionLambda;
 import com.compassion.commons.gui.swt.util.MnemonicUtils;
-import com.elderresearch.commons.icons.eri.IconsERI;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
